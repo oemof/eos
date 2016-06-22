@@ -98,7 +98,7 @@ logging.info('Create oemof objects')
 bgas = Bus(uid="bgas",
            type="gas",
            price=0,
-           sum_out_limit=45243/0.58*0.0,
+           sum_out_limit=45243/0.58*0.05,
            balanced=True,
            excess=False)
 
