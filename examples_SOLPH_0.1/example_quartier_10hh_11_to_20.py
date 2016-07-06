@@ -90,6 +90,11 @@ def optimise_storage_size(energysystem,
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
+    data_of_chosen_households = [data_load[str(hh[demand])]
+    for demand in ['demand_1', 'demand_2', 'demand_3', 'demand_4',
+                   'demand_5', 'demand_6', 'demand_7', 'demand_8',
+                   'demand_9', 'demand_10']]
+
     # read standardized feed-in from wind and pv
     data_re = pd.read_csv(
             "../example/example_data/example_data_re.csv", sep=',')
@@ -110,8 +115,9 @@ def optimise_storage_size(energysystem,
     Sink(label='excess_bel', inputs={bel: Flow()})
 
     # create commodity object for import electricity resource
-    Source(label='gridsource', outputs={bel: Flow(nominal_value=45243*grid_share,
-                                           summed_max=1)})
+    Source(label='gridsource', outputs={bel: Flow(nominal_value=np.sum(
+                                        data_of_chosen_households)*grid_share,
+                                        summed_max=1)})
 
     # create fixed source object for pv
     Source(label='pv', outputs={bel: Flow(actual_value=data_re['pv'],
