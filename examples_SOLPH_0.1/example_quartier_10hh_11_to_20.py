@@ -41,7 +41,7 @@ def initialise_energysystem(number_timesteps=8760):
 
 
 def optimise_storage_size(energysystem,
-                          solvername='gurobi'):
+                          solvername='cbc'):
 
     hh_start = 11
 
@@ -210,6 +210,12 @@ def get_result_dict(energysystem):
 
 
 def create_plots(energysystem):
+    logging.info('Plot results')
+    myresults = tpd.DataFramePlot(energy_system=energysystem)
+    gridsource = myresults.slice_by(obj_label='gridsource', type='input',
+                                    date_from='2012-01-01 00:00:00',
+                                    date_to='2012-12-31 23:00:00')
+
     imp = gridsource.sort_values(by='val', ascending=False).reset_index()
 
     imp.plot(linewidth=1.5)
