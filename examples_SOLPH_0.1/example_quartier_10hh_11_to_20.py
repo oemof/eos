@@ -17,6 +17,8 @@ Options:
                            pool. Counts 10 households up from start-hh.
                            [default: 11]
       --ssr=SSR            Self-sufficiency degree. [default: 0.7]
+      --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
+                           2010-2014. [default: 2010]
       --dry-run            Do nothing. Only print what would be done.
 
 '''
@@ -50,11 +52,12 @@ from oemof.solph import OperationalModel
 # import helper to read coastdat data
 from eos import helper_coastdat as hlp
 
-def initialise_energysystem(number_timesteps=8760):
+def initialise_energysystem(year, number_timesteps=8760):
     """initialize the energy system
     """
     logging.info('Initialize the energy system')
-    date_time_index = pd.date_range('1/1/2012', periods=number_timesteps,
+    date_time_index = pd.date_range('1/1/' + year,
+                                    periods=number_timesteps,
                                     freq='H')
 
     return core_es.EnergySystem(groupings=solph.GROUPINGS,
@@ -103,7 +106,7 @@ def optimise_storage_size(energysystem,
         'latitude': 53.41,
         'longitude': 11.84}    #Parchim
 
-    data_pv = hlp.get_pv_generation(year=2010,
+    data_pv = hlp.get_pv_generation(year=int(arguments['--year']),
                                     azimuth=180,
                                     tilt=30,
                                     albedo=0.2,
@@ -180,58 +183,58 @@ def optimise_storage_size(energysystem,
     return energysystem
 
 
-def get_result_dict(energysystem):
+def get_result_dict(energysystem, year):
     logging.info('Check the results')
     ces = energysystem.groups['ces']
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
     gridsource = myresults.slice_by(obj_label='gridsource', type='input',
-                                    date_from='2012-01-01 00:00:00',
-                                    date_to='2012-12-31 23:00:00')
+                                    date_from=year + '-01-01 00:00:00',
+                                    date_to=year + '-12-31 23:00:00')
 
     demand_1 = myresults.slice_by(obj_label='demand_1',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_2 = myresults.slice_by(obj_label='demand_2',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_3 = myresults.slice_by(obj_label='demand_3',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_4 = myresults.slice_by(obj_label='demand_4',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_5 = myresults.slice_by(obj_label='demand_5',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_6 = myresults.slice_by(obj_label='demand_6',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_7 = myresults.slice_by(obj_label='demand_7',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_8 = myresults.slice_by(obj_label='demand_8',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_9 = myresults.slice_by(obj_label='demand_9',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_10 = myresults.slice_by(obj_label='demand_10',
-                                   date_from='2012-01-01 00:00:00',
-                                   date_to='2012-12-31 23:00:00')
+                                   date_from=year + '-01-01 00:00:00',
+                                   date_to=year + '-12-31 23:00:00')
 
     pv = myresults.slice_by(obj_label='pv',
-                            date_from='2012-01-01 00:00:00',
-                            date_to='2012-12-31 23:00:00')
+                            date_from=year + '-01-01 00:00:00',
+                            date_to=year + '-12-31 23:00:00')
 
     return {'gridsource_sum': gridsource.sum(),
             'demand_sum_1': demand_1.sum(),
@@ -251,12 +254,12 @@ def get_result_dict(energysystem):
             }
 
 
-def create_plots(energysystem):
+def create_plots(energysystem, year):
     logging.info('Plot results')
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
     gridsource = myresults.slice_by(obj_label='gridsource', type='input',
-                                    date_from='2012-01-01 00:00:00',
-                                    date_to='2012-12-31 23:00:00')
+                                    date_from=year + '-01-01 00:00:00',
+                                    date_to=year + '-12-31 23:00:00')
 
     imp = gridsource.sort_values(by='val', ascending=False).reset_index()
 
@@ -267,13 +270,13 @@ def create_plots(energysystem):
 
 def main(**arguments):
     logger.define_logging()
-    esys = initialise_energysystem()
+    esys = initialise_energysystem(year=arguments['--year'])
     esys = optimise_storage_size(esys, **arguments)
     # esys.dump()
     # esys.restore()
     import pprint as pp
-    pp.pprint(get_result_dict(esys))
-    create_plots(esys)
+    pp.pprint(get_result_dict(esys, year=arguments['--year']))
+    create_plots(esys, year=arguments['--year'])
 
 
 if __name__ == "__main__":
