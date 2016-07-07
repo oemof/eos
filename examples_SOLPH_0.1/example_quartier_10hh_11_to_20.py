@@ -1,11 +1,25 @@
 # -*- coding: utf-8 -*-
 
-"""
-General description:
----------------------
+''' Example for simulating pv-battery systems in quarters
 
+Usage: example_quartier_10hh_11_to_20.py [options]
 
-"""
+Options:
+
+  -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
+                           or "gurobi".
+                           [default: gurobi]
+  -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
+                           WARNING, ERROR or CRITICAL.
+                           [default: ERROR]
+  -h, --help               Display this help.
+      --start-hh=STAR      Household to start when choosing from household
+                           pool. Counts 10 households up from start-hh.
+                           [default: 11]
+      --ssr=SSR            Self-sufficiency degree. [default: 0.7]
+      --dry-run            Do nothing. Only print what would be done.
+
+'''
 
 ###############################################################################
 # imports
@@ -14,6 +28,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import logging
+
+try:
+    from docopt import docopt
+except ImportError:
+    print("Unable to import docopt.\nIs the 'docopt' package installed?")
 
 # Outputlib
 from oemof.outputlib import to_pandas as tpd
@@ -40,10 +59,17 @@ def initialise_energysystem(number_timesteps=8760):
                                 time_idx=date_time_index)
 
 
-def optimise_storage_size(energysystem,
-                          solvername='gurobi'):
+def validate(**arguments):
+    valid = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    if arguments["--loglevel"] not in valid:
+        exit("Invalid loglevel: " + arguments["--loglevel"])
+    return arguments
 
-    hh_start = 11
+
+def optimise_storage_size(energysystem,
+                          **arguments):
+
+    hh_start = int(arguments['--start-hh'])
 
     hh_to_choose = np.arange(hh_start, hh_start+10)
 
@@ -64,6 +90,11 @@ def optimise_storage_size(energysystem,
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
+    data_of_chosen_households = [data_load[str(hh[demand])]
+    for demand in ['demand_1', 'demand_2', 'demand_3', 'demand_4',
+                   'demand_5', 'demand_6', 'demand_7', 'demand_8',
+                   'demand_9', 'demand_10']]
+
     # read standardized feed-in from wind and pv
     data_re = pd.read_csv(
             "../example/example_data/example_data_re.csv", sep=',')
@@ -72,7 +103,7 @@ def optimise_storage_size(energysystem,
     # Create oemof object
     ##########################################################################
 
-    ssr = 0.7  # noch als Uebergabewert implementieren
+    ssr = float(arguments['--ssr'])
     grid_share = 1 - ssr
 
     logging.info('Create oemof objects')
@@ -84,8 +115,9 @@ def optimise_storage_size(energysystem,
     Sink(label='excess_bel', inputs={bel: Flow()})
 
     # create commodity object for import electricity resource
-    Source(label='gridsource', outputs={bel: Flow(nominal_value=45243*grid_share,
-                                           summed_max=1)})
+    Source(label='gridsource', outputs={bel: Flow(nominal_value=np.sum(
+                                        data_of_chosen_households)*grid_share,
+                                        summed_max=1)})
 
     # create fixed source object for pv
     Source(label='pv', outputs={bel: Flow(actual_value=data_re['pv'],
@@ -129,7 +161,7 @@ def optimise_storage_size(energysystem,
     om = OperationalModel(energysystem, timeindex=energysystem.time_idx)
 
     logging.info('Solve the optimization problem')
-    om.solve(solver=solvername, solve_kwargs={'tee': True})
+    om.solve(solver=arguments['--solver'], solve_kwargs={'tee': True})
 
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',
@@ -210,6 +242,12 @@ def get_result_dict(energysystem):
 
 
 def create_plots(energysystem):
+    logging.info('Plot results')
+    myresults = tpd.DataFramePlot(energy_system=energysystem)
+    gridsource = myresults.slice_by(obj_label='gridsource', type='input',
+                                    date_from='2012-01-01 00:00:00',
+                                    date_to='2012-12-31 23:00:00')
+
     imp = gridsource.sort_values(by='val', ascending=False).reset_index()
 
     imp.plot(linewidth=1.5)
@@ -217,13 +255,22 @@ def create_plots(energysystem):
     plt.show()
 
 
-if __name__ == "__main__":
+def main(**arguments):
     logger.define_logging()
     esys = initialise_energysystem()
-    esys = optimise_storage_size(esys)
+    esys = optimise_storage_size(esys, **arguments)
     # esys.dump()
     # esys.restore()
     import pprint as pp
     pp.pprint(get_result_dict(esys))
     create_plots(esys)
 
+
+if __name__ == "__main__":
+    arguments = docopt(__doc__)
+    print(arguments)
+    if arguments["--dry-run"]:
+        print("This is a dry run. Exiting before doing anything.")
+        exit(0)
+    arguments = validate(**arguments)
+    main(**arguments)
