@@ -47,6 +47,8 @@ from oemof.solph import (Bus, Source, Sink, Flow, Storage)
 from oemof.solph.network import Investment
 from oemof.solph import OperationalModel
 
+# import helper to read coastdat data
+from eos import helper_coastdat as hlp
 
 def initialise_energysystem(number_timesteps=8760):
     """initialize the energy system
@@ -95,9 +97,17 @@ def optimise_storage_size(energysystem,
                    'demand_5', 'demand_6', 'demand_7', 'demand_8',
                    'demand_9', 'demand_10']]
 
-    # read standardized feed-in from wind and pv
-    data_re = pd.read_csv(
-            "../example/example_data/example_data_re.csv", sep=',')
+    # read standardized feed-in from pv
+    loc = {
+        'tz': 'Europe/Berlin',
+        'latitude': 53.41,
+        'longitude': 11.84}    #Parchim
+
+    data_pv = hlp.get_pv_generation(year=2010,
+                                    azimuth=180,
+                                    tilt=30,
+                                    albedo=0.2,
+                                    loc=loc)
 
     ##########################################################################
     # Create oemof object
@@ -120,7 +130,7 @@ def optimise_storage_size(energysystem,
                                         summed_max=1)})
 
     # create fixed source object for pv
-    Source(label='pv', outputs={bel: Flow(actual_value=data_re['pv'],
+    Source(label='pv', outputs={bel: Flow(actual_value=data_pv,
                                           nominal_value=100,
                                           fixed=True, fixed_costs=15)})
 
