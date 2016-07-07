@@ -35,7 +35,7 @@ except ImportError:
     print("Unable to import docopt.\nIs the 'docopt' package installed?")
 
 # Outputlib
-from oemof.outputlib import to_pandas as tpd
+from oemof import outputlib
 
 # Default logger of oemof
 from oemof.tools import logger
@@ -173,7 +173,7 @@ def optimise_storage_size(energysystem,
 def get_result_dict(energysystem):
     logging.info('Check the results')
     ces = energysystem.groups['ces']
-    myresults = tpd.DataFramePlot(energy_system=energysystem)
+    myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
     gridsource = myresults.slice_by(obj_label='gridsource', type='input',
                                     date_from='2012-01-01 00:00:00',
@@ -243,7 +243,7 @@ def get_result_dict(energysystem):
 
 def create_plots(energysystem):
     logging.info('Plot results')
-    myresults = tpd.DataFramePlot(energy_system=energysystem)
+    myresults = outputlib.DataFramePlot(energy_system=energysystem)
     gridsource = myresults.slice_by(obj_label='gridsource', type='input',
                                     date_from='2012-01-01 00:00:00',
                                     date_to='2012-12-31 23:00:00')
