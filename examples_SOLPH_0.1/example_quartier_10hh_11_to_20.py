@@ -88,7 +88,11 @@ def optimise_storage_size(energysystem,
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
-    data_of_chosen_households = [data_load[str(hh[demand])] for demand in hh]
+    consumption_of_chosen_households = {}
+    for i in np.arange(int(arguments['--num-hh'])):
+        consumption_of_chosen_households['demand_' + str(i+1)] = \
+                data_load[str(hh['demand_' + str(i+1)])].sum()
+    print(consumption_of_chosen_households)
 
     # read standardized feed-in from pv
     loc = {
@@ -118,8 +122,9 @@ def optimise_storage_size(energysystem,
     Sink(label='excess_bel', inputs={bel: Flow()})
 
     # create commodity object for import electricity resource
-    Source(label='gridsource', outputs={bel: Flow(nominal_value=np.sum(
-                                        data_of_chosen_households)*grid_share,
+    Source(label='gridsource', outputs={bel: Flow(nominal_value=sum(
+                                        consumption_of_chosen_households.
+                                        values())*grid_share,
                                         summed_max=1)})
 
     # create fixed source object for pv
@@ -132,9 +137,7 @@ def optimise_storage_size(energysystem,
         label=demand,
         inputs={bel: Flow(actual_value=data_load[str(hh[demand])],
                 fixed=True, nominal_value=1)})
-        for demand in ['demand_1', 'demand_2', 'demand_3', 'demand_4',
-                       'demand_5', 'demand_6', 'demand_7', 'demand_8',
-                       'demand_9', 'demand_10']]
+        for demand in hh]
 
     # Calculate ep_costs from capex to compare with old solph
     capex = 375
