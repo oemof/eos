@@ -125,13 +125,13 @@ def create_energysystem(energysystem,
                                     albedo=0.2,
                                     loc=loc)
 
-    ##########################################################################
-    # Create oemof object
-    ##########################################################################
-
+    # Calculate grid share
     ssr = float(arguments['--ssr'])
     grid_share = 1 - ssr
 
+    ##########################################################################
+    # Create oemof object
+    ##########################################################################
     logging.info('Create oemof objects')
 
     # create electricity bus
@@ -145,11 +145,16 @@ def create_energysystem(energysystem,
                                         consumption_of_chosen_households.
                                         values())*grid_share,
                                         summed_max=1)})
+    print(sum(consumption_of_chosen_households.values())*grid_share)
 
     # create fixed source object for pv
+    # Source(label='pv', outputs={bel: Flow(actual_value=data_pv,
+    #                                       fixed=True, fixed_costs=15)},
+    #        investment=Investment(ep_costs=pv_epc))
+
     Source(label='pv', outputs={bel: Flow(actual_value=data_pv,
-                                          fixed=True, fixed_costs=15)},
-           investment=Investment(ep_costs=pv_epc))
+                                          fixed=True, fixed_costs=15,
+                                          nominal_value=100)})
 
     # create simple sink objects for demands 1 to 10
     [Sink(
