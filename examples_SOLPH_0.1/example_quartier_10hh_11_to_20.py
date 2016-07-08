@@ -54,6 +54,7 @@ from oemof.solph import OperationalModel
 # import helper to read coastdat data
 from eos import helper_coastdat as hlp
 
+
 def initialise_energysystem(year, number_timesteps=8760):
     """initialize the energy system
     """
@@ -73,18 +74,37 @@ def validate(**arguments):
     return arguments
 
 
-def optimise_storage_size(energysystem,
-                          **arguments):
+def create_energysystem(energysystem,
+                        **arguments):
 
+    ###########################################################################
+    # read and calculate parameters
+    ###########################################################################
+
+    # Calculate ep_costs from capex
+    storage_capex = 375
+    storage_lifetime = 10
+    storage_wacc = 0.07
+    storage_epc = storage_capex * (storage_wacc * (1 + storage_wacc) **
+                                   storage_lifetime) / ((1 + storage_wacc) **
+                                                        storage_lifetime - 1)
+
+    pv_capex = 1000
+    pv_lifetime = 20
+    pv_wacc = 0.07
+    pv_epc = pv_capex * (pv_wacc * (1 + pv_wacc) **
+                         pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
+
+    # Choose households according to simulation options
     hh_start = int(arguments['--start-hh'])
     hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
     hh = {}
     for i in np.arange(int(arguments['--num-hh'])):
         hh['demand_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
 
-    # read load data in kW
+    # Read load data in kW
     data_load = \
-            pd.read_csv(
+        pd.read_csv(
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
@@ -92,13 +112,12 @@ def optimise_storage_size(energysystem,
     for i in np.arange(int(arguments['--num-hh'])):
         consumption_of_chosen_households['demand_' + str(i+1)] = \
                 data_load[str(hh['demand_' + str(i+1)])].sum()
-    print(consumption_of_chosen_households)
 
-    # read standardized feed-in from pv
+    # Read standardized feed-in from pv
     loc = {
         'tz': 'Europe/Berlin',
         'latitude': 53.41,
-        'longitude': 11.84}    #Parchim
+        'longitude': 11.84}    # Parchim
 
     data_pv = hlp.get_pv_generation(year=int(arguments['--year']),
                                     azimuth=180,
@@ -129,8 +148,8 @@ def optimise_storage_size(energysystem,
 
     # create fixed source object for pv
     Source(label='pv', outputs={bel: Flow(actual_value=data_pv,
-                                          nominal_value=100,
-                                          fixed=True, fixed_costs=15)})
+                                          fixed=True, fixed_costs=15)},
+           investment=Investment(ep_costs=pv_epc))
 
     # create simple sink objects for demands 1 to 10
     [Sink(
@@ -138,12 +157,6 @@ def optimise_storage_size(energysystem,
         inputs={bel: Flow(actual_value=data_load[str(hh[demand])],
                 fixed=True, nominal_value=1)})
         for demand in hh]
-
-    # Calculate ep_costs from capex to compare with old solph
-    capex = 375
-    lifetime = 10
-    wacc = 0.07
-    epc = capex * (wacc * (1 + wacc) ** lifetime) / ((1 + wacc) ** lifetime - 1)
 
     # create storage transformer object for storage
     Storage(
@@ -155,7 +168,7 @@ def optimise_storage_size(energysystem,
         nominal_output_capacity_ratio=1/6,
         inflow_conversion_factor=1, outflow_conversion_factor=0.8,
         fixed_costs=0,
-        investment=Investment(ep_costs=epc),
+        investment=Investment(ep_costs=storage_epc),
     )
 
     ##########################################################################
@@ -264,7 +277,7 @@ def create_plots(energysystem, year):
 def main(**arguments):
     logger.define_logging()
     esys = initialise_energysystem(year=arguments['--year'])
-    esys = optimise_storage_size(esys, **arguments)
+    esys = create_energysystem(esys, **arguments)
     # esys.dump()
     # esys.restore()
     import pprint as pp
