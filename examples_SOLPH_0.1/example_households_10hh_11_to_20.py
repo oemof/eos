@@ -16,7 +16,7 @@ Options:
       --start-hh=START     Household to start when choosing from household
                            pool. Counts a chosen number of households up
                            from start-hh, see next option.
-                           [default: 11]
+                           [default: 1]
       --num-hh=NUM         Number of households to choose. [default: 10]
       --ssr=SSR            Self-sufficiency degree. [default: 0.7]
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
