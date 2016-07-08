@@ -80,7 +80,7 @@ def optimise_storage_size(energysystem,
     hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
     hh = {}
     for i in np.arange(int(arguments['--num-hh'])):
-        hh['demand_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
+        hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
 
     # read load data in kW
     data_load = \
@@ -88,7 +88,11 @@ def optimise_storage_size(energysystem,
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
-    data_of_chosen_households = [data_load[str(hh[demand])] for demand in hh]
+    consumption_of_chosen_households = {}
+    for i in np.arange(int(arguments['--num-hh'])):
+        consumption_of_chosen_households['house_' + str(i+1)] = \
+                data_load[str(hh['house_' + str(i+1)])].sum()
+
 
     # read standardized feed-in from pv
     loc = {
@@ -118,23 +122,28 @@ def optimise_storage_size(energysystem,
     Sink(label='excess_bel', inputs={bel: Flow()})
 
     # create commodity object for import electricity resource
-    Source(label='gridsource', outputs={bel: Flow(nominal_value=np.sum(
-                                        data_of_chosen_households)*grid_share,
-                                        summed_max=1)})
+    [Source(
+        label=label + '_gridsource',
+        outputs={bel: Flow(nominal_value=consumption_of_chosen_households
+                           [label] *
+                           grid_share,
+                           summed_max=1)})
+        for label in hh]
 
     # create fixed source object for pv
-    Source(label='pv', outputs={bel: Flow(actual_value=data_pv,
-                                          nominal_value=100,
-                                          fixed=True, fixed_costs=15)})
+    [Source(
+        label=label + '_pv',
+        outputs={bel: Flow(actual_value=data_pv,
+                           nominal_value=10,
+                           fixed=True, fixed_costs=15)})
+        for label in hh]
 
     # create simple sink objects for demands 1 to 10
     [Sink(
-        label=demand,
-        inputs={bel: Flow(actual_value=data_load[str(hh[demand])],
+        label=label + '_demand',
+        inputs={bel: Flow(actual_value=data_load[str(hh[label])],
                 fixed=True, nominal_value=1)})
-        for demand in ['demand_1', 'demand_2', 'demand_3', 'demand_4',
-                       'demand_5', 'demand_6', 'demand_7', 'demand_8',
-                       'demand_9', 'demand_10']]
+        for label in hh]
 
     # Calculate ep_costs from capex to compare with old solph
     capex = 375
@@ -178,51 +187,51 @@ def get_result_dict(energysystem, year):
     ces = energysystem.groups['ces']
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
-    gridsource = myresults.slice_by(obj_label='gridsource', type='input',
+    gridsource = myresults.slice_by(obj_label='house_1_gridsource', type='input',
                                     date_from=year + '-01-01 00:00:00',
                                     date_to=year + '-12-31 23:00:00')
 
-    demand_1 = myresults.slice_by(obj_label='demand_1',
+    demand_1 = myresults.slice_by(obj_label='house_1_demand_1',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_2 = myresults.slice_by(obj_label='demand_2',
+    demand_2 = myresults.slice_by(obj_label='house_2_demand_2',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_3 = myresults.slice_by(obj_label='demand_3',
+    demand_3 = myresults.slice_by(obj_label='house_3_demand_3',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_4 = myresults.slice_by(obj_label='demand_4',
+    demand_4 = myresults.slice_by(obj_label='house_4_demand_4',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_5 = myresults.slice_by(obj_label='demand_5',
+    demand_5 = myresults.slice_by(obj_label='house_5_demand_5',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_6 = myresults.slice_by(obj_label='demand_6',
+    demand_6 = myresults.slice_by(obj_label='house_6_demand_6',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_7 = myresults.slice_by(obj_label='demand_7',
+    demand_7 = myresults.slice_by(obj_label='house_7_demand_7',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_8 = myresults.slice_by(obj_label='demand_8',
+    demand_8 = myresults.slice_by(obj_label='house_8_demand_8',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_9 = myresults.slice_by(obj_label='demand_9',
+    demand_9 = myresults.slice_by(obj_label='house_9_demand_9',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_10 = myresults.slice_by(obj_label='demand_10',
+    demand_10 = myresults.slice_by(obj_label='house_10_demand_10',
                                    date_from=year + '-01-01 00:00:00',
                                    date_to=year + '-12-31 23:00:00')
 
-    pv = myresults.slice_by(obj_label='pv',
+    pv = myresults.slice_by(obj_label='house_1_pv',
                             date_from=year + '-01-01 00:00:00',
                             date_to=year + '-12-31 23:00:00')
 
@@ -272,7 +281,7 @@ def main(**arguments):
     logger.define_logging()
     esys = initialise_energysystem(year=arguments['--year'])
     esys = optimise_storage_size(esys, **arguments)
-    # esys.dump()
+    esys.dump()
     # esys.restore()
     import pprint as pp
     pp.pprint(get_result_dict(esys, year=arguments['--year']))
