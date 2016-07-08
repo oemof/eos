@@ -191,43 +191,43 @@ def get_result_dict(energysystem, year):
                                     date_from=year + '-01-01 00:00:00',
                                     date_to=year + '-12-31 23:00:00')
 
-    demand_1 = myresults.slice_by(obj_label='house_1_demand_1',
+    demand_1 = myresults.slice_by(obj_label='house_1_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_2 = myresults.slice_by(obj_label='house_2_demand_2',
+    demand_2 = myresults.slice_by(obj_label='house_2_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_3 = myresults.slice_by(obj_label='house_3_demand_3',
+    demand_3 = myresults.slice_by(obj_label='house_3_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_4 = myresults.slice_by(obj_label='house_4_demand_4',
+    demand_4 = myresults.slice_by(obj_label='house_4_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_5 = myresults.slice_by(obj_label='house_5_demand_5',
+    demand_5 = myresults.slice_by(obj_label='house_5_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_6 = myresults.slice_by(obj_label='house_6_demand_6',
+    demand_6 = myresults.slice_by(obj_label='house_6_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_7 = myresults.slice_by(obj_label='house_7_demand_7',
+    demand_7 = myresults.slice_by(obj_label='house_7_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_8 = myresults.slice_by(obj_label='house_8_demand_8',
+    demand_8 = myresults.slice_by(obj_label='house_8_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_9 = myresults.slice_by(obj_label='house_9_demand_9',
+    demand_9 = myresults.slice_by(obj_label='house_9_demand',
                                   date_from=year + '-01-01 00:00:00',
                                   date_to=year + '-12-31 23:00:00')
 
-    demand_10 = myresults.slice_by(obj_label='house_10_demand_10',
+    demand_10 = myresults.slice_by(obj_label='house_10_demand',
                                    date_from=year + '-01-01 00:00:00',
                                    date_to=year + '-12-31 23:00:00')
 
