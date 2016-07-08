@@ -13,9 +13,11 @@ Options:
                            WARNING, ERROR or CRITICAL.
                            [default: ERROR]
   -h, --help               Display this help.
-      --start-hh=STAR      Household to start when choosing from household
-                           pool. Counts 10 households up from start-hh.
+      --start-hh=START     Household to start when choosing from household
+                           pool. Counts a chosen number of households up
+                           from start-hh, see next option.
                            [default: 11]
+      --num-hh=NUM         Number of households to choose. [default: 10]
       --ssr=SSR            Self-sufficiency degree. [default: 0.7]
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
@@ -75,19 +77,11 @@ def optimise_storage_size(energysystem,
                           **arguments):
 
     hh_start = int(arguments['--start-hh'])
-
-    hh_to_choose = np.arange(hh_start, hh_start+10)
-
-    hh = {'demand_1': 'hh_' + str(hh_to_choose[0]),
-          'demand_2': 'hh_' + str(hh_to_choose[1]),
-          'demand_3': 'hh_' + str(hh_to_choose[2]),
-          'demand_4': 'hh_' + str(hh_to_choose[3]),
-          'demand_5': 'hh_' + str(hh_to_choose[4]),
-          'demand_6': 'hh_' + str(hh_to_choose[5]),
-          'demand_7': 'hh_' + str(hh_to_choose[6]),
-          'demand_8': 'hh_' + str(hh_to_choose[7]),
-          'demand_9': 'hh_' + str(hh_to_choose[8]),
-          'demand_10': 'hh_' + str(hh_to_choose[9])}
+    hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
+    hh = {}
+    for i in np.arange(int(arguments['--num-hh'])):
+        hh['demand_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
+    print(hh)
 
     # read load data in kW
     data_load = \
@@ -95,10 +89,10 @@ def optimise_storage_size(energysystem,
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
-    data_of_chosen_households = [data_load[str(hh[demand])]
-    for demand in ['demand_1', 'demand_2', 'demand_3', 'demand_4',
-                   'demand_5', 'demand_6', 'demand_7', 'demand_8',
-                   'demand_9', 'demand_10']]
+    data_of_chosen_households = [data_load[str(hh[demand])] for demand in hh]
+    # for demand in ['demand_1', 'demand_2', 'demand_3', 'demand_4',
+    #                'demand_5', 'demand_6', 'demand_7', 'demand_8',
+    #                'demand_9', 'demand_10']]
 
     # read standardized feed-in from pv
     loc = {
