@@ -81,7 +81,6 @@ def optimise_storage_size(energysystem,
     hh = {}
     for i in np.arange(int(arguments['--num-hh'])):
         hh['demand_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
-    print(hh)
 
     # read load data in kW
     data_load = \
@@ -90,9 +89,6 @@ def optimise_storage_size(energysystem,
                  sep=",") / 1000
 
     data_of_chosen_households = [data_load[str(hh[demand])] for demand in hh]
-    # for demand in ['demand_1', 'demand_2', 'demand_3', 'demand_4',
-    #                'demand_5', 'demand_6', 'demand_7', 'demand_8',
-    #                'demand_9', 'demand_10']]
 
     # read standardized feed-in from pv
     loc = {
