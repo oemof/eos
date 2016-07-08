@@ -1,11 +1,27 @@
 # -*- coding: utf-8 -*-
 
-"""
-General description:
----------------------
+''' Example for simulating pv-battery systems in quarters
 
+Usage: example_quartier_10hh_11_to_20.py [options]
 
-"""
+Options:
+
+  -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
+                           or "gurobi".
+                           [default: gurobi]
+  -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
+                           WARNING, ERROR or CRITICAL.
+                           [default: ERROR]
+  -h, --help               Display this help.
+      --start-hh=STAR      Household to start when choosing from household
+                           pool. Counts 10 households up from start-hh.
+                           [default: 11]
+      --ssr=SSR            Self-sufficiency degree. [default: 0.7]
+      --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
+                           2010-2014. [default: 2010]
+      --dry-run            Do nothing. Only print what would be done.
+
+'''
 
 ###############################################################################
 # imports
@@ -21,7 +37,7 @@ except ImportError:
     print("Unable to import docopt.\nIs the 'docopt' package installed?")
 
 # Outputlib
-from oemof.outputlib import to_pandas as tpd
+from oemof import outputlib
 
 # Default logger of oemof
 from oemof.tools import logger
@@ -33,26 +49,34 @@ from oemof.solph import (Bus, Source, Sink, Flow, Storage)
 from oemof.solph.network import Investment
 from oemof.solph import OperationalModel
 
+# import helper to read coastdat data
+from eos import helper_coastdat as hlp
 
-def initialise_energysystem(number_timesteps=8760):
+def initialise_energysystem(year, number_timesteps=8760):
     """initialize the energy system
     """
     logging.info('Initialize the energy system')
-    date_time_index = pd.date_range('1/1/2012', periods=number_timesteps,
+    date_time_index = pd.date_range('1/1/' + year,
+                                    periods=number_timesteps,
                                     freq='H')
 
     return core_es.EnergySystem(groupings=solph.GROUPINGS,
                                 time_idx=date_time_index)
 
 
-def optimise_storage_size(energysystem,
-                          solvername='gurobi'):
+def validate(**arguments):
+    valid = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    if arguments["--loglevel"] not in valid:
+        exit("Invalid loglevel: " + arguments["--loglevel"])
+    return arguments
 
-    hh_start = 11
+
+def optimise_storage_size(energysystem,
+                          **arguments):
+
+    hh_start = int(arguments['--start-hh'])
 
     hh_to_choose = np.arange(hh_start, hh_start+10)
-    print(hh_to_choose)
-    print(hh_to_choose[0])
 
     hh = {'demand_1': 'hh_' + str(hh_to_choose[0]),
           'demand_2': 'hh_' + str(hh_to_choose[1]),
@@ -64,8 +88,6 @@ def optimise_storage_size(energysystem,
           'demand_8': 'hh_' + str(hh_to_choose[7]),
           'demand_9': 'hh_' + str(hh_to_choose[8]),
           'demand_10': 'hh_' + str(hh_to_choose[9])}
-    print(hh['demand_1'])
-    print(hh['demand_10'])
 
     # read load data in kW
     data_load = \
@@ -73,15 +95,28 @@ def optimise_storage_size(energysystem,
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
-    # read standardized feed-in from wind and pv
-    data_re = pd.read_csv(
-            "../example/example_data/example_data_re.csv", sep=',')
+    data_of_chosen_households = [data_load[str(hh[demand])]
+    for demand in ['demand_1', 'demand_2', 'demand_3', 'demand_4',
+                   'demand_5', 'demand_6', 'demand_7', 'demand_8',
+                   'demand_9', 'demand_10']]
+
+    # read standardized feed-in from pv
+    loc = {
+        'tz': 'Europe/Berlin',
+        'latitude': 53.41,
+        'longitude': 11.84}    #Parchim
+
+    data_pv = hlp.get_pv_generation(year=int(arguments['--year']),
+                                    azimuth=180,
+                                    tilt=30,
+                                    albedo=0.2,
+                                    loc=loc)
 
     ##########################################################################
     # Create oemof object
     ##########################################################################
 
-    ssr = 0.7  # noch als Uebergabewert implementieren
+    ssr = float(arguments['--ssr'])
     grid_share = 1 - ssr
 
     logging.info('Create oemof objects')
@@ -93,12 +128,12 @@ def optimise_storage_size(energysystem,
     Sink(label='excess_bel', inputs={bel: Flow()})
 
     # create commodity object for import electricity resource
-    Source(label='gridsource', outputs={bel: Flow(
-                                        nominal_value=45243*grid_share,
+    Source(label='gridsource', outputs={bel: Flow(nominal_value=np.sum(
+                                        data_of_chosen_households)*grid_share,
                                         summed_max=1)})
 
     # create fixed source object for pv
-    Source(label='pv', outputs={bel: Flow(actual_value=data_re['pv'],
+    Source(label='pv', outputs={bel: Flow(actual_value=data_pv,
                                           nominal_value=100,
                                           fixed=True, fixed_costs=15)})
 
@@ -139,7 +174,7 @@ def optimise_storage_size(energysystem,
     om = OperationalModel(energysystem, timeindex=energysystem.time_idx)
 
     logging.info('Solve the optimization problem')
-    om.solve(solver=solvername, solve_kwargs={'tee': True})
+    om.solve(solver=arguments['--solver'], solve_kwargs={'tee': True})
 
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',
@@ -148,58 +183,58 @@ def optimise_storage_size(energysystem,
     return energysystem
 
 
-def get_result_dict(energysystem):
+def get_result_dict(energysystem, year):
     logging.info('Check the results')
     ces = energysystem.groups['ces']
-    myresults = tpd.DataFramePlot(energy_system=energysystem)
+    myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
     gridsource = myresults.slice_by(obj_label='gridsource', type='input',
-                                    date_from='2012-01-01 00:00:00',
-                                    date_to='2012-12-31 23:00:00')
+                                    date_from=year + '-01-01 00:00:00',
+                                    date_to=year + '-12-31 23:00:00')
 
     demand_1 = myresults.slice_by(obj_label='demand_1',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_2 = myresults.slice_by(obj_label='demand_2',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_3 = myresults.slice_by(obj_label='demand_3',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_4 = myresults.slice_by(obj_label='demand_4',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_5 = myresults.slice_by(obj_label='demand_5',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_6 = myresults.slice_by(obj_label='demand_6',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_7 = myresults.slice_by(obj_label='demand_7',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_8 = myresults.slice_by(obj_label='demand_8',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_9 = myresults.slice_by(obj_label='demand_9',
-                                  date_from='2012-01-01 00:00:00',
-                                  date_to='2012-12-31 23:00:00')
+                                  date_from=year + '-01-01 00:00:00',
+                                  date_to=year + '-12-31 23:00:00')
 
     demand_10 = myresults.slice_by(obj_label='demand_10',
-                                   date_from='2012-01-01 00:00:00',
-                                   date_to='2012-12-31 23:00:00')
+                                   date_from=year + '-01-01 00:00:00',
+                                   date_to=year + '-12-31 23:00:00')
 
     pv = myresults.slice_by(obj_label='pv',
-                            date_from='2012-01-01 00:00:00',
-                            date_to='2012-12-31 23:00:00')
+                            date_from=year + '-01-01 00:00:00',
+                            date_to=year + '-12-31 23:00:00')
 
     return {'gridsource_sum': gridsource.sum(),
             'demand_sum_1': demand_1.sum(),
@@ -219,7 +254,7 @@ def get_result_dict(energysystem):
             }
 
 
-def create_plots(energysystem):
+def create_plots(energysystem, year):
     import_1 = gridsource_1.sort_values(by='val', ascending=False).reset_index()
     import_2 = gridsource_2.sort_values(by='val', ascending=False).reset_index()
     import_3 = gridsource_3.sort_values(by='val', ascending=False).reset_index()
@@ -243,20 +278,22 @@ def create_plots(energysystem):
     plt.show()
 
 
-if __name__ == "__main__":
-    # arguments = docopt(__doc__)
-    # print(arguments)
-    # if arguments["--dry-run"]:
-    #     print("This is a dry run. Exiting before doing anything.")
-    #     exit(0)
-    # arguments = validate(**arguments)
-
+def main(**arguments):
     logger.define_logging()
-    esys = initialise_energysystem()
-    esys = optimise_storage_size(esys)
+    esys = initialise_energysystem(year=arguments['--year'])
+    esys = optimise_storage_size(esys, **arguments)
     # esys.dump()
     # esys.restore()
     import pprint as pp
-    pp.pprint(get_result_dict(esys))
-    create_plots(esys)
+    pp.pprint(get_result_dict(esys, year=arguments['--year']))
+    create_plots(esys, year=arguments['--year'])
 
+
+if __name__ == "__main__":
+    arguments = docopt(__doc__)
+    print(arguments)
+    if arguments["--dry-run"]:
+        print("This is a dry run. Exiting before doing anything.")
+        exit(0)
+    arguments = validate(**arguments)
+    main(**arguments)
