@@ -22,7 +22,7 @@ required_parameter_pv = {
     'albedo': 'Albedo value'}
 
 
-def get_pv_generation(year=2010, module_name='Yingli_YL210__2008__E__',
+def get_pv_generation(year, module_name='Yingli_YL210__2008__E__',
                       **kwargs):
 
     # Specification of the pv module
