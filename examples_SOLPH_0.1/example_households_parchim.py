@@ -15,10 +15,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import logging
 
-#try:
-#    from docopt import docopt
-#except ImportError:
-#    print("Unable to import docopt.\nIs the 'docopt' package installed?")
+from oemof import outputlib as tpd
+
+try:
+    from docopt import docopt
+except ImportError:
+    print("Unable to import docopt.\nIs the 'docopt' package installed?")
 
 # Outputlib
 #from oemof.outputlib import to_pandas as tpd
@@ -27,9 +29,8 @@ import logging
 from oemof.tools import logger
 
 # import oemof core and solph classes to create energy system objects
-from oemof.core import energy_system as core_es
+#from oemof.core import energy_system as core_es
 import oemof.solph as solph
-from oemof.solph import (Bus, Source, Sink, Flow, Storage)
 from oemof.solph.network import Investment
 from oemof.solph import OperationalModel
 from eos import helper_parchim as hlp
@@ -41,9 +42,17 @@ def initialise_energysystem(number_timesteps=8760):
     logging.info('Initialize the energy system')
     date_time_index = pd.date_range('1/1/2012', periods=number_timesteps,
                                     freq='H')
+                                    
+    energysystem = solph.EnergySystem(
+        groupings=solph.GROUPINGS, time_idx=date_time_index)
+    return energysystem
+    
 
-    return core_es.EnergySystem(groupings=solph.GROUPINGS,
-                                time_idx=date_time_index)
+def validate(**arguments):
+    valid = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    if arguments["--loglevel"] not in valid:
+        exit("Invalid loglevel: " + arguments["--loglevel"])
+    return arguments
 
 
 def optimise_storage_size(energysystem,
@@ -69,21 +78,22 @@ def optimise_storage_size(energysystem,
     # Create oemof object
     ##########################################################################
 	
-    number_hh = np.shape(data_pv)[1] - 1
+    #number_hh = np.shape(data_pv)[1] - 1
+    number_hh = 2
 	
     loc = {
         'tz': 'Europe/Berlin',
         'latitude': 53.41,
         'longitude': 11.84}    #Parchim
-    price_el = 52
+    price_el = 0.28
     max_feedin = 0.5
-    fit = -5
-    sc_tax = 8
+    fit = -0.1
+    sc_tax = 0.06
     hh_start = 11 #todo: softcode
     
         # Calculate ep_costs from capex to compare with old solph
     #TODO ????
-    capex = 375
+    capex = 1500
     lifetime = 10
     wacc = 0.07
     epc = capex * (wacc * (1 + wacc) ** lifetime) / ((1 + wacc) ** lifetime - 1)
@@ -105,9 +115,9 @@ def optimise_storage_size(energysystem,
 	#create objects for every hh
 	
 	# create electricity bus for grid demand
-    bel_grid = Bus(label="electricity_grid")
+    bel_grid = solph.Bus(label="bel_grid")
     		# create commodity object for import electricity resource
-    Source(label='gridsource', outputs={bel_grid: Flow(
+    solph.Source(label='gridsource', outputs={bel_grid: solph.Flow(
 									variable_costs=price_el)})
          
     house_pv = 0
@@ -117,73 +127,67 @@ def optimise_storage_size(energysystem,
         label_pv = 'hh_' + str(house_pv)
         print(label_pv)
         # create electricity bus for pv
-        bel_pv = Bus(label="electricity_pv_"+house)
+        bel_pv = solph.Bus(label="bel_pv_"+house)
 			
         # create electricity bus for battery           
-        bel_bat = Bus(label="electricity_bat_"+house)
+        bel_bat = solph.Bus(label="bel_bat_"+house)
 		
 # create excess component for the electricity bus to allow overproduction
-        Sink(label="excess_"+house, inputs={bel_pv: Flow()})
+        solph.Sink(label="excess_"+house, inputs={bel_pv: solph.Flow()})
 
 		# create fixed source objects for pv
-        Source(label=house+ '_pv', outputs={bel_pv: Flow(
+        #TODO: pv als Optimierungsgröße
+        solph.Source(label=house+ '_pv', outputs={bel_pv: solph.Flow(
                         actual_value=hlp.get_pv_generation(
                         	azimuth=data_pv[label_pv][1], 
 					tilt=data_pv[label_pv][2], 
      					albedo=data_pv[label_pv][3],
 					loc=loc),
      				  nominal_value=data_pv[label_pv][0],
-                        fixed=True, fixed_costs=15)})
-        print('pv erstellt mit richtigemoutputbus')
+                        fixed=True, fixed_costs=1000)})
 
 											  
 		# create excess component for the pv feedin
-        Sink(label=house+'_feedin', inputs={bel_pv: Flow(
-								variable_costs=fit,
-								nominal_value=data_pv[label_pv][0],
-								max=max_feedin)})
+#        solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
+#								variable_costs=fit,
+#								nominal_value=data_pv[label_pv][0],
+#								max=max_feedin)})
         #TODO stimmt das mit nominalvalue und max???
+        
+        bel_demand = solph.Bus(label="bel_demand_"+house)        
+
+        solph.LinearTransformer(label=house+'_demandTransformer', inputs={
+                                bel_pv: solph.Flow(),
+                                bel_grid: solph.Flow(),
+                                bel_bat: solph.Flow()},
+                                ouputs={bel_demand},
+                                conversion_factors={bel_demand: 1})
+                                
 
 
-    # create simple sink objects for demands 
-        [Sink(
+    # create simple sink objects for demands         
+        solph.Sink(
             label="demand_"+house,
-            inputs={bel_pv: Flow(
+            inputs={bel_demand: solph.Flow(
 						actual_value=data_load[str(house)],
 						fixed=True, 
 						nominal_value=1,
-						variable_costs=sc_tax), 
-				bel_grid: Flow(),
-				bel_bat: Flow()})]
+						variable_costs=sc_tax)})
     
     
-            # create storage transformer object for storage
-        Storage(
-            label='bat'+house,
-            inputs={bel_pv: Flow(variable_costs=sc_tax)},
-            outputs={bel_bat: Flow(variable_costs=0)},
+    ##         create storage transformer object for storage
+        solph.Storage(
+            label='bat_'+house,
+            inputs={bel_pv: solph.Flow(variable_costs=sc_tax)},
+            outputs={bel_bat: solph.Flow(variable_costs=0)},
             capacity_loss=0.01,
             nominal_input_capacity_ratio=1/6,
             nominal_output_capacity_ratio=1/6,
             inflow_conversion_factor=0.9, outflow_conversion_factor=0.9,
             fixed_costs=0,
-            investment=Investment(ep_costs=epc))
+            investment=solph.Investment(ep_costs=epc))
     
 
-
-
-    # create storage transformer object for storage
-#    Storage(
-#        label='ces',
-#        inputs={bel: Flow(variable_costs=0)},
-#        outputs={bel: Flow(variable_costs=0)},
-#        capacity_loss=0.00,
-#        nominal_input_capacity_ratio=1/6,
-#        nominal_output_capacity_ratio=1/6,
-#        inflow_conversion_factor=1, outflow_conversion_factor=0.8,
-#        fixed_costs=0,
-#        investment=Investment(ep_costs=epc),
-#    )
 
     ##########################################################################
     # Optimise the energy system and plot the results
@@ -192,8 +196,12 @@ def optimise_storage_size(energysystem,
     logging.info('Optimise the energy system')
 
     om = OperationalModel(energysystem, timeindex=energysystem.time_idx)
+    
+    for e in energysystem.entities:
+        print (e)
 
     logging.info('Solve the optimization problem')
+ #   print('solve auskommentiert')
     om.solve(solver=solvername, solve_kwargs={'tee': True})
 
     logging.info('Store lp-file')
@@ -275,43 +283,32 @@ def get_result_dict(energysystem):
 
 
 def create_plots(energysystem):
-    import_1 = gridsource_1.sort_values(by='val', ascending=False).reset_index()
-    import_2 = gridsource_2.sort_values(by='val', ascending=False).reset_index()
-    import_3 = gridsource_3.sort_values(by='val', ascending=False).reset_index()
-    import_4 = gridsource_4.sort_values(by='val', ascending=False).reset_index()
-    import_5 = gridsource_5.sort_values(by='val', ascending=False).reset_index()
-    import_6 = gridsource_6.sort_values(by='val', ascending=False).reset_index()
-    import_7 = gridsource_7.sort_values(by='val', ascending=False).reset_index()
-    import_8 = gridsource_8.sort_values(by='val', ascending=False).reset_index()
-    import_9 = gridsource_9.sort_values(by='val', ascending=False).reset_index()
-    import_10 = gridsource_10.sort_values(by='val', ascending=False).reset_index()
+    logging.info('Plot results')
+    myresults = tpd.DataFramePlot(energy_system=energysystem)
+    gridsource = myresults.slice_by(obj_label='gridsource', type='input',
+                                    date_from='2012-01-01 00:00:00',
+                                    date_to='2012-12-31 23:00:00')
 
-    imp = pd.DataFrame(dict(hh_1=import_1.val, hh_2=import_2.val,
-                            hh_3=import_3.val, hh_4=import_4.val,
-                            hh_5=import_5.val, hh_6=import_6.val,
-                            hh_7=import_7.val, hh_8=import_8.val,
-                            hh_9=import_9.val, hh_10=import_10.val),
-                            index=import_1.index)
+    imp = gridsource.sort_values(by='val', ascending=False).reset_index()
 
     imp.plot(linewidth=1.5)
 
     plt.show()
 
-
 if __name__ == "__main__":
-    # arguments = docopt(__doc__)
-    # print(arguments)
-    # if arguments["--dry-run"]:
-    #     print("This is a dry run. Exiting before doing anything.")
-    #     exit(0)
-    # arguments = validate(**arguments)
+#    arguments = docopt(__doc__)
+#    print(arguments)
+#    if arguments["--dry-run"]:
+#        print("This is a dry run. Exiting before doing anything.")
+#        exit(0)
+#    arguments = validate(**arguments)
 
     logger.define_logging()
     esys = initialise_energysystem()
     esys = optimise_storage_size(esys)
     # esys.dump()
     # esys.restore()
-#    import pprint as pp
-#    pp.pprint(get_result_dict(esys))
-#    create_plots(esys)
+    import pprint as pp
+    pp.pprint(get_result_dict(esys))
+    create_plots(esys)
 
