@@ -115,32 +115,41 @@ def optimise_storage_size(energysystem,
     logging.info('Create oemof objects')
 
     # create electricity bus
-    bel = solph.Bus(label="electricity")
+    bel = {bustype: solph.Bus(
+              uid=bustype,
+              type=bustype,
+              balanced=True,
+              excess=False)
+           for bustype in hh}
 
     # create excess component for the electricity bus to allow overproduction
-    solph.Sink(label='excess_bel', inputs={bel: solph.Flow()})
+    [solph.Sink(
+        label=label + 'excess_bel',
+        inputs={bel[label]: solph.Flow()})
+        for label in hh]
 
     # create commodity object for import electricity resource
     [solph.Source(
         label=label + '_gridsource',
-        outputs={bel: solph.Flow(nominal_value=consumption_of_chosen_households
-                                 [label] *
-                                 grid_share,
-                                 summed_max=1)})
+        outputs={bel[label]: solph.Flow(
+            nominal_value=consumption_of_chosen_households
+            [label] *
+            grid_share,
+            summed_max=1)})
         for label in hh]
 
     # create fixed source object for pv
     [solph.Source(
         label=label + '_pv',
-        outputs={bel: solph.Flow(actual_value=data_pv,
-                                 nominal_value=10,
-                                 fixed=True, fixed_costs=15)})
+        outputs={bel[label]: solph.Flow(actual_value=data_pv,
+                                        nominal_value=10,
+                                        fixed=True, fixed_costs=15)})
         for label in hh]
 
     # create simple sink objects for demands 1 to 10
     [solph.Sink(
         label=label + '_demand',
-        inputs={bel: solph.Flow(actual_value=data_load[str(hh[label])],
+        inputs={bel[label]: solph.Flow(actual_value=data_load[str(hh[label])],
                 fixed=True, nominal_value=1)})
         for label in hh]
 
@@ -152,10 +161,10 @@ def optimise_storage_size(energysystem,
                                                      )
 
     # create storage transformer object for storage
-    solph.Storage(
-        label='ces',
-        inputs={bel: solph.Flow(variable_costs=0)},
-        outputs={bel: solph.Flow(variable_costs=0)},
+    [solph.Storage(
+        label=label + 'ces',
+        inputs={bel[label]: solph.Flow(variable_costs=0)},
+        outputs={bel[label]: solph.Flow(variable_costs=0)},
         capacity_loss=0.00,
         nominal_input_capacity_ratio=1/6,
         nominal_output_capacity_ratio=1/6,
@@ -163,6 +172,7 @@ def optimise_storage_size(energysystem,
         fixed_costs=0,
         investment=Investment(ep_costs=epc),
     )
+        for label in hh]
 
     ##########################################################################
     # Optimise the energy system and plot the results
