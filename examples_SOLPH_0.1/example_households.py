@@ -47,12 +47,12 @@ from oemof.tools import logger
 # import oemof core and solph classes to create energy system objects
 from oemof.core import energy_system as core_es
 import oemof.solph as solph
-from oemof.solph import (Bus, Source, Sink, Flow, Storage)
 from oemof.solph.network import Investment
 from oemof.solph import OperationalModel
 
 # import helper to read coastdat data
 from eos import helper_coastdat as hlp
+
 
 def initialise_energysystem(year, number_timesteps=8760):
     """initialize the energy system
@@ -84,7 +84,7 @@ def optimise_storage_size(energysystem,
 
     # read load data in kW
     data_load = \
-            pd.read_csv(
+        pd.read_csv(
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
@@ -93,12 +93,11 @@ def optimise_storage_size(energysystem,
         consumption_of_chosen_households['house_' + str(i+1)] = \
                 data_load[str(hh['house_' + str(i+1)])].sum()
 
-
     # read standardized feed-in from pv
     loc = {
         'tz': 'Europe/Berlin',
         'latitude': 53.41,
-        'longitude': 11.84}    #Parchim
+        'longitude': 11.84}    # Parchim
 
     data_pv = hlp.get_pv_generation(year=int(arguments['--year']),
                                     azimuth=180,
@@ -116,32 +115,32 @@ def optimise_storage_size(energysystem,
     logging.info('Create oemof objects')
 
     # create electricity bus
-    bel = Bus(label="electricity")
+    bel = solph.Bus(label="electricity")
 
     # create excess component for the electricity bus to allow overproduction
-    Sink(label='excess_bel', inputs={bel: Flow()})
+    solph.Sink(label='excess_bel', inputs={bel: solph.Flow()})
 
     # create commodity object for import electricity resource
-    [Source(
+    [solph.Source(
         label=label + '_gridsource',
-        outputs={bel: Flow(nominal_value=consumption_of_chosen_households
-                           [label] *
-                           grid_share,
-                           summed_max=1)})
+        outputs={bel: solph.Flow(nominal_value=consumption_of_chosen_households
+                                 [label] *
+                                 grid_share,
+                                 summed_max=1)})
         for label in hh]
 
     # create fixed source object for pv
-    [Source(
+    [solph.Source(
         label=label + '_pv',
-        outputs={bel: Flow(actual_value=data_pv,
-                           nominal_value=10,
-                           fixed=True, fixed_costs=15)})
+        outputs={bel: solph.Flow(actual_value=data_pv,
+                                 nominal_value=10,
+                                 fixed=True, fixed_costs=15)})
         for label in hh]
 
     # create simple sink objects for demands 1 to 10
-    [Sink(
+    [solph.Sink(
         label=label + '_demand',
-        inputs={bel: Flow(actual_value=data_load[str(hh[label])],
+        inputs={bel: solph.Flow(actual_value=data_load[str(hh[label])],
                 fixed=True, nominal_value=1)})
         for label in hh]
 
@@ -149,13 +148,14 @@ def optimise_storage_size(energysystem,
     capex = 375
     lifetime = 10
     wacc = 0.07
-    epc = capex * (wacc * (1 + wacc) ** lifetime) / ((1 + wacc) ** lifetime - 1)
+    epc = capex * (wacc * (1 + wacc) ** lifetime) / ((1 + wacc) ** lifetime - 1
+                                                     )
 
     # create storage transformer object for storage
-    Storage(
+    solph.Storage(
         label='ces',
-        inputs={bel: Flow(variable_costs=0)},
-        outputs={bel: Flow(variable_costs=0)},
+        inputs={bel: solph.Flow(variable_costs=0)},
+        outputs={bel: solph.Flow(variable_costs=0)},
         capacity_loss=0.00,
         nominal_input_capacity_ratio=1/6,
         nominal_output_capacity_ratio=1/6,
@@ -187,7 +187,8 @@ def get_result_dict(energysystem, year):
     ces = energysystem.groups['ces']
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
-    gridsource = myresults.slice_by(obj_label='house_1_gridsource', type='input',
+    gridsource = myresults.slice_by(obj_label='house_1_gridsource',
+                                    type='input',
                                     date_from=year + '-01-01 00:00:00',
                                     date_to=year + '-12-31 23:00:00')
 
