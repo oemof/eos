@@ -47,7 +47,6 @@ from oemof.tools import logger
 # import oemof core and solph classes to create energy system objects
 from oemof.core import energy_system as core_es
 import oemof.solph as solph
-from oemof.solph import (Bus, Source, Sink, Flow, Storage)
 from oemof.solph.network import Investment
 from oemof.solph import OperationalModel
 
@@ -135,15 +134,16 @@ def create_energysystem(energysystem,
     logging.info('Create oemof objects')
 
     # create electricity bus
-    bel = Bus(label="electricity")
+    bel = solph.Bus(label="electricity")
 
     # create excess component for the electricity bus to allow overproduction
-    Sink(label='excess_bel', inputs={bel: Flow()})
+    solph.Sink(label='excess_bel', inputs={bel: solph.Flow()})
 
     # create commodity object for import electricity resource
-    Source(label='gridsource', outputs={bel: Flow(nominal_value=sum(
-                                        consumption_of_chosen_households.
-                                        values())*grid_share,
+    solph.Source(label='gridsource', outputs={bel: solph.Flow(
+                                        nominal_value=sum(
+                                            consumption_of_chosen_households.
+                                            values())*grid_share,
                                         summed_max=1)})
     print(sum(consumption_of_chosen_households.values())*grid_share)
 
@@ -152,22 +152,23 @@ def create_energysystem(energysystem,
     #                                       fixed=True, fixed_costs=15)},
     #        investment=Investment(ep_costs=pv_epc))
 
-    Source(label='pv', outputs={bel: Flow(actual_value=data_pv,
-                                          fixed=True, fixed_costs=15,
-                                          nominal_value=100)})
+    solph.Source(label='pv', outputs={bel: solph.Flow(actual_value=data_pv,
+                                                      fixed=True,
+                                                      fixed_costs=15,
+                                                      nominal_value=100)})
 
     # create simple sink objects for demands 1 to 10
-    [Sink(
+    [solph.Sink(
         label=label + '_demand',
-        inputs={bel: Flow(actual_value=data_load[str(hh[label])],
+        inputs={bel: solph.Flow(actual_value=data_load[str(hh[label])],
                 fixed=True, nominal_value=1)})
         for label in hh]
 
     # create storage transformer object for storage
-    Storage(
+    solph.Storage(
         label='ces',
-        inputs={bel: Flow(variable_costs=0)},
-        outputs={bel: Flow(variable_costs=0)},
+        inputs={bel: solph.Flow(variable_costs=0)},
+        outputs={bel: solph.Flow(variable_costs=0)},
         capacity_loss=0.00,
         nominal_input_capacity_ratio=1/6,
         nominal_output_capacity_ratio=1/6,
