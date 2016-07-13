@@ -18,7 +18,7 @@ Options:
                            from start-hh, see next option.
                            [default: 1]
       --num-hh=NUM         Number of households to choose. [default: 10]
-      --ssr=SSR            Self-sufficiency degree. [default: 0.7]
+      --ssr=SSR            Self-sufficiency degree.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
       --dry-run            Do nothing. Only print what would be done.
@@ -73,16 +73,38 @@ def validate(**arguments):
     return arguments
 
 
-def optimise_storage_size(energysystem,
-                          **arguments):
+def create_energysystem(energysystem,
+                        **arguments):
 
+    ###########################################################################
+    # read and calculate parameters
+    ###########################################################################
+
+    # Electricity from grid price
+    price_el = 0.30
+
+    # Calculate ep_costs from capex
+    storage_capex = 375
+    storage_lifetime = 10
+    storage_wacc = 0.07
+    storage_epc = storage_capex * (storage_wacc * (1 + storage_wacc) **
+                                   storage_lifetime) / ((1 + storage_wacc) **
+                                                        storage_lifetime - 1)
+
+    pv_capex = 1000
+    pv_lifetime = 20
+    pv_wacc = 0.07
+    pv_epc = pv_capex * (pv_wacc * (1 + pv_wacc) **
+                         pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
+
+    # Choose households according to simulation options
     hh_start = int(arguments['--start-hh'])
     hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
     hh = {}
     for i in np.arange(int(arguments['--num-hh'])):
         hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
 
-    # read load data in kW
+    # Read load data in kW
     data_load = \
         pd.read_csv(
                  "../example/example_data/example_data_load_hourly_mean.csv",
@@ -105,13 +127,13 @@ def optimise_storage_size(energysystem,
                                     albedo=0.2,
                                     loc=loc)
 
+    # Calculate grid share
+    if arguments['--ssr']:
+        grid_share = 1 - float(arguments['--ssr'])
+
     ##########################################################################
     # Create oemof object
     ##########################################################################
-
-    ssr = float(arguments['--ssr'])
-    grid_share = 1 - ssr
-
     logging.info('Create oemof objects')
 
     # create electricity bus
@@ -129,14 +151,22 @@ def optimise_storage_size(energysystem,
         for label in hh]
 
     # create commodity object for import electricity resource
-    [solph.Source(
-        label=label + '_gridsource',
-        outputs={bel[label]: solph.Flow(
-            nominal_value=consumption_of_chosen_households
-            [label] *
-            grid_share,
-            summed_max=1)})
-        for label in hh]
+    if arguments['--ssr']:
+        [solph.Source(
+            label=label + '_gridsource',
+            outputs={bel[label]: solph.Flow(
+                nominal_value=consumption_of_chosen_households
+                [label] *
+                grid_share,
+                summed_max=1)})
+            for label in hh]
+
+    else:
+        [solph.Source(
+            label=label + '_gridsource',
+            outputs={bel[label]: solph.Flow(
+                                            variable_costs=price_el)})
+            for label in hh]
 
     # create fixed source object for pv
     [solph.Source(
@@ -153,13 +183,6 @@ def optimise_storage_size(energysystem,
                 fixed=True, nominal_value=1)})
         for label in hh]
 
-    # Calculate ep_costs from capex to compare with old solph
-    capex = 375
-    lifetime = 10
-    wacc = 0.07
-    epc = capex * (wacc * (1 + wacc) ** lifetime) / ((1 + wacc) ** lifetime - 1
-                                                     )
-
     # create storage transformer object for storage
     [solph.Storage(
         label=label + 'ces',
@@ -170,7 +193,7 @@ def optimise_storage_size(energysystem,
         nominal_output_capacity_ratio=1/6,
         inflow_conversion_factor=1, outflow_conversion_factor=0.8,
         fixed_costs=0,
-        investment=Investment(ep_costs=epc),
+        investment=Investment(ep_costs=storage_epc),
     )
         for label in hh]
 
@@ -291,7 +314,7 @@ def create_plots(energysystem, year):
 def main(**arguments):
     logger.define_logging()
     esys = initialise_energysystem(year=arguments['--year'])
-    esys = optimise_storage_size(esys, **arguments)
+    esys = create_energysystem(esys, **arguments)
     esys.dump()
     # esys.restore()
     import pprint as pp
