@@ -185,12 +185,12 @@ def create_energysystem(energysystem,
 
     om = OperationalModel(energysystem, timeindex=energysystem.time_idx)
 
-    logging.info('Solve the optimization problem')
-    om.solve(solver=arguments['--solver'], solve_kwargs={'tee': True})
-
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',
              io_options={'symbolic_solver_labels': True})
+
+    logging.info('Solve the optimization problem')
+    om.solve(solver=arguments['--solver'], solve_kwargs={'tee': True})
 
     return energysystem
 
