@@ -6,6 +6,7 @@ Usage: example_quartier_10hh_11_to_20.py [options]
 
 Options:
 
+  -s, --scenario=SCENARIO  The scenario name. [default: scenario_test]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: gurobi]
@@ -74,26 +75,37 @@ def validate(**arguments):
     return arguments
 
 
-def read_and_calculate_parameters():
+def read_and_calculate_parameters(**arguments):
 
     ###########################################################################
     # read and calculate parameters
     ###########################################################################
 
+    logging.info('Read and calculate parameters')
+
+    # Read parameter csv files
+    cost_parameter = pd.read_csv(
+            'data/' + arguments['--scenario'] + '_cost_parameter.csv',
+            delimiter=',', index_col=0)
+
+    tech_parameter = pd.read_csv(
+            'data/' + arguments['--scenario'] + '_tech_parameter.csv',
+            delimiter=',')
+
     # Electricity from grid price
-    price_el = 0.30
+    price_el = cost_parameter.loc['grid']['opex_var']
 
     # Calculate ep_costs from capex
-    storage_capex = 375
-    storage_lifetime = 10
-    storage_wacc = 0.07
+    storage_capex = cost_parameter.loc['storage']['capex']
+    storage_lifetime = cost_parameter.loc['storage']['lifetime']
+    storage_wacc = cost_parameter.loc['storage']['wacc']
     storage_epc = storage_capex * (storage_wacc * (1 + storage_wacc) **
                                    storage_lifetime) / ((1 + storage_wacc) **
                                                         storage_lifetime - 1)
 
-    pv_capex = 1000
-    pv_lifetime = 20
-    pv_wacc = 0.07
+    pv_capex = cost_parameter.loc['pv']['capex']
+    pv_lifetime = cost_parameter.loc['pv']['lifetime']
+    pv_wacc = cost_parameter.loc['pv']['wacc']
     pv_epc = pv_capex * (pv_wacc * (1 + pv_wacc) **
                          pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
 
@@ -134,7 +146,9 @@ def read_and_calculate_parameters():
     else:
         grid_share = None
 
-    parameters = {'price_el': price_el,
+    parameters = {'cost_parameter': cost_parameter,
+                  'tech_parameter': tech_parameter,
+                  'price_el': price_el,
                   'storage_epc': storage_epc,
                   'pv_epc': pv_epc,
                   'data_load': data_load,
@@ -142,6 +156,10 @@ def read_and_calculate_parameters():
                   'grid_share': grid_share,
                   'hh': hh,
                   'consumption_households': consumption_of_chosen_households}
+
+    logging.info('Check parameters')
+    print(parameters['cost_parameter'])
+    print(parameters['tech_parameter'])
 
     return parameters
 
@@ -319,7 +337,7 @@ def main(**arguments):
     esys = initialise_energysystem(year=arguments['--year'],
                                    number_timesteps=int(
                                        arguments['--timesteps']))
-    parameters = read_and_calculate_parameters()
+    parameters = read_and_calculate_parameters(**arguments)
     esys = create_energysystem(esys,
                                parameters,
                                **arguments)
