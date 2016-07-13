@@ -74,8 +74,7 @@ def validate(**arguments):
     return arguments
 
 
-def create_energysystem(energysystem,
-                        **arguments):
+def read_and_calculate_parameters():
 
     ###########################################################################
     # read and calculate parameters
@@ -132,6 +131,23 @@ def create_energysystem(energysystem,
     if arguments['--ssr']:
         grid_share = 1 - float(arguments['--ssr'])
 
+    else:
+        grid_share = None
+
+    parameters = {'price_el': price_el,
+                  'storage_epc': storage_epc,
+                  'pv_epc': pv_epc,
+                  'data_load': data_load,
+                  'data_pv': data_pv,
+                  'grid_share': grid_share,
+                  'hh': hh,
+                  'consumption_households': consumption_of_chosen_households}
+
+    return parameters
+
+def create_energysystem(energysystem, parameters,
+                        **arguments):
+
     ##########################################################################
     # Create oemof object
     ##########################################################################
@@ -143,46 +159,48 @@ def create_energysystem(energysystem,
               type=bustype,
               balanced=True,
               excess=False)
-           for bustype in hh}
+           for bustype in parameters['hh']}
 
     # create excess component for the electricity bus to allow overproduction
     [solph.Sink(
         label=label + 'excess_bel',
         inputs={bel[label]: solph.Flow()})
-        for label in hh]
+        for label in parameters['hh']]
 
     # create commodity object for import electricity resource
     if arguments['--ssr']:
         [solph.Source(
             label=label + '_gridsource',
             outputs={bel[label]: solph.Flow(
-                nominal_value=consumption_of_chosen_households
+                nominal_value=parameters['consumption_households']
                 [label] *
-                grid_share,
+                parameters['grid_share'],
                 summed_max=1)})
-            for label in hh]
+            for label in parameters['hh']]
 
     else:
         [solph.Source(
             label=label + '_gridsource',
             outputs={bel[label]: solph.Flow(
-                                            variable_costs=price_el)})
-            for label in hh]
+                                            variable_costs=parameters[
+                                                'price_el'])})
+            for label in parameters['hh']]
 
     # create fixed source object for pv
     [solph.Source(
         label=label + '_pv',
-        outputs={bel[label]: solph.Flow(actual_value=data_pv,
+        outputs={bel[label]: solph.Flow(actual_value=parameters['data_pv'],
                                         nominal_value=10,
                                         fixed=True, fixed_costs=15)})
-        for label in hh]
+        for label in parameters['hh']]
 
     # create simple sink objects for demands 1 to 10
     [solph.Sink(
         label=label + '_demand',
-        inputs={bel[label]: solph.Flow(actual_value=data_load[str(hh[label])],
+        inputs={bel[label]: solph.Flow(actual_value=parameters['data_load']
+                                       [str(parameters['hh'][label])],
                 fixed=True, nominal_value=1)})
-        for label in hh]
+        for label in parameters['hh']]
 
     # create storage transformer object for storage
     [solph.Storage(
@@ -194,9 +212,9 @@ def create_energysystem(energysystem,
         nominal_output_capacity_ratio=1/6,
         inflow_conversion_factor=1, outflow_conversion_factor=0.8,
         fixed_costs=0,
-        investment=Investment(ep_costs=storage_epc),
+        investment=Investment(ep_costs=parameters['storage_epc']),
     )
-        for label in hh]
+        for label in parameters['hh']]
 
     ##########################################################################
     # Optimise the energy system and plot the results
@@ -216,7 +234,7 @@ def create_energysystem(energysystem,
     return energysystem
 
 
-def get_result_dict(energysystem, year):
+def get_result_dict(energysystem, parameters, year):
     logging.info('Check the results')
     ces = energysystem.groups['ces']
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
@@ -317,11 +335,14 @@ def main(**arguments):
     esys = initialise_energysystem(year=arguments['--year'],
                                    number_timesteps=int(
                                        arguments['--timesteps']))
-    esys = create_energysystem(esys, **arguments)
+    parameters = read_and_calculate_parameters()
+    esys = create_energysystem(esys,
+                               parameters,
+                               **arguments)
     esys.dump()
     # esys.restore()
     import pprint as pp
-    pp.pprint(get_result_dict(esys, year=arguments['--year']))
+    pp.pprint(get_result_dict(esys, parameters, year=arguments['--year']))
     create_plots(esys, year=arguments['--year'])
 
 
