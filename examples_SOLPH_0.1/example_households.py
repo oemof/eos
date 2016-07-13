@@ -12,6 +12,7 @@ Options:
   -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
                            WARNING, ERROR or CRITICAL.
                            [default: ERROR]
+  -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
   -h, --help               Display this help.
       --start-hh=START     Household to start when choosing from household
                            pool. Counts a chosen number of households up
@@ -54,7 +55,7 @@ from oemof.solph import OperationalModel
 from eos import helper_coastdat as hlp
 
 
-def initialise_energysystem(year, number_timesteps=8760):
+def initialise_energysystem(year, number_timesteps):
     """initialize the energy system
     """
     logging.info('Initialize the energy system')
@@ -313,7 +314,9 @@ def create_plots(energysystem, year):
 
 def main(**arguments):
     logger.define_logging()
-    esys = initialise_energysystem(year=arguments['--year'])
+    esys = initialise_energysystem(year=arguments['--year'],
+                                   number_timesteps=int(
+                                       arguments['--timesteps']))
     esys = create_energysystem(esys, **arguments)
     esys.dump()
     # esys.restore()
