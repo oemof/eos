@@ -18,7 +18,7 @@ Options:
                            from start-hh, see next option.
                            [default: 1]
       --num-hh=NUM         Number of households to choose. [default: 10]
-      --ssr=SSR            Self-sufficiency degree. [default: 0.7]
+      --ssr=SSR            Self-sufficiency degree.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
       --dry-run            Do nothing. Only print what would be done.
@@ -80,6 +80,9 @@ def create_energysystem(energysystem,
     # read and calculate parameters
     ###########################################################################
 
+    # Electricity from grid price
+    price_el = 0.30
+
     # Calculate ep_costs from capex
     storage_capex = 375
     storage_lifetime = 10
@@ -125,8 +128,8 @@ def create_energysystem(energysystem,
                                     loc=loc)
 
     # Calculate grid share
-    ssr = float(arguments['--ssr'])
-    grid_share = 1 - ssr
+    if arguments['--ssr']:
+        grid_share = 1 - float(arguments['--ssr'])
 
     ##########################################################################
     # Create oemof object
@@ -140,12 +143,16 @@ def create_energysystem(energysystem,
     solph.Sink(label='excess_bel', inputs={bel: solph.Flow()})
 
     # create commodity object for import electricity resource
-    solph.Source(label='gridsource', outputs={bel: solph.Flow(
+    if arguments['--ssr']:
+        solph.Source(label='gridsource', outputs={bel: solph.Flow(
                                         nominal_value=sum(
-                                            consumption_of_chosen_households.
-                                            values())*grid_share,
+                                             consumption_of_chosen_households.
+                                             values())*grid_share,
                                         summed_max=1)})
-    print(sum(consumption_of_chosen_households.values())*grid_share)
+
+    else:
+        solph.Source(label='gridsource', outputs={bel: solph.Flow(
+                                            variable_costs=price_el)})
 
     # create fixed source object for pv
     # Source(label='pv', outputs={bel: Flow(actual_value=data_pv,
