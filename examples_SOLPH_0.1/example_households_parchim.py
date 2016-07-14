@@ -30,11 +30,11 @@ from oemof.solph import OperationalModel
 from eos import helper_parchim as hlp
 
 
-def initialise_energysystem(number_timesteps=8760):
+def initialise_energysystem(year, number_timesteps=8760):
     """initialize the energy system
     """
     logging.info('Initialize the energy system')
-    date_time_index = pd.date_range('1/1/2010', periods=number_timesteps,
+    date_time_index = pd.date_range('1/1/' + year, periods=number_timesteps,
                                     freq='H')
 
     energysystem = solph.EnergySystem(
@@ -133,6 +133,7 @@ def optimise_storage_size(energysystem,
         bel_demand = solph.Bus(label="bel_demand_"+house)
 
         # create fixed source objects for pv
+        # TODO: year!!
         solph.Source(label='pv_'+house,
                      outputs={bel_pv: solph.Flow(
                          actual_value=hlp.get_pv_generation(
@@ -143,6 +144,14 @@ def optimise_storage_size(energysystem,
                          nominal_value=data_pv[label_pv][0],
                          fixed=True, fixed_costs=50,
                          investment=solph.Investment(ep_costs=epc_pv))})
+
+        test = hlp.get_pv_generation(
+            azimuth=data_pv[label_pv][1],
+            tilt=data_pv[label_pv][2],
+            albedo=data_pv[label_pv][3],
+            loc=loc)
+        print('sum pv')
+        print(sum(test))
 
         # create excess component for bel_pv to allow overproduction
         solph.Sink(label="excess_"+house, inputs={bel_pv: solph.Flow()})
@@ -161,7 +170,7 @@ def optimise_storage_size(energysystem,
             conversion_factors={bel_demand: 1})
 
         solph.LinearTransformer(
-            label="gridTransformer_"+house,
+            label="grid_Transformer_"+house,
             inputs={bel_grid: solph.Flow()},
             outputs={bel_demand: solph.Flow()},
             conversion_factors={bel_demand: 1})
@@ -209,41 +218,67 @@ def optimise_storage_size(energysystem,
     return energysystem, households
 
 
-def get_result_dict(energysystem, households):
+def get_result_dict(energysystem, households, year):
     logging.info('Check the results')
 
     myresults = tpd.DataFramePlot(energy_system=energysystem)
 
     gridsource = myresults.slice_by(obj_label='gridsource',
-                                    date_from='2012-01-01 00:00:00',
-                                    date_to='2012-12-31 23:00:00')
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
     results_dc = {}
 
     for house in households:
         storage = energysystem.groups['bat_'+house]
         demand = myresults.slice_by(obj_label='demand_'+house,
-                                    date_from='2012-01-01 00:00:00',
-                                    date_to='2012-12-31 23:00:00')
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
+
         pv = myresults.slice_by(obj_label='pv_'+house,
-                                date_from='2012-01-01 00:00:00',
-                                date_to='2012-12-31 23:00:00')
+                                date_from=year+'-01-01 00:00:00',
+                                date_to=year+'-12-31 23:00:00')
+
+        excess = myresults.slice_by(obj_label='excess_'+house,
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
+
+        feedin = myresults.slice_by(obj_label='feedin_'+house,
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
+
+        sc = myresults.slice_by(obj_label='sc_Transformer_'+house,
+                                date_from=year+'-01-01 00:00:00',
+                                date_to=year+'-12-31 23:00:00')
+
+        grid = myresults.slice_by(obj_label='grid_Transformer_'+house,
+                                  date_from=year+'-01-01 00:00:00',
+                                  date_to=year+'-12-31 23:00:00')
+
+        bat = myresults.slice_by(obj_label='bat_'+house,
+                                 date_from=year+'-01-01 00:00:00',
+                                 date_to=year+'-12-31 23:00:00')
 
         results_dc['demand_'+house] = demand.sum()
-        results_dc['pv_'+house] = demand.sum()
+        results_dc['pv_'+house] = pv.sum()
         results_dc['pv_inst_'+house] = pv.max()
-        results_dc['gridsource'] = gridsource.sum()
+        results_dc['excess'+house] = excess.sum()
+        results_dc['feedin'+house] = feedin.sum()
+        results_dc['self_con_'+house] = sc.sum()
+        results_dc['grid_'+house] = grid.sum()
+        results_dc['gridsource_sum'] = gridsource.sum()
         results_dc['objective'] = energysystem.results.objective
+        results_dc['bat_'+house] = bat.sum()
         results_dc['storage_cap_'+house] = energysystem.results[
             storage][storage].invest
     return(results_dc)
 
 
-def create_plots(energysystem):
+def create_plots(energysystem, year):
     logging.info('Plot results')
     myresults = tpd.DataFramePlot(energy_system=energysystem)
     gridsource = myresults.slice_by(obj_label='gridsource', type='input',
-                                    date_from='2012-01-01 00:00:00',
-                                    date_to='2012-12-31 23:00:00')
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
 
     imp = gridsource.sort_values(by='val', ascending=False).reset_index()
 
@@ -258,12 +293,12 @@ if __name__ == "__main__":
 #        print("This is a dry run. Exiting before doing anything.")
 #        exit(0)
 #    arguments = validate(**arguments)
-
+    year = '2010'  # TODO: softcode
     logger.define_logging()
-    esys = initialise_energysystem()
+    esys = initialise_energysystem(year)
     esys, households = optimise_storage_size(esys)
     esys.dump()
     # esys.restore()
     import pprint as pp
-    pp.pprint(get_result_dict(esys, households))
-    create_plots(esys)
+    pp.pprint(get_result_dict(esys, households, year))
+    create_plots(esys, year)
