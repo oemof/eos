@@ -64,27 +64,27 @@ def optimise_storage_size(energysystem,
     # tilt = data_pv['hh_2'][2]
     # albedo = data_pv['hh_2'][3]
 
-    #number_hh = np.shape(data_pv)[1] - 1 #TODO
-    number_hh = 2
+    # number_hh = np.shape(data_pv)[1] - 1 #TODO
+    number_hh = 8
 
     loc = {
         'tz': 'Europe/Berlin',
         'latitude': 53.41,
         'longitude': 11.84}    # Parchim
 
-    price_el = 0.30
+    price_el = 0.50
     max_feedin = 0.5
-    fit = 0.01         # -0.123
-    sc_tax = 0      # TODO ab 10kWp/10MW: 0.0222
+    fit = -0.1         # -0.123
+    sc_tax = 0.0      # TODO ab 10kWp/10MW: 0.0222
     hh_start = 1    # TODO: softcode
 
     # Calculate ep_costs from capex to compare with old solph
     #TODO ????
-    capex = 1500
+    capex = 1000
     lifetime = 10
-    wacc = 0.05
+    wacc = 0.005
 
-    capex_pv = 1000
+    capex_pv = 900
     lifetime_pv = 20
 
     epc = capex * (wacc * (1 + wacc) ** lifetime) / (
@@ -95,7 +95,7 @@ def optimise_storage_size(energysystem,
     # create list of household(numbers) to choośe, beginning with hh_start
     hh_to_choose = np.arange(hh_start, hh_start + number_hh)
 
-    #creta dict hh with 'demand_1' = 'hh_start'
+    # create dict hh with 'demand_1' = 'hh_start'
     hh = {}
     for n in range(0, number_hh):
         hh['demand_' + str(n+1)] = 'hh_' + str(hh_to_choose[n])
@@ -112,12 +112,6 @@ def optimise_storage_size(energysystem,
     logging.info('Create oemof objects')
     # create objects for every hh
 
-    # create electricity bus for grid demand
-    bel_grid = solph.Bus(label="bel_grid")
-    # create commodity object for import electricity resource
-    solph.Source(label='gridsource', outputs={bel_grid: solph.Flow(
-        variable_costs=price_el)})
-
     house_pv = 0
 
     for house in households:
@@ -131,6 +125,11 @@ def optimise_storage_size(energysystem,
 
         # create electricity bus for demand
         bel_demand = solph.Bus(label="bel_demand_"+house)
+
+        # create commodity object for import electricity resource
+        solph.Source(label='gridsource_'+house, outputs={
+            bel_demand: solph.Flow(
+                variable_costs=price_el)})
 
         # create fixed source objects for pv
         # TODO: year!!
@@ -169,12 +168,6 @@ def optimise_storage_size(energysystem,
             outputs={bel_demand: solph.Flow()},
             conversion_factors={bel_demand: 1})
 
-        solph.LinearTransformer(
-            label="grid_Transformer_"+house,
-            inputs={bel_grid: solph.Flow()},
-            outputs={bel_demand: solph.Flow()},
-            conversion_factors={bel_demand: 1})
-
         # create simple sink object for demands
         solph.Sink(
             label="demand_"+house,
@@ -209,7 +202,7 @@ def optimise_storage_size(energysystem,
              io_options={'symbolic_solver_labels': True})
 
     for e in energysystem.entities:
-        print (e)
+        print(e)
 
     logging.info('Solve the optimization problem')
 
@@ -223,9 +216,6 @@ def get_result_dict(energysystem, households, year):
 
     myresults = tpd.DataFramePlot(energy_system=energysystem)
 
-    gridsource = myresults.slice_by(obj_label='gridsource',
-                                    date_from=year+'-01-01 00:00:00',
-                                    date_to=year+'-12-31 23:00:00')
     results_dc = {}
 
     for house in households:
@@ -250,7 +240,7 @@ def get_result_dict(energysystem, households, year):
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
-        grid = myresults.slice_by(obj_label='grid_Transformer_'+house,
+        grid = myresults.slice_by(obj_label='gridsource_'+house,
                                   date_from=year+'-01-01 00:00:00',
                                   date_to=year+'-12-31 23:00:00')
 
@@ -261,11 +251,11 @@ def get_result_dict(energysystem, households, year):
         results_dc['demand_'+house] = demand.sum()
         results_dc['pv_'+house] = pv.sum()
         results_dc['pv_inst_'+house] = pv.max()
-        results_dc['excess'+house] = excess.sum()
-        results_dc['feedin'+house] = feedin.sum()
-        results_dc['self_con_'+house] = sc.sum()
+        results_dc['excess_'+house] = excess.sum()
+        results_dc['feedin_'+house] = feedin.sum()
+        results_dc['self_con_'+house] = sc.sum() / 2
+        # TODO get in or oputflow of transformer
         results_dc['grid_'+house] = grid.sum()
-        results_dc['gridsource_sum'] = gridsource.sum()
         results_dc['objective'] = energysystem.results.objective
         results_dc['bat_'+house] = bat.sum()
         results_dc['storage_cap_'+house] = energysystem.results[
@@ -276,7 +266,7 @@ def get_result_dict(energysystem, households, year):
 def create_plots(energysystem, year):
     logging.info('Plot results')
     myresults = tpd.DataFramePlot(energy_system=energysystem)
-    gridsource = myresults.slice_by(obj_label='gridsource', type='input',
+    gridsource = myresults.slice_by(obj_label='gridsource_hh_1', type='input',
                                     date_from=year+'-01-01 00:00:00',
                                     date_to=year+'-12-31 23:00:00')
 
