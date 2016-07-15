@@ -23,7 +23,7 @@ Options:
       --ssr=SSR            Self-sufficiency degree.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
-      --parchim            option with different pv plants (will need
+      --parchim=PARCHIM    option with different pv plants (will need
                            scenario_pv.csv) and max feedin [default: True]
       --dry-run            Do nothing. Only print what would be done.
 
@@ -99,7 +99,7 @@ def read_and_calculate_parameters(**arguments):
     else:
         pv_parameter = 0
 
-    print('pv_parameter:')    
+    print('pv_parameter:')
     print(pv_parameter)
 
     # Electricity from grid price
