@@ -347,10 +347,11 @@ def get_result_dict(energysystem, parameters, year):
         results_dc['self_con_'+house] = sc.sum() / 2
         # TODO get in or oputflow of transformer
         results_dc['grid_'+house] = grid.sum()
-        results_dc['objective'] = energysystem.results.objective
+        results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
         results_dc['bat_'+house] = bat.sum()
         results_dc['storage_cap_'+house] = energysystem.results[
             storage][storage].invest
+        results_dc['objective'] = energysystem.results.objective
     return(results_dc)
 
 
