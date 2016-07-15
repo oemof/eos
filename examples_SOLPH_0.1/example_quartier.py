@@ -6,23 +6,29 @@ Usage: example_quartier_10hh_11_to_20.py [options]
 
 Options:
 
-  -s, --scenario=SCENARIO  The scenario name. [default: scenario_test]
+  -s, --scenario=SCENARIO  The scenario name. [default: scenario_parchim]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
-                           [default: gurobi]
+                           [default: cbc]
   -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
                            WARNING, ERROR or CRITICAL.
                            [default: ERROR]
   -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
   -h, --help               Display this help.
+      --lat=LAT            Sets the simulation longitude to choose the right
+                           weather data set. [default: 53.41] # Parchim
+      --lon=LON            Sets the simulation latitude to choose the right
+                           weather data set. [default: 11.84] # Parchim
       --start-hh=START     Household to start when choosing from household
                            pool. Counts a chosen number of households up
                            from start-hh, see next option.
                            [default: 1]
-      --num-hh=NUM         Number of households to choose. [default: 10]
+      --num-hh=NUM         Number of households to choose. [default: 2]
       --ssr=SSR            Self-sufficiency degree.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
+      --parchim=PARCHIM    Option with different pv plants (will need
+                           scenario_pv.csv) and max feedin [default: True]
       --dry-run            Do nothing. Only print what would be done.
 
 '''
@@ -47,10 +53,7 @@ from oemof import outputlib
 from oemof.tools import logger
 
 # import oemof core and solph classes to create energy system objects
-from oemof.core import energy_system as core_es
 import oemof.solph as solph
-from oemof.solph.network import Investment
-from oemof.solph import OperationalModel
 
 # import helper to read coastdat data
 from eos import helper_coastdat as hlp
@@ -64,8 +67,8 @@ def initialise_energysystem(year, number_timesteps):
                                     periods=number_timesteps,
                                     freq='H')
 
-    return core_es.EnergySystem(groupings=solph.GROUPINGS,
-                                time_idx=date_time_index)
+    return solph.EnergySystem(groupings=solph.GROUPINGS,
+                              time_idx=date_time_index)
 
 
 def validate(**arguments):
@@ -90,10 +93,23 @@ def read_and_calculate_parameters(**arguments):
 
     tech_parameter = pd.read_csv(
             'data/' + arguments['--scenario'] + '_tech_parameter.csv',
-            delimiter=',')
+            delimiter=',', index_col=0)
+
+    if arguments['--parchim'] is True:
+        pv_parameter = pd.read_csv(
+            'data/' + arguments['--scenario'] + '_pv.csv',
+            delimiter=';')
+    else:
+        pv_parameter = 0
 
     # Electricity from grid price
     price_el = cost_parameter.loc['grid']['opex_var']
+    fit = cost_parameter.loc['fit']['opex_var']
+    sc_tax = cost_parameter.loc['sc']['opex_var']
+    opex_pv = cost_parameter.loc['pv']['opex_fix']
+    opex_bat = cost_parameter.loc['storage']['opex_fix']
+
+    max_feedin = tech_parameter.loc['pv']['max_feedin']
 
     # Calculate ep_costs from capex
     storage_capex = cost_parameter.loc['storage']['capex']
@@ -130,8 +146,8 @@ def read_and_calculate_parameters(**arguments):
     # Read standardized feed-in from pv
     loc = {
         'tz': 'Europe/Berlin',
-        'latitude': 53.41,
-        'longitude': 11.84}    # Parchim
+        'latitude': float(arguments['--lat']),
+        'longitude': float(arguments['--lon'])}
 
     data_pv = hlp.get_pv_generation(year=int(arguments['--year']),
                                     azimuth=180,
@@ -148,18 +164,26 @@ def read_and_calculate_parameters(**arguments):
 
     parameters = {'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
+                  'pv_parameter': pv_parameter,
                   'price_el': price_el,
+                  'fit': fit,
+                  'sc_tax': sc_tax,
+                  'max_feedin': max_feedin,
+                  'opex_pv': opex_pv,
+                  'opex_bat': opex_bat,
                   'storage_epc': storage_epc,
                   'pv_epc': pv_epc,
                   'data_load': data_load,
                   'data_pv': data_pv,
                   'grid_share': grid_share,
                   'hh': hh,
-                  'consumption_households': consumption_of_chosen_households}
+                  'consumption_households': consumption_of_chosen_households,
+                  'loc': loc}
 
     logging.info('Check parameters')
-    print(parameters['cost_parameter'])
-    print(parameters['tech_parameter'])
+    print('cost parameter:\n', parameters['cost_parameter'])
+    print('tech parameter:\n', parameters['tech_parameter'])
+    print('pv parameter:\n', parameters['pv_parameter'])
 
     return parameters
 
@@ -222,7 +246,7 @@ def create_energysystem(energysystem, parameters,
         nominal_output_capacity_ratio=1/6,
         inflow_conversion_factor=1, outflow_conversion_factor=0.8,
         fixed_costs=0,
-        investment=Investment(ep_costs=parameters['storage_epc']),
+        investment=solph.Investment(ep_costs=parameters['storage_epc']),
     )
 
     ##########################################################################
@@ -231,7 +255,7 @@ def create_energysystem(energysystem, parameters,
 
     logging.info('Optimise the energy system')
 
-    om = OperationalModel(energysystem, timeindex=energysystem.time_idx)
+    om = solph.OperationalModel(energysystem, timeindex=energysystem.time_idx)
 
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',
