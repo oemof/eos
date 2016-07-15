@@ -85,7 +85,6 @@ def read_and_calculate_parameters(**arguments):
     ###########################################################################
 
     logging.info('Read and calculate parameters')
-    print(arguments['--scenario'])
 
     # Read parameter csv files
     cost_parameter = pd.read_csv(
@@ -102,9 +101,6 @@ def read_and_calculate_parameters(**arguments):
             delimiter=';')
     else:
         pv_parameter = 0
-
-    print('pv_parameter:')
-    print(pv_parameter)
 
     # Electricity from grid price
     price_el = cost_parameter.loc['grid']['opex_var']
@@ -147,7 +143,7 @@ def read_and_calculate_parameters(**arguments):
         consumption_of_chosen_households['house_' + str(i+1)] = \
             data_load[str(hh['house_' + str(i+1)])].sum()
 
-    # read standardized feed-in from pv
+    # Read standardized feed-in from pv
     loc = {
         'tz': 'Europe/Berlin',
         'latitude': float(arguments['--lat']),
@@ -185,8 +181,9 @@ def read_and_calculate_parameters(**arguments):
                   'loc': loc}
 
     logging.info('Check parameters')
-    print(parameters['cost_parameter'])
-    print(parameters['tech_parameter'])
+    print('cost parameter:\n', parameters['cost_parameter'])
+    print('tech parameter:\n', parameters['tech_parameter'])
+    print('pv parameter:\n', parameters['pv_parameter'])
 
     return parameters
 
@@ -214,7 +211,7 @@ def create_energysystem(energysystem, parameters,
         solph.Sink(label=house+"_excess", inputs={bel_pv: solph.Flow()})
 
         if arguments['--parchim'] is True:
-            # create excess component for the pv feedin
+            # create sink component for the pv feedin
             solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
                 variable_costs=parameters['fit'],
                 nominal_value=parameters['pv_parameter'][label_pv][0],
