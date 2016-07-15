@@ -15,6 +15,10 @@ Options:
                            [default: ERROR]
   -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
   -h, --help               Display this help.
+      --lat=LAT            Sets the simulation longitude to choose the right
+                           weather data set. [default: 53.41] # Parchim
+      --lon=LON            Sets the simulation latitude to choose the right
+                           weather data set. [default: 11.84] # Parchim
       --start-hh=START     Household to start when choosing from household
                            pool. Counts a chosen number of households up
                            from start-hh, see next option.
@@ -23,7 +27,7 @@ Options:
       --ssr=SSR            Self-sufficiency degree.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
-      --parchim=PARCHIM    option with different pv plants (will need
+      --parchim=PARCHIM    Option with different pv plants (will need
                            scenario_pv.csv) and max feedin [default: True]
       --dry-run            Do nothing. Only print what would be done.
 
@@ -146,8 +150,8 @@ def read_and_calculate_parameters(**arguments):
     # read standardized feed-in from pv
     loc = {
         'tz': 'Europe/Berlin',
-        'latitude': 53.41,
-        'longitude': 11.84}    # Parchim
+        'latitude': float(arguments['--lat']),
+        'longitude': float(arguments['--lon'])}
 
     data_pv = hlp.get_pv_generation(year=int(arguments['--year']),
                                     azimuth=180,
