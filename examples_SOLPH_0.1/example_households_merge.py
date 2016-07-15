@@ -92,7 +92,7 @@ def read_and_calculate_parameters(**arguments):
         'data/' + arguments['--scenario'] + '_tech_parameter.csv',
         delimiter=',', index_col=0)
 
-    if arguments['--parchim']:
+    if arguments['--parchim'] is True:
         pv_parameter = pd.read_csv(
             'data/' + arguments['--scenario'] + '_pv.csv',
             delimiter=';')
@@ -209,7 +209,7 @@ def create_energysystem(energysystem, parameters,
         # create excess component for bel_pv to allow overproduction
         solph.Sink(label=house+"_excess", inputs={bel_pv: solph.Flow()})
 
-        if arguments['--parchim']:
+        if arguments['--parchim'] is True:
             # create excess component for the pv feedin
             solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
                 variable_costs=parameters['fit'],
@@ -232,7 +232,7 @@ def create_energysystem(energysystem, parameters,
                     variable_costs=parameters['price_el'])})
 
         # create fixed source object for pv
-        if arguments['--parchim']:
+        if arguments['--parchim'] is True:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
                 actual_value=hlp.get_pv_generation(
                     year=int(arguments['--year']),
@@ -331,7 +331,7 @@ def get_result_dict(energysystem, parameters, year):
         bat = myresults.slice_by(obj_label=house+'_bat',
                                  date_from=year+'-01-01 00:00:00',
                                  date_to=year+'-12-31 23:00:00')
-        if arguments['--parchim']:
+        if arguments['--parchim'] is True:
             feedin = myresults.slice_by(obj_label=house+'_feedin',
                                         date_from=year+'-01-01 00:00:00',
                                         date_to=year+'-12-31 23:00:00')
