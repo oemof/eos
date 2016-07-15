@@ -54,10 +54,10 @@ from oemof.tools import logger
 
 # import oemof core and solph classes to create energy system objects
 import oemof.solph as solph
-from oemof.solph import OperationalModel
 
 # import helper to read coastdat data
 from eos import helper_coastdat as hlp
+
 
 def initialise_energysystem(year, number_timesteps):
     """initialize the energy system
@@ -291,7 +291,7 @@ def create_energysystem(energysystem, parameters,
 
     logging.info('Optimise the energy system')
 
-    om = OperationalModel(energysystem, timeindex=energysystem.time_idx)
+    om = solph.OperationalModel(energysystem, timeindex=energysystem.time_idx)
 
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',
