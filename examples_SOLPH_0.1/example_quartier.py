@@ -190,21 +190,6 @@ def create_energysystem(energysystem, parameters,
     # Create electricity bus for demand
     bel_demand = solph.Bus(label="bel_demand")
 
-    # Create commodity object for import electricity resource
-    if arguments['--ssr']:
-        solph.Source(
-            label='gridsource',
-            outputs={bel_demand: solph.Flow(
-                nominal_value=sum(
-                    parameters['consumption_households'].values()) *
-                parameters['grid_share'],
-                summed_max=1)})
-
-    else:
-        solph.Source(label='gridsource', outputs={
-            bel_demand: solph.Flow(
-                variable_costs=parameters['price_el'])})
-
     # Create storage transformer object for storage
     tech_parameter = parameters['tech_parameter']
     solph.Storage(
@@ -220,6 +205,21 @@ def create_energysystem(energysystem, parameters,
         outflow_conversion_factor=tech_parameter.loc['storage']['eta_out'],
         fixed_costs=parameters['opex_bat'],
         investment=solph.Investment(ep_costs=parameters['storage_epc']))
+
+    # Create commodity object for import electricity resource
+    if arguments['--ssr']:
+        solph.Source(
+            label='gridsource',
+            outputs={bel_demand: solph.Flow(
+                nominal_value=sum(
+                    parameters['consumption_households'].values()) *
+                parameters['grid_share'],
+                summed_max=1)})
+
+    else:
+        solph.Source(label='gridsource', outputs={
+            bel_demand: solph.Flow(
+                variable_costs=parameters['price_el'])})
 
     house_pv = 0
     for house in parameters['hh']:
@@ -239,6 +239,16 @@ def create_energysystem(energysystem, parameters,
                 nominal_value=parameters['pv_parameter'][label_pv][0],
                 max=parameters['max_feedin'])})
 
+        # Create linear transformer to connect pv and demand bus
+        solph.LinearTransformer(
+            label=house+"_sc_Transformer",
+            inputs={bel_pv: solph.Flow(variable_costs=parameters['sc_tax'])},
+            outputs={bel_demand: solph.Flow()},
+            conversion_factors={bel_demand: 1})
+
+        # data_re = pd.read_csv("../example/example_data/example_data_re.csv", sep=',')
+        # data_pv = data_re['pv']
+
         # Create fixed source object for pv
         solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
             actual_value=hlp.get_pv_generation(
@@ -250,13 +260,6 @@ def create_energysystem(energysystem, parameters,
             nominal_value=parameters['pv_parameter'][label_pv][0],
             fixed=True,
             fixed_costs=parameters['opex_pv'])})
-
-        # Create linear transformer to connect pv and demand bus
-        solph.LinearTransformer(
-            label=house+"_sc_Transformer",
-            inputs={bel_pv: solph.Flow(variable_costs=parameters['sc_tax'])},
-            outputs={bel_demand: solph.Flow()},
-            conversion_factors={bel_demand: 1})
 
         # Create simple sink objects for demands
         solph.Sink(
