@@ -189,7 +189,7 @@ def create_energysystem(energysystem, parameters,
     house_pv = 0
     for house in parameters['hh']:
         house_pv = house_pv + 1
-        label_pv = 'hh_' + str(house_pv)
+        label_pv = 'pv_' + str(house_pv)
 
         # create electricity bus for pv
         bel_pv = solph.Bus(label=house+"_bel_pv")
