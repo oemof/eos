@@ -287,77 +287,61 @@ def create_energysystem(energysystem, parameters,
 
 def get_result_dict(energysystem, parameters, year):
     logging.info('Check the results')
-    ces = energysystem.groups['ces']
+
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
-    gridsource = myresults.slice_by(obj_label='gridsource', type='input',
-                                    date_from=year + '-01-01 00:00:00',
-                                    date_to=year + '-12-31 23:00:00')
+    grid = myresults.slice_by(obj_label='gridsource',
+                              date_from=year+'-01-01 00:00:00',
+                              date_to=year+'-12-31 23:00:00')
 
-    demand_1 = myresults.slice_by(obj_label='house_1_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+    bat = myresults.slice_by(obj_label='bat',
+                             date_from=year+'-01-01 00:00:00',
+                             date_to=year+'-12-31 23:00:00')
 
-    demand_2 = myresults.slice_by(obj_label='house_2_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+    storage = energysystem.groups['bat']
 
-    demand_3 = myresults.slice_by(obj_label='house_3_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+    results_dc = {}
 
-    demand_4 = myresults.slice_by(obj_label='house_4_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+    for house in parameters['hh']:
+        demand = myresults.slice_by(obj_label=house+'_demand',
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
 
-    demand_5 = myresults.slice_by(obj_label='house_5_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+        pv = myresults.slice_by(obj_label=house+'_pv',
+                                date_from=year+'-01-01 00:00:00',
+                                date_to=year+'-12-31 23:00:00')
 
-    demand_6 = myresults.slice_by(obj_label='house_6_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+        excess = myresults.slice_by(obj_label=house+'_excess',
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
 
-    demand_7 = myresults.slice_by(obj_label='house_7_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+        sc = myresults.slice_by(obj_label=house+'_sc_Transformer',
+                                date_from=year+'-01-01 00:00:00',
+                                date_to=year+'-12-31 23:00:00')
 
-    demand_8 = myresults.slice_by(obj_label='house_8_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+        if arguments['--feedin'] is True:
+            feedin = myresults.slice_by(obj_label=house+'_feedin',
+                                        date_from=year+'-01-01 00:00:00',
+                                        date_to=year+'-12-31 23:00:00')
+        else:
+            feedin = [0,0]
 
-    demand_9 = myresults.slice_by(obj_label='house_9_demand',
-                                  date_from=year + '-01-01 00:00:00',
-                                  date_to=year + '-12-31 23:00:00')
+        results_dc['demand_'+house] = demand.sum()
+        results_dc['pv_'+house] = pv.sum()
+        results_dc['pv_inst_'+house] = pv.max()
+        results_dc['excess_'+house] = excess.sum()
+        results_dc['feedin_'+house] = sum(feedin)
+        results_dc['self_con_'+house] = sc.sum() / 2
+        # TODO get in or oputflow of transformer
+        results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
+        results_dc['bat_'+house] = bat.sum()
 
-    demand_10 = myresults.slice_by(obj_label='house_10_demand',
-                                   date_from=year + '-01-01 00:00:00',
-                                   date_to=year + '-12-31 23:00:00')
+    results_dc['grid'] = grid.sum()
+    results_dc['storage_cap'] = energysystem.results[
+        storage][storage].invest
+    results_dc['objective'] = energysystem.results.objective
 
-    pv = myresults.slice_by(obj_label='pv',
-                            date_from=year + '-01-01 00:00:00',
-                            date_to=year + '-12-31 23:00:00')
-
-    return {'gridsource_sum': gridsource.sum(),
-            'check_ssr': 1 - (gridsource.sum() /
-                              sum(
-                              parameters['consumption_households'].values())),
-            'demand_sum_1': demand_1.sum(),
-            'demand_sum_2': demand_2.sum(),
-            'demand_sum_3': demand_3.sum(),
-            'demand_sum_4': demand_4.sum(),
-            'demand_sum_5': demand_5.sum(),
-            'demand_sum_6': demand_6.sum(),
-            'demand_sum_7': demand_7.sum(),
-            'demand_sum_8': demand_8.sum(),
-            'demand_sum_9': demand_9.sum(),
-            'demand_sum_10': demand_10.sum(),
-            'pv_sum': pv.sum(),
-            'pv_inst': pv.max()/0.76474,
-            'storage_cap': energysystem.results[ces][ces].invest,
-            }
-
-            # 'objective: ', energysystem.results.objective
+    return(results_dc)
 
 
 def create_plots(energysystem, year):
@@ -387,7 +371,7 @@ def main(**arguments):
     # esys.restore()
     import pprint as pp
     pp.pprint(get_result_dict(esys, parameters, year=arguments['--year']))
-    create_plots(esys, year=arguments['--year'])
+#    create_plots(esys, year=arguments['--year'])
 
 
 if __name__ == "__main__":
