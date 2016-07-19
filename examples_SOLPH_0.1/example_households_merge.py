@@ -27,7 +27,7 @@ Options:
       --ssr=SSR            Self-sufficiency degree.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
-      --parchim=PARCHIM    Option with different pv plants (will need
+      --feedin=FEEDIN      Option with different pv plants (will need
                            scenario_pv.csv) and max feedin [default: True]
       --dry-run            Do nothing. Only print what would be done.
 
@@ -95,12 +95,9 @@ def read_and_calculate_parameters(**arguments):
         'data/' + arguments['--scenario'] + '_tech_parameter.csv',
         delimiter=',', index_col=0)
 
-    if arguments['--parchim'] is True:
-        pv_parameter = pd.read_csv(
-            'data/' + arguments['--scenario'] + '_pv.csv',
-            delimiter=';')
-    else:
-        pv_parameter = 0
+    pv_parameter = pd.read_csv(
+        'data/' + arguments['--scenario'] + '_pv.csv',
+        delimiter=';')
 
     # Electricity from grid price
     price_el = cost_parameter.loc['grid']['opex_var']
@@ -210,7 +207,7 @@ def create_energysystem(energysystem, parameters,
         # create excess component for bel_pv to allow overproduction
         solph.Sink(label=house+"_excess", inputs={bel_pv: solph.Flow()})
 
-        if arguments['--parchim'] is True:
+        if arguments['--feedin'] is True:
             # create sink component for the pv feedin
             solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
                 variable_costs=parameters['fit'],
@@ -233,22 +230,16 @@ def create_energysystem(energysystem, parameters,
                     variable_costs=parameters['price_el'])})
 
         # create fixed source object for pv
-        if arguments['--parchim'] is True:
-            solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=hlp.get_pv_generation(
-                    year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'][label_pv][1],
-                    tilt=parameters['pv_parameter'][label_pv][2],
-                    albedo=parameters['pv_parameter'][label_pv][3],
-                    loc=parameters['loc']),
-                nominal_value=parameters['pv_parameter'][label_pv][0],
-                fixed=True,
-                fixed_costs=parameters['opex_pv'])})
-        else:
-            solph.Source(label=house + '_pv', outputs={bel_pv: solph.Flow(
-                actual_value=parameters['data_pv'],
-                nominal_value=10,
-                fixed=True, fixed_costs=15)})  # TODO: opex_pv???
+        solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
+            actual_value=hlp.get_pv_generation(
+                year=int(arguments['--year']),
+                azimuth=parameters['pv_parameter'][label_pv][1],
+                tilt=parameters['pv_parameter'][label_pv][2],
+                albedo=parameters['pv_parameter'][label_pv][3],
+                loc=parameters['loc']),
+            nominal_value=parameters['pv_parameter'][label_pv][0],
+            fixed=True,
+            fixed_costs=parameters['opex_pv'])})
 
         # create simple sink objects for demands
         solph.Sink(
@@ -332,7 +323,7 @@ def get_result_dict(energysystem, parameters, year):
         bat = myresults.slice_by(obj_label=house+'_bat',
                                  date_from=year+'-01-01 00:00:00',
                                  date_to=year+'-12-31 23:00:00')
-        if arguments['--parchim'] is True:
+        if arguments['--feedin'] is True:
             feedin = myresults.slice_by(obj_label=house+'_feedin',
                                         date_from=year+'-01-01 00:00:00',
                                         date_to=year+'-12-31 23:00:00')
@@ -381,7 +372,6 @@ def create_plots(energysystem, year):
 
 
 def main(**arguments):
-#    arguments['--parchim'] = True
     logger.define_logging()
     esys = initialise_energysystem(year=arguments['--year'],
                                    number_timesteps=int(
