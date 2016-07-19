@@ -191,18 +191,20 @@ def create_energysystem(energysystem, parameters,
     bel_demand = solph.Bus(label="bel_demand")
 
     # Create storage transformer object for storage
-    tech_parameter = parameters['tech_parameter']
     solph.Storage(
         label='bat',
         inputs={bel_demand: solph.Flow(variable_costs=0)},
         outputs={bel_demand: solph.Flow(variable_costs=0)},
-        capacity_loss=tech_parameter.loc['storage']['cap_loss'],
-        nominal_input_capacity_ratio=tech_parameter.loc['storage'][
-            'c_rate'],
-        nominal_output_capacity_ratio=tech_parameter.loc['storage'][
-            'c_rate'],
-        inflow_conversion_factor=tech_parameter.loc['storage']['eta_in'],
-        outflow_conversion_factor=tech_parameter.loc['storage']['eta_out'],
+        capacity_loss=parameters[
+            'tech_parameter'].loc['storage']['cap_loss'],
+        nominal_input_capacity_ratio=parameters[
+            'tech_parameter'].loc['storage']['c_rate'],
+        nominal_output_capacity_ratio=parameters[
+            'tech_parameter'].loc['storage']['c_rate'],
+        inflow_conversion_factor=parameters[
+            'tech_parameter'].loc['storage']['eta_in'],
+        outflow_conversion_factor=parameters[
+            'tech_parameter'].loc['storage']['eta_out'],
         fixed_costs=parameters['opex_bat'],
         investment=solph.Investment(ep_costs=parameters['storage_epc']))
 
