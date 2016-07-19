@@ -146,12 +146,6 @@ def read_and_calculate_parameters(**arguments):
         'latitude': float(arguments['--lat']),
         'longitude': float(arguments['--lon'])}
 
-    data_pv = hlp.get_pv_generation(year=int(arguments['--year']),
-                                    azimuth=180,
-                                    tilt=30,
-                                    albedo=0.2,
-                                    loc=loc)
-
     # Calculate grid share
     if arguments['--ssr']:
         grid_share = 1 - float(arguments['--ssr'])
@@ -171,7 +165,6 @@ def read_and_calculate_parameters(**arguments):
                   'storage_epc': storage_epc,
                   'pv_epc': pv_epc,
                   'data_load': data_load,
-                  'data_pv': data_pv,
                   'grid_share': grid_share,
                   'hh': hh,
                   'consumption_households': consumption_of_chosen_households,
