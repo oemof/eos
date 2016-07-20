@@ -29,7 +29,7 @@ Options:
       --pv-costopt         Cost optimization for pv plants.
       --feedin             Option with different pv plants (will need
                            scenario_pv.csv) and max feedin
-      --write_results      write results to data/scenarioname_results.csv
+      --write-results      write results to data/scenarioname_results.csv
       --ssr=SSR            Self-sufficiency degree.
       --dry-run            Do nothing. Only print what would be done.
 
