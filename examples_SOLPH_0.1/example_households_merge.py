@@ -294,8 +294,10 @@ def create_energysystem(energysystem, parameters,
     return energysystem
 
 
-def get_result_dict(energysystem, parameters, year):
+def get_result_dict(energysystem, parameters, **arguments):
     logging.info('Check the results')
+
+    year = arguments['--year']
 
     results_dc = {}
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
@@ -389,7 +391,7 @@ def main(**arguments):
     esys.dump()
     # esys.restore()
     import pprint as pp
-    pp.pprint(get_result_dict(esys, parameters, year=arguments['--year']))
+    pp.pprint(get_result_dict(esys, parameters, **arguments))
 #    create_plots(esys, year=arguments['--year'])
 
 
