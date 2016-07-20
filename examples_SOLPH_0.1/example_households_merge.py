@@ -365,7 +365,7 @@ def get_result_dict(energysystem, parameters, **arguments):
             storage][storage].invest
         results_dc['objective'] = energysystem.results.objective
 
-        if arguments['--write_results']:
+        if arguments['--write-results']:
             parameter_dc = {}
             parameter_dc['cost_parameter'] = parameters['cost_parameter']
             parameter_dc['tech_parameter'] = parameters['tech_parameter']
