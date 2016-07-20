@@ -346,9 +346,9 @@ def get_result_dict(energysystem, parameters, **arguments):
         else:
             results_dc['feedin_'+house] = 0
 
-        if arguments['--pv-costopt']:
-            pv_inst = energysystem.results[pv][pv].invest
-            results_dc['pv_inst'+house] = pv_inst
+        # if arguments['--pv-costopt']:
+            # pv_inst = energysystem.results[pv][pv].invest
+            # results_dc['pv_inst'+house] = pv_inst
 
         results_dc['demand_'+house] = demand.sum()
         results_dc['pv_'+house] = pv.sum()
