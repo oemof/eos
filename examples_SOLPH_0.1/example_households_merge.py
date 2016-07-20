@@ -29,6 +29,7 @@ Options:
       --pv-costopt         Cost optimization for pv plants.
       --feedin             Option with different pv plants (will need
                            scenario_pv.csv) and max feedin
+      --write_results      write results to data/scenarioname_results.csv
       --ssr=SSR            Self-sufficiency degree.
       --dry-run            Do nothing. Only print what would be done.
 
@@ -41,6 +42,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import logging
+import csv
 
 try:
     from docopt import docopt
@@ -342,7 +344,7 @@ def get_result_dict(energysystem, parameters, **arguments):
             feedin = myresults.slice_by(obj_label=house+'_feedin',
                                         date_from=year+'-01-01 00:00:00',
                                         date_to=year+'-12-31 23:00:00')
-            results_dc['feedin_'+house] = feedin.sum()
+            results_dc['feedin_'+house] = float(feedin.sum())
         else:
             results_dc['feedin_'+house] = 0
 
@@ -350,18 +352,40 @@ def get_result_dict(energysystem, parameters, **arguments):
             # pv_inst = energysystem.results[pv][pv].invest
             # results_dc['pv_inst'+house] = pv_inst
 
-        results_dc['demand_'+house] = demand.sum()
-        results_dc['pv_'+house] = pv.sum()
-        results_dc['pv_max_'+house] = pv.max()
-        results_dc['excess_'+house] = excess.sum()
-        results_dc['self_con_'+house] = sc.sum() / 2
+        results_dc['demand_'+house] = float(demand.sum())
+        results_dc['pv_'+house] = float(pv.sum())
+        results_dc['pv_max_'+house] = float(pv.max())
+        results_dc['excess_'+house] = float(excess.sum())
+        results_dc['self_con_'+house] = float(sc.sum()) / 2
         # TODO get in or oputflow of transformer
-        results_dc['grid_'+house] = grid.sum()
-        results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
-        results_dc['bat_'+house] = bat.sum()
+        results_dc['grid_'+house] = float(grid.sum())
+        results_dc['check_ssr'+house] = float(1 - (grid.sum() / demand.sum()))
+        results_dc['bat_'+house] = float(bat.sum())
         results_dc['storage_cap_'+house] = energysystem.results[
             storage][storage].invest
         results_dc['objective'] = energysystem.results.objective
+
+        if arguments['--write_results']:
+            parameter_dc = {}
+            parameter_dc['cost_parameter'] = parameters['cost_parameter']
+            parameter_dc['tech_parameter'] = parameters['tech_parameter']
+            parameter_dc['pv_parameter'] = parameters['pv_parameter']
+            parameter_dc['options'] = arguments
+
+            x = list(results_dc.keys())
+            x1 = list(parameter_dc.keys())
+            y = list(results_dc.values())
+            y1 = list(parameter_dc.values())
+            f = open(
+                'data/'+arguments['--scenario']+'_results.csv',
+                'w', newline='')
+            w = csv.writer(f, delimiter=';')
+            w.writerow(x)
+            w.writerow(y)
+            w.writerow(x1)
+            w.writerow(y1)
+            f.close
+            
     return(results_dc)
 
 
@@ -402,7 +426,8 @@ def main(**arguments):
     esys.dump()
     # esys.restore()
     import pprint as pp
-    pp.pprint(get_result_dict(esys, parameters, **arguments))
+    results = get_result_dict(esys, parameters, **arguments)
+    pp.pprint(results)
 #    create_plots(esys, year=arguments['--year'])
 
 
