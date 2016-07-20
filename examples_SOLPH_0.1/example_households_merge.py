@@ -330,11 +330,15 @@ def get_result_dict(energysystem, parameters, year):
                                         date_from=year+'-01-01 00:00:00',
                                         date_to=year+'-12-31 23:00:00')
         else:
-            feedin = [0,0]
+            feedin = [0, 0]
+
+        if arguments['--pv-costopt'] is True:
+            pv_inst = energysystem.results[pv][pv].invest
+            results_dc['pv_inst'+house] = pv_inst
 
         results_dc['demand_'+house] = demand.sum()
         results_dc['pv_'+house] = pv.sum()
-        results_dc['pv_inst_'+house] = pv.max()
+        results_dc['pv_max_'+house] = pv.max()
         results_dc['excess_'+house] = excess.sum()
         results_dc['feedin_'+house] = sum(feedin)
         results_dc['self_con_'+house] = sc.sum() / 2
