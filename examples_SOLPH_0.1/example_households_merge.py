@@ -26,9 +26,9 @@ Options:
       --num-hh=NUM         Number of households to choose. [default: 2]
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
-      --pv-costopt=COST    Cost optimization for pv plants. [default: False]
-      --feedin=FEEDIN      Option with different pv plants (will need
-                           scenario_pv.csv) and max feedin [default: True]
+      --pv-costopt         Cost optimization for pv plants.
+      --feedin             Option with different pv plants (will need
+                           scenario_pv.csv) and max feedin
       --ssr=SSR            Self-sufficiency degree.
       --dry-run            Do nothing. Only print what would be done.
 
@@ -235,10 +235,10 @@ def create_energysystem(energysystem, parameters,
         solph.Sink(label=house+"_excess", inputs={bel_pv: solph.Flow()})
 
         # Create sink component for the pv feedin
-        if arguments['--feedin'] is True:
+        if arguments['--feedin']:
             solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
                 variable_costs=parameters['fit'],
-                nominal_value=parameters['pv_parameter'][label_pv][0],
+                nominal_value=parameters['pv_parameter'][label_pv][0],  # TODO: abhängig von PV!
                 max=parameters['max_feedin'])})
 
         # Create linear transformer to connect pv and demand bus
@@ -252,7 +252,7 @@ def create_energysystem(energysystem, parameters,
         # data_pv = data_re['pv']
 
         # Create fixed source object for pv
-        if arguments['--pv-costopt'] is True:
+        if arguments['--pv-costopt']:
             print('not working')
 
         else:
@@ -266,6 +266,10 @@ def create_energysystem(energysystem, parameters,
                 nominal_value=parameters['pv_parameter'][label_pv][0],
                 fixed=True,
                 fixed_costs=parameters['opex_pv'])})
+                
+        # pv_plant = [obj for obj in energysystem.entities if obj_label == (
+        #           house+'_pv')]
+        # 
 
         # Create simple sink objects for demands
         solph.Sink(
@@ -327,14 +331,16 @@ def get_result_dict(energysystem, parameters, **arguments):
         bat = myresults.slice_by(obj_label=house+'_bat',
                                  date_from=year+'-01-01 00:00:00',
                                  date_to=year+'-12-31 23:00:00')
-        if arguments['--feedin'] is True:
+
+        if arguments['--feedin']:
             feedin = myresults.slice_by(obj_label=house+'_feedin',
                                         date_from=year+'-01-01 00:00:00',
                                         date_to=year+'-12-31 23:00:00')
+            results_dc['feedin_'+house] = feedin.sum()
         else:
-            feedin = [0, 0]
+            results_dc['feedin_'+house] = 0
 
-        if arguments['--pv-costopt'] is True:
+        if arguments['--pv-costopt']:
             pv_inst = energysystem.results[pv][pv].invest
             results_dc['pv_inst'+house] = pv_inst
 
@@ -342,7 +348,6 @@ def get_result_dict(energysystem, parameters, **arguments):
         results_dc['pv_'+house] = pv.sum()
         results_dc['pv_max_'+house] = pv.max()
         results_dc['excess_'+house] = excess.sum()
-        results_dc['feedin_'+house] = sum(feedin)
         results_dc['self_con_'+house] = sc.sum() / 2
         # TODO get in or oputflow of transformer
         results_dc['grid_'+house] = grid.sum()
