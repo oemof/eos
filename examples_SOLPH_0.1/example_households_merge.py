@@ -255,7 +255,7 @@ def create_energysystem(energysystem, parameters,
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
                 actual_value=hlp.get_pv_generation(
                     year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'].loc['azimuth']label_pv],
+                    azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
                     tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
                     albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
                     loc=parameters['loc']),
@@ -267,7 +267,7 @@ def create_energysystem(energysystem, parameters,
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
                 actual_value=hlp.get_pv_generation(
                     year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'].loc['azimuth']label_pv],
+                    azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
                     tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
                     albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
                     loc=parameters['loc']),
