@@ -100,7 +100,7 @@ def read_and_calculate_parameters(**arguments):
 
     pv_parameter = pd.read_csv(
         'data/' + arguments['--scenario'] + '_pv.csv',
-        delimiter=';')
+        delimiter=';', index_col=0)
 
     # Electricity from grid price
     price_el = cost_parameter.loc['grid']['opex_var']
@@ -240,7 +240,7 @@ def create_energysystem(energysystem, parameters,
         if arguments['--feedin']:
             solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
                 variable_costs=parameters['fit'],
-                nominal_value=parameters['pv_parameter'][label_pv][0],  # TODO: abhängig von PV!
+                nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],  # TODO: abhängig von PV!
                 max=parameters['max_feedin'])})
 
         # Create linear transformer to connect pv and demand bus
@@ -255,9 +255,9 @@ def create_energysystem(energysystem, parameters,
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
                 actual_value=hlp.get_pv_generation(
                     year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'][label_pv][1],
-                    tilt=parameters['pv_parameter'][label_pv][2],
-                    albedo=parameters['pv_parameter'][label_pv][3],
+                    azimuth=parameters['pv_parameter'].loc['azimuth']label_pv],
+                    tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
+                    albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
                     loc=parameters['loc']),
                 fixed=True,
                 fixed_costs=parameters['opex_pv'],
@@ -267,11 +267,11 @@ def create_energysystem(energysystem, parameters,
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
                 actual_value=hlp.get_pv_generation(
                     year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'][label_pv][1],
-                    tilt=parameters['pv_parameter'][label_pv][2],
-                    albedo=parameters['pv_parameter'][label_pv][3],
+                    azimuth=parameters['pv_parameter'].loc['azimuth']label_pv],
+                    tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
+                    albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
                     loc=parameters['loc']),
-                nominal_value=parameters['pv_parameter'][label_pv][0],
+                nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],
                 fixed=True,
                 fixed_costs=parameters['opex_pv'])})
 
@@ -385,7 +385,7 @@ def get_result_dict(energysystem, parameters, **arguments):
             w.writerow(x1)
             w.writerow(y1)
             f.close
-            
+
     return(results_dc)
 
 
