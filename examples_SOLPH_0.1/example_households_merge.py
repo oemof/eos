@@ -248,9 +248,6 @@ def create_energysystem(energysystem, parameters,
             outputs={bel_demand: solph.Flow()},
             conversion_factors={bel_demand: 1})
 
-        data_re = pd.read_csv("../example/example_data/example_data_re.csv", sep=',')
-        data_pv = data_re['pv']
-
         # Create fixed source object for pv
         if arguments['--pv-costopt']:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
