@@ -248,12 +248,16 @@ def create_energysystem(energysystem, parameters,
             outputs={bel_demand: solph.Flow()},
             conversion_factors={bel_demand: 1})
 
-        # data_re = pd.read_csv("../example/example_data/example_data_re.csv", sep=',')
-        # data_pv = data_re['pv']
+        data_re = pd.read_csv("../example/example_data/example_data_re.csv", sep=',')
+        data_pv = data_re['pv']
 
         # Create fixed source object for pv
         if arguments['--pv-costopt']:
-            print('not working')
+            solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
+                actual_value=data_pv,
+                fixed=True,
+                fixed_costs=parameters['opex_pv'])},
+                investment=solph.Investment(ep_costs=parameters['pv_epc']))
 
         else:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
@@ -266,10 +270,10 @@ def create_energysystem(energysystem, parameters,
                 nominal_value=parameters['pv_parameter'][label_pv][0],
                 fixed=True,
                 fixed_costs=parameters['opex_pv'])})
-                
+
         # pv_plant = [obj for obj in energysystem.entities if obj_label == (
         #           house+'_pv')]
-        # 
+        #
 
         # Create simple sink objects for demands
         solph.Sink(
