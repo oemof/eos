@@ -254,10 +254,15 @@ def create_energysystem(energysystem, parameters,
         # Create fixed source object for pv
         if arguments['--pv-costopt']:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=data_pv,
+                actual_value=hlp.get_pv_generation(
+                    year=int(arguments['--year']),
+                    azimuth=parameters['pv_parameter'][label_pv][1],
+                    tilt=parameters['pv_parameter'][label_pv][2],
+                    albedo=parameters['pv_parameter'][label_pv][3],
+                    loc=parameters['loc']),
                 fixed=True,
-                fixed_costs=parameters['opex_pv'])},
-                investment=solph.Investment(ep_costs=parameters['pv_epc']))
+                fixed_costs=parameters['opex_pv'],
+                investment=solph.Investment(ep_costs=parameters['pv_epc']))})
 
         else:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
