@@ -29,7 +29,7 @@ Options:
       --pv-costopt         Cost optimization for pv plants.
       --feedin             Option with different pv plants (will need
                            scenario_pv.csv) and max feedin
-      --write_results      write results to data/scenarioname_results.csv
+      --write-results      write results to data/scenarioname_results.csv
       --ssr=SSR            Self-sufficiency degree.
       --dry-run            Do nothing. Only print what would be done.
 
@@ -100,7 +100,7 @@ def read_and_calculate_parameters(**arguments):
 
     pv_parameter = pd.read_csv(
         'data/' + arguments['--scenario'] + '_pv.csv',
-        delimiter=';')
+        delimiter=';', index_col=0)
 
     # Electricity from grid price
     price_el = cost_parameter.loc['grid']['opex_var']
@@ -240,7 +240,7 @@ def create_energysystem(energysystem, parameters,
         if arguments['--feedin']:
             solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
                 variable_costs=parameters['fit'],
-                nominal_value=parameters['pv_parameter'][label_pv][0],  # TODO: abhängig von PV!
+                nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],  # TODO: abhängig von PV!
                 max=parameters['max_feedin'])})
 
         # Create linear transformer to connect pv and demand bus
@@ -250,26 +250,28 @@ def create_energysystem(energysystem, parameters,
             outputs={bel_demand: solph.Flow()},
             conversion_factors={bel_demand: 1})
 
-        data_re = pd.read_csv("../example/example_data/example_data_re.csv", sep=',')
-        data_pv = data_re['pv']
-
         # Create fixed source object for pv
         if arguments['--pv-costopt']:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=data_pv,
+                actual_value=hlp.get_pv_generation(
+                    year=int(arguments['--year']),
+                    azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
+                    tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
+                    albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
+                    loc=parameters['loc']),
                 fixed=True,
-                fixed_costs=parameters['opex_pv'])},
-                investment=solph.Investment(ep_costs=parameters['pv_epc']))
+                fixed_costs=parameters['opex_pv'],
+                investment=solph.Investment(ep_costs=parameters['pv_epc']))})
 
         else:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
                 actual_value=hlp.get_pv_generation(
                     year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'][label_pv][1],
-                    tilt=parameters['pv_parameter'][label_pv][2],
-                    albedo=parameters['pv_parameter'][label_pv][3],
+                    azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
+                    tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
+                    albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
                     loc=parameters['loc']),
-                nominal_value=parameters['pv_parameter'][label_pv][0],
+                nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],
                 fixed=True,
                 fixed_costs=parameters['opex_pv'])})
 
@@ -346,9 +348,9 @@ def get_result_dict(energysystem, parameters, **arguments):
         else:
             results_dc['feedin_'+house] = 0
 
-        if arguments['--pv-costopt']:
-            pv_inst = energysystem.results[pv][pv].invest
-            results_dc['pv_inst'+house] = pv_inst
+        # if arguments['--pv-costopt']:
+            # pv_inst = energysystem.results[pv][pv].invest
+            # results_dc['pv_inst'+house] = pv_inst
 
         results_dc['demand_'+house] = float(demand.sum())
         results_dc['pv_'+house] = float(pv.sum())
@@ -363,7 +365,7 @@ def get_result_dict(energysystem, parameters, **arguments):
             storage][storage].invest
         results_dc['objective'] = energysystem.results.objective
 
-        if arguments['--write_results']:
+        if arguments['--write-results']:
             parameter_dc = {}
             parameter_dc['cost_parameter'] = parameters['cost_parameter']
             parameter_dc['tech_parameter'] = parameters['tech_parameter']
@@ -383,7 +385,7 @@ def get_result_dict(energysystem, parameters, **arguments):
             w.writerow(x1)
             w.writerow(y1)
             f.close
-            
+
     return(results_dc)
 
 
