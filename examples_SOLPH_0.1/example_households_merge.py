@@ -275,10 +275,6 @@ def create_energysystem(energysystem, parameters,
                 fixed=True,
                 fixed_costs=parameters['opex_pv'])})
 
-        # pv_plant = [obj for obj in energysystem.entities if obj_label == (
-        #           house+'_pv')]
-        #
-
         # Create simple sink objects for demands
         solph.Sink(
             label=house+"_demand",
