@@ -1,31 +1,32 @@
 # -*- coding: utf-8 -*-
 
-"""
-General description:
----------------------
+''' Example for simulating pv-battery systems in quarters
 
-The example models the following energy system:
+Usage: example_quartier_10hh_11_to_20.py [options]
 
-                input/output  bgas     bel
-                     |          |        |       |
-                     |          |        |       |
- wind(FixedSource)   |------------------>|       |
-                     |          |        |       |
- pv(FixedSource)     |------------------>|       |
-                     |          |        |       |
- rgas(Commodity)     |--------->|        |       |
-                     |          |        |       |
- demand(Sink)        |<------------------|       |
-                     |          |        |       |
-                     |          |        |       |
- pp_gas(Transformer) |<---------|        |       |
-                     |------------------>|       |
-                     |          |        |       |
- storage(Storage)    |<------------------|       |
-                     |------------------>|       |
+Options:
 
+  -s, --scenario=SCENARIO  The scenario name. [default: scenario]
+  -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
+                           or "gurobi".
+                           [default: cbc]
+  -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
+                           WARNING, ERROR or CRITICAL.
+                           [default: ERROR]
+  -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
+  -h, --help               Display this help.
+      --lat=LAT            Sets the simulation longitude to choose the right
+                           weather data set. [default: 53.41] # Parchim
+      --lon=LON            Sets the simulation latitude to choose the right
+                           weather data set. [default: 11.84] # Parchim
+      --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
+                           2010-2014. [default: 2010]
+      --num-regions=NUM    Number of regions. [default: 24]
+      --costopt            Cost optimization.
+      --ssr=SSR            Self-sufficiency degree.
+      --dry-run            Do nothing. Only print what would be done.
 
-"""
+'''
 
 ###############################################################################
 # imports
@@ -33,279 +34,327 @@ The example models the following energy system:
 import matplotlib.pyplot as plt
 import pandas as pd
 import logging
-import numpy as np
 
-# import solph module to create/process optimization model instance
-from oemof.solph import predefined_objectives as predefined_objectives
+try:
+    from docopt import docopt
+except ImportError:
+    print("Unable to import docopt.\nIs the 'docopt' package installed?")
 
 # Outputlib
-from oemof.outputlib import to_pandas as tpd
+from oemof import outputlib
 
 # Default logger of oemof
 from oemof.tools import logger
 
-# import oemof base classes to create energy system objects
-from oemof.core import energy_system as es
-from oemof.core.network.entities import Bus
-from oemof.core.network.entities.components import sinks as sink
-from oemof.core.network.entities.components import sources as source
-from oemof.core.network.entities.components import transformers as transformer
+# import oemof core and solph classes to create energy system objects
+import oemof.solph as solph
 
 
-# Define logger
-logger.define_logging()
+def initialise_energysystem(year, number_timesteps):
+    """initialize the energy system
+    """
+    logging.info('Initialize the energy system')
+    date_time_index = pd.date_range('1/1/' + year,
+                                    periods=number_timesteps,
+                                    freq='H')
 
-###############################################################################
-# read data from csv file and set time index
-###############################################################################
-
-# annual demand in GWh
-# annual_demand = 5165
-annual_demand = 189
-
-# Installed Wind in MW
-# wind_installed = 1516
-wind_installed = 110
-
-# Installed PV in MW
-# pv_installed = 1491
-pv_installed = 80.1
-
-# Annual biogas potential in GWh
-# annual_biogas_potential = 2244
-annual_biogas_potential = 0
-
-# Installed capacity BHKW in kW
-bhkw_installed = 0
-# bhkw_installed = 63290 + 32751 + 2299  # not flexible
-# bhkw_installed = # flexible
-
-autarky_degree = 0.85
-grid_share = 1 - autarky_degree
-
-logging.info('Read data from csv file and set time index')
-data = pd.read_csv("../example_data/storage_invest.csv", sep=',')
-# data_load = pd.read_csv("../example_data/ap6/load_ap6_2030_kW_woTimesteps.csv",
- #                        sep=',')['demand_el']
-data_load = data['demand_el']/data['demand_el'].sum()*annual_demand*1e6
-
-residual = data_load - (data['wind']*wind_installed*1e3
-                                + data['pv']*pv_installed*1e3)
-positive = residual.where(residual > 0, 0)
-negative = residual.where(residual < 0, 0)
-print(positive.sum())
-print(negative.sum())
-print('len',len(negative.nonzero()[0]))
-
-time_index = pd.date_range('1/1/2012', periods=8760, freq='H')
-
-###############################################################################
-# initialize the energy system
-###############################################################################
-
-logging.info('Initialize the energy system')
-simulation = es.Simulation(
-    timesteps=range(len(time_index)), verbose=True, solver='gurobi',
-    objective_options={'function': predefined_objectives.minimize_cost},
-    debug=True)
-
-energysystem = es.EnergySystem(time_idx=time_index, simulation=simulation)
-
-###############################################################################
-# set optimzation options for storage components
-###############################################################################
-
-transformer.Storage.optimization_options.update({'investment': True})
-
-###############################################################################
-# Create oemof object
-###############################################################################
-
-logging.info('Create oemof objects')
-# create gas bus
-bgas = Bus(uid="bgas",
-           balanced=True,
-           excess=False)
-
-# create biogas bus
-bbiogas = Bus(uid="bbiogas",
-              balanced=True,
-              excess=False)
-
-# create electricity bus
-bel = Bus(uid="bel",
-          excess=True)
-
-# create commodity object for gas resource
-rgas = source.Commodity(uid='rgas',
-                        outputs=[bgas],
-                        sum_out_limit=data_load.sum()/0.58*grid_share)
-
-print(grid_share)
-print(data_load.sum()/0.58*grid_share)
-print(data_load.sum())
-
-rbiogas = source.Commodity(uid='rbiogas',
-                           outputs=[bbiogas],
-                           sum_out_limit=annual_biogas_potential*1e6)
-
-# create fixed source object for wind
-wind = source.FixedSource(uid="wind",
-                          outputs=[bel],
-                          val=data['wind'],
-                          out_max=[wind_installed*1000],
-                          add_out_limit=0,
-                          capex=1000,
-                          opex_fix=20,
-                          lifetime=25,
-                          crf=0.08)
-
-# create fixed source object for pv
-pv = source.FixedSource(uid="pv",
-                        outputs=[bel],
-                        val=data['pv'],
-                        out_max=[pv_installed*1000],
-                        add_out_limit=0,
-                        capex=900,
-                        opex_fix=15,
-                        lifetime=25,
-                        crf=0.08)
-
-bhkw = transformer.Simple(uid='bhkw',
-                          inputs=[bbiogas], outputs=[bel],
-                          out_max=[bhkw_installed],
-                          add_out_limit=0,
-                          eta=[0.38])
-
-# create simple sink object for demand
-demand = sink.Simple(uid="demand", inputs=[bel], val=data_load)
-
-# create simple transformer object for gas powerplant
-pp_gas = transformer.Simple(uid='pp_gas',
-                            inputs=[bgas], outputs=[bel],
-                            opex_var=0, out_max=[10e10], eta=[0.58])
-
-# create storage transformer object for storage
-storage = transformer.Storage(uid='sto_simple',
-                              inputs=[bel],
-                              outputs=[bel],
-                              eta_in=1,
-                              eta_out=0.8,
-                              cap_loss=0.00,
-                              opex_fix=0,
-                              opex_var=1,
-                              capex=375,
-                              cap_max=0,
-                              c_rate_in=1/6,
-                              c_rate_out=1/6,
-                              lifetime=10,
-                              wacc=0.07)
-
-###############################################################################
-# Optimise the energy system and plot the results
-###############################################################################
-
-logging.info('Optimise the energy system')
-
-# If you dumped the energysystem once, you can skip the optimisation with '#'
-# and use the restore method.
-energysystem.optimize()
-#
-energysystem.dump()
-#energysystem.restore()
-
-logging.info('Plot the results')
-
-cdict = {'wind': '#5b5bae',
-         'pv': '#ffde32',
-         'sto_simple': '#42c77a',
-         'pp_gas': '#636f6b',
-         'demand': '#ce4aff'}
-
-# Plotting the input flows of the electricity bus for January
-myplot = tpd.DataFramePlot(energy_system=energysystem)
-
-pp_gas = myplot.slice_by(bus_uid="bel",
-                         type='input', obj_uid='pp_gas',
-                         date_from="2012-01-01 00:00:00",
-                         date_to="2012-12-31 23:00:00")
-
-demand = myplot.slice_by(bus_uid="bel",
-                         type='output', obj_uid='demand',
-                         date_from="2012-01-01 00:00:00",
-                         date_to="2012-12-31 23:00:00")
-
-wind = myplot.slice_by(bus_uid="bel",
-                       type='input', obj_uid='wind',
-                       date_from="2012-01-01 00:00:00",
-                       date_to="2012-12-31 23:00:00")
-
-pv = myplot.slice_by(bus_uid="bel",
-                     type='input', obj_uid='pv',
-                     date_from="2012-01-01 00:00:00",
-                     date_to="2012-12-31 23:00:00")
-
-bhkw = myplot.slice_by(bus_uid="bel",
-                       type='input', obj_uid='bhkw',
-                       date_from="2012-01-01 00:00:00",
-                       date_to="2012-12-31 23:00:00")
-
-print('pp_gas_sum: ', pp_gas.sum())
-print('demand_sum: ', demand.sum())
-print('demand_max: ', demand.max())
-print('wind_sum: ', wind.sum())
-print('wind_max: ', wind.max())
-print('pv_sum: ', pv.sum())
-print('pv_max: ', pv.max()/0.7647)
-print('biogas_pot: ', bhkw.sum()/0.38)
-
-bhkw.plot()
-plt.show()
-
-print('storage: ', energysystem.results[storage].add_cap)
-
-print('objective: ', energysystem.results.objective)
-
-myplot.slice_unstacked(bus_uid="bel", type="input",
-                       date_from="2012-01-01 00:00:00",
-                       date_to="2012-01-31 00:00:00")
-colorlist = myplot.color_from_dict(cdict)
-myplot.plot(color=colorlist, linewidth=2, title="January 2012")
-myplot.ax.legend(loc='upper right')
-myplot.ax.set_ylabel('Power in MW')
-myplot.ax.set_xlabel('Date')
-myplot.set_datetime_ticks(date_format='%d-%m-%Y', tick_distance=24*7)
-
-# Plotting the output flows of the electricity bus for January
-myplot.slice_unstacked(bus_uid="bel", type="output")
-myplot.plot(title="Year 2016", colormap='Spectral', linewidth=2)
-myplot.ax.legend(loc='upper right')
-myplot.ax.set_ylabel('Power in MW')
-myplot.ax.set_xlabel('Date')
-myplot.set_datetime_ticks()
-
-# plt.show()
-
-# Plotting a combined stacked plot
-fig = plt.figure(figsize=(24, 14))
-plt.rc('legend', **{'fontsize': 19})
-plt.rcParams.update({'font.size': 19})
-# plt.style.use('grayscale')
+    return solph.EnergySystem(groupings=solph.GROUPINGS,
+                              time_idx=date_time_index)
 
 
-handles, labels = myplot.io_plot(
-    bus_uid="bel", cdict=cdict,
-    barorder=['pv', 'wind', 'pp_gas', 'sto_simple'],
-    lineorder=['demand', 'sto_simple'],
-    line_kwa={'linewidth': 4},
-    ax=fig.add_subplot(1, 1, 1),
-    date_from="2012-06-01 00:00:00",
-    date_to="2012-06-8 00:00:00",
-    )
-myplot.ax.set_ylabel('Power in MW')
-myplot.ax.set_xlabel('Date')
-myplot.ax.set_title("Electricity bus")
-myplot.set_datetime_ticks(tick_distance=24, date_format='%d-%m-%Y')
-myplot.outside_legend(handles=handles, labels=labels)
+def validate(**arguments):
+    valid = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+    if arguments["--loglevel"] not in valid:
+        exit("Invalid loglevel: " + arguments["--loglevel"])
+    return arguments
 
-# plt.show()
+
+def read_and_calculate_parameters(**arguments):
+
+    ###########################################################################
+    # read and calculate parameters
+    ###########################################################################
+
+    logging.info('Read and calculate parameters')
+
+    # Read parameter csv files
+    region_parameter = pd.read_csv(
+        'scenarios_region/' + arguments['--scenario'] +
+        '_region_parameter.csv',
+        delimiter=',', index_col=0)
+
+    cost_parameter = pd.read_csv(
+        'scenarios_region/' + arguments['--scenario'] + '_cost_parameter.csv',
+        delimiter=',', index_col=0)
+
+    tech_parameter = pd.read_csv(
+        'scenarios_region/' + arguments['--scenario'] + '_tech_parameter.csv',
+        delimiter=',', index_col=0)
+
+    data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+    data_load = data['demand_el']  # demand in kW
+    data_wind = data['wind']
+    data_pv = data['pv']
+
+    # residual = data_load - (data['wind']*wind_installed*1e3
+    #                                 + data['pv']*pv_installed*1e3)
+    # positive = residual.where(residual > 0, 0)
+    # negative = residual.where(residual < 0, 0)
+    # print(positive.sum())
+    # print(negative.sum())
+    # print('len',len(negative.nonzero()[0]))
+
+    # Calculate ep_costs from capex
+    storage_capex = cost_parameter.loc['storage']['capex']
+    storage_lifetime = cost_parameter.loc['storage']['lifetime']
+    storage_wacc = cost_parameter.loc['storage']['wacc']
+    storage_epc = storage_capex * (storage_wacc * (1 + storage_wacc) **
+                                   storage_lifetime) / ((1 + storage_wacc) **
+                                                        storage_lifetime - 1)
+
+    # Calculate grid share
+    if arguments['--ssr']:
+        grid_share = 1 - float(arguments['--ssr'])
+
+    else:
+        grid_share = None
+
+    parameters = {'region_parameter': region_parameter,
+                  'cost_parameter': cost_parameter,
+                  'tech_parameter': tech_parameter,
+                  'data': data,
+                  'data_load': data_load,
+                  'data_wind': data_wind,
+                  'data_pv': data_pv,
+                  'storage_epc': storage_epc,
+                  'grid_share': grid_share,
+                  }
+
+    logging.info('Check parameters')
+    print('cost parameter:\n', parameters['cost_parameter'])
+    print('tech parameter:\n', parameters['tech_parameter'])
+
+    return parameters
+
+
+def create_energysystem(energysystem, parameters,
+                        **arguments):
+
+    ##########################################################################
+    # Create oemof object
+    ##########################################################################
+    logging.info('Create oemof objects')
+
+    for region in range(int(arguments['--num-regions'])):
+
+        # Create electricity bus for demand
+        bel = solph.Bus(label='region_'+str(region)+'_bel')
+
+        # Create storage transformer object for storage
+        solph.Storage(
+            label='region_'+str(region)+'_bat',
+            inputs={bel: solph.Flow(variable_costs=0)},
+            outputs={bel: solph.Flow(variable_costs=0)},
+            capacity_loss=parameters[
+                'tech_parameter'].loc['storage']['cap_loss'],
+            nominal_input_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            nominal_output_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            inflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_in'],
+            outflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_out'],
+            fixed_costs=parameters[
+                'cost_parameter'].loc['storage']['opex_fix'],
+            investment=solph.Investment(ep_costs=parameters['storage_epc']))
+
+        # Create commodity object for import electricity resource
+        if arguments['--ssr']:
+            solph.Source(
+                label='region_'+str(region)+'_gridsource',
+                outputs={bel: solph.Flow(
+                    nominal_value=(float(parameters
+                                   ['region_parameter'].loc
+                                   ['annual_demand_GWh'][region]) *
+                                   1e6 * parameters['grid_share']),
+                    summed_max=1)})
+
+        else:
+            print('Cost optimization is not implemented yet')
+            # solph.Source(label='region_'+str(region)+'_gridsource', outputs={
+            #     bel: solph.Flow(
+            #         variable_costs=parameters['price_el'])})
+
+        # Create excess component to allow overproduction
+        solph.Sink(label='region_'+str(region)+'__excess',
+                   inputs={bel: solph.Flow()})
+
+        # Create fixed source object for wind
+
+        if arguments['--costopt']:
+            print('Cost optimization is not implemented yet')
+            # solph.Source(label='region_'+str(region)+'_wind',
+            #              outputs={bel: solph.Flow(
+            #                       actual_value=parameters['data_wind'],
+            #                       fixed=True,
+            #                       fixed_costs=parameters['opex_wind'],
+            #                       investment=solph.Investment(
+            #                           ep_costs=parameters['wind_epc']))})
+
+        else:
+            test=solph.Source(label='region_'+str(region)+'_wind',
+                         outputs={bel: solph.Flow(
+                                  actual_value=parameters['data_wind'],
+                                  nominal_value=float(parameters['region_parameter'].
+                                  loc['wind_MW'][region])*1e3,
+                                  fixed=True)})
+
+        # Create fixed source object for pv
+        if arguments['--costopt']:
+            print('Cost optimization is not implemented yet')
+            # solph.Source(label='region_'+str(region)+'_pv',
+            #              outputs={bel: solph.Flow(
+            #                       actual_value=parameters['data_pv'],
+            #                       fixed=True,
+            #                       fixed_costs=parameters['opex_pv'],
+            #                       investment=solph.Investment(
+            #                           ep_costs=parameters['pv_epc']))})
+
+        else:
+            test2=solph.Source(label='region_'+str(region)+'_pv',
+                         outputs={bel: solph.Flow(
+                                  actual_value=parameters['data_pv'],
+                                  nominal_value=float(parameters['region_parameter'].
+                                  loc['pv_MW'][region])*1e3,
+                                  fixed=True)})
+
+        # Create simple sink objects for demands
+        solph.Sink(label='region_'+str(region)+'_demand',
+                   inputs={bel: solph.Flow(
+                           actual_value=(parameters['data_load'] /
+                                         parameters['data_load'].sum() *
+                                         float(parameters['region_parameter'].
+                                         loc['annual_demand_GWh'][region])*1e6),
+
+                           fixed=True,
+                           nominal_value=1)})
+
+
+    print(test)
+    # print(test).nominal_value
+    # print(test2).nominal_value
+    ##########################################################################
+    # Optimise the energy system and plot the results
+    ##########################################################################
+
+    logging.info('Optimise the energy system')
+
+    om = solph.OperationalModel(energysystem, timeindex=energysystem.time_idx)
+
+    logging.info('Store lp-file')
+    om.write('optimization_problem.lp',
+             io_options={'symbolic_solver_labels': True})
+
+    logging.info('Solve the optimization problem')
+    om.solve(solver=arguments['--solver'], solve_kwargs={'tee': True})
+
+    return energysystem
+
+
+def get_result_dict(energysystem, parameters, **arguments):
+    logging.info('Check the results')
+
+    year = arguments['--year']
+
+    myresults = outputlib.DataFramePlot(energy_system=energysystem)
+
+    grid = myresults.slice_by(obj_label='gridsource',
+                              date_from=year+'-01-01 00:00:00',
+                              date_to=year+'-12-31 23:00:00')
+
+    bat = myresults.slice_by(obj_label='bat',
+                             date_from=year+'-01-01 00:00:00',
+                             date_to=year+'-12-31 23:00:00')
+
+    storage = energysystem.groups['bat']
+
+    demand = myresults.slice_by(obj_label=house+'_demand',
+                                date_from=year+'-01-01 00:00:00',
+                                date_to=year+'-12-31 23:00:00')
+
+    pv = myresults.slice_by(obj_label=house+'_pv',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00')
+
+    excess = myresults.slice_by(obj_label=house+'_excess',
+                                date_from=year+'-01-01 00:00:00',
+                                date_to=year+'-12-31 23:00:00')
+
+    # if arguments['--pv-costopt']:
+        # pv_inst = energysystem.results[pv][pv].invest
+        # results_dc['pv_inst'+house] = pv_inst
+
+    results_dc['demand_'+house] = demand.sum()
+    results_dc['pv_'+house] = pv.sum()
+    results_dc['pv_max_'+house] = pv.max()
+    results_dc['excess_'+house] = excess.sum()
+    results_dc['self_con_'+house] = sc.sum() / 2
+    # TODO get in or oputflow of transformer
+    results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
+    results_dc['bat_'+house] = bat.sum()
+
+    results_dc['grid'] = grid.sum()
+    results_dc['storage_cap'] = energysystem.results[
+        storage][storage].invest
+    results_dc['objective'] = energysystem.results.objective
+# print('pp_gas_sum: ', pp_gas.sum())
+# print('demand_sum: ', demand.sum())
+# print('demand_max: ', demand.max())
+# print('wind_sum: ', wind.sum())
+# print('wind_max: ', wind.max())
+# print('pv_sum: ', pv.sum())
+# print('pv_max: ', pv.max()/0.7647)
+# print('biogas_pot: ', bhkw.sum()/0.38)
+
+    return(results_dc)
+
+
+def create_plots(energysystem, year):
+    logging.info('Plot results')
+    myresults = outputlib.DataFramePlot(energy_system=energysystem)
+    gridsource = myresults.slice_by(obj_label='gridsource', type='input',
+                                    date_from=year + '-01-01 00:00:00',
+                                    date_to=year + '-12-31 23:00:00')
+
+    imp = gridsource.sort_values(by='val', ascending=False).reset_index()
+
+    imp.plot(linewidth=1.5)
+
+    plt.show()
+
+
+def main(**arguments):
+    logger.define_logging()
+    esys = initialise_energysystem(year=arguments['--year'],
+                                   number_timesteps=int(
+                                       arguments['--timesteps']))
+    parameters = read_and_calculate_parameters(**arguments)
+    esys = create_energysystem(esys,
+                               parameters,
+                               **arguments)
+    esys.dump()
+    # esys.restore()
+    import pprint as pp
+    pp.pprint(get_result_dict(esys, parameters, **arguments))
+#    create_plots(esys, year=arguments['--year'])
+
+
+if __name__ == "__main__":
+    arguments = docopt(__doc__)
+    print(arguments)
+    if arguments["--dry-run"]:
+        print("This is a dry run. Exiting before doing anything.")
+        exit(0)
+    arguments = validate(**arguments)
+    main(**arguments)
