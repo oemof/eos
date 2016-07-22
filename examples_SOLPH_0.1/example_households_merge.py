@@ -326,6 +326,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                                     date_to=year+'-12-31 23:00:00')
 
         sc = myresults.slice_by(obj_label=house+'_sc_Transformer',
+                                type='output',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
@@ -334,6 +335,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                                   date_to=year+'-12-31 23:00:00')
 
         bat = myresults.slice_by(obj_label=house+'_bat',
+                                 type='output',
                                  date_from=year+'-01-01 00:00:00',
                                  date_to=year+'-12-31 23:00:00')
 
@@ -353,7 +355,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         results_dc['pv_'+house] = float(pv.sum())
         results_dc['pv_max_'+house] = float(pv.max())
         results_dc['excess_'+house] = float(excess.sum())
-        results_dc['self_con_'+house] = float(sc.sum()) / 2
+        results_dc['self_con_'+house] = float(sc.sum())
         # TODO get in or oputflow of transformer
         results_dc['grid_'+house] = float(grid.sum())
         results_dc['check_ssr'+house] = float(1 - (grid.sum() / demand.sum()))
