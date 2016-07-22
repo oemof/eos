@@ -43,6 +43,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import logging
 import csv
+import pickle
 
 try:
     from docopt import docopt
@@ -381,6 +382,11 @@ def get_result_dict(energysystem, parameters, **arguments):
             w.writerow(x1)
             w.writerow(y1)
             f.close
+
+    pickle.dump(results_dc, open("save_results_dc.p", "wb"))
+    pickle.dump(myresults, open("save_myresults.p", "wb"))
+    #  reload: results_dc = pickle.load( open( "save_myresults.p", "rb" ) )
+#    energysystem.dump(dpath='data/')
 
     return(results_dc)
 
