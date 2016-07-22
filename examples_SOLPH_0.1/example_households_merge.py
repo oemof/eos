@@ -43,6 +43,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import logging
 import csv
+import pickle
 
 try:
     from docopt import docopt
@@ -255,29 +256,32 @@ def create_energysystem(energysystem, parameters,
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
                 actual_value=hlp.get_pv_generation(
                     year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
+                    azimuth=parameters[
+                        'pv_parameter'].loc['azimuth'][label_pv],
                     tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
                     albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
                     loc=parameters['loc']),
                 fixed=True,
                 fixed_costs=parameters['opex_pv'],
-                investment=solph.Investment(ep_costs=parameters['pv_epc']))})
+                investment=solph.Investment(
+                    maximum=parameters['pv_parameter'].loc['p_max'][label_pv],
+                    ep_costs=parameters['pv_epc']))})
 
         else:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
                 actual_value=hlp.get_pv_generation(
                     year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
+                    azimuth=parameters[
+                        'pv_parameter'].loc['azimuth'][label_pv],
                     tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
                     albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
                     loc=parameters['loc']),
-                nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],
+                nominal_value=parameters[
+                    'pv_parameter'].loc['p_max'][label_pv],
                 fixed=True,
                 fixed_costs=parameters['opex_pv'])})
-
-        # pv_plant = [obj for obj in energysystem.entities if obj_label == (
-        #           house+'_pv')]
-        #
+            parameters['pv_inst'+house] = parameters[
+                'pv_parameter'].loc['p_max'][label_pv]
 
         # Create simple sink objects for demands
         solph.Sink(
@@ -316,6 +320,9 @@ def get_result_dict(energysystem, parameters, **arguments):
 
     for house in parameters['hh']:
         storage = energysystem.groups[house+'_bat']
+        pv_i = energysystem.groups[house+'_pv']
+        pv_bel = energysystem.groups[house+'_bel_pv']
+
         demand = myresults.slice_by(obj_label=house+'_demand',
                                     date_from=year+'-01-01 00:00:00',
                                     date_to=year+'-12-31 23:00:00')
@@ -329,6 +336,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                                     date_to=year+'-12-31 23:00:00')
 
         sc = myresults.slice_by(obj_label=house+'_sc_Transformer',
+                                type='output',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
@@ -337,6 +345,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                                   date_to=year+'-12-31 23:00:00')
 
         bat = myresults.slice_by(obj_label=house+'_bat',
+                                 type='output',
                                  date_from=year+'-01-01 00:00:00',
                                  date_to=year+'-12-31 23:00:00')
 
@@ -348,21 +357,40 @@ def get_result_dict(energysystem, parameters, **arguments):
         else:
             results_dc['feedin_'+house] = 0
 
-        # if arguments['--pv-costopt']:
-            # pv_inst = energysystem.results[pv][pv].invest
-            # results_dc['pv_inst'+house] = pv_inst
+        if arguments['--pv-costopt']:
+            pv_inst = energysystem.results[pv_i][pv_bel].invest
+            results_dc['pv_inst_'+house] = pv_inst
+        else:
+            results_dc['pv_inst_'+house] = parameters['pv_inst'+house]
+
+        #  cost_calculation:
+        pv_cost = (parameters['pv_epc'] + parameters['opex_pv']) * \
+            results_dc['pv_inst_'+house]
+        storage_cost = (
+            parameters['storage_epc'] + parameters['opex_bat']) * \
+            energysystem.results[storage][storage].invest
+        sc_cost = float(sc.sum()) * parameters['sc_tax']
+        grid_cost = float(grid.sum()) * parameters['price_el']
+        fit_cost = results_dc['feedin_'+house] * parameters['fit']
+        whole_cost = storage_cost + sc_cost + grid_cost + fit_cost + pv_cost
+        price_el_mix = whole_cost / float(demand.sum())
 
         results_dc['demand_'+house] = float(demand.sum())
         results_dc['pv_'+house] = float(pv.sum())
         results_dc['pv_max_'+house] = float(pv.max())
         results_dc['excess_'+house] = float(excess.sum())
-        results_dc['self_con_'+house] = float(sc.sum()) / 2
-        # TODO get in or oputflow of transformer
+        results_dc['self_con_'+house] = float(sc.sum())
         results_dc['grid_'+house] = float(grid.sum())
-        results_dc['check_ssr'+house] = float(1 - (grid.sum() / demand.sum()))
+        results_dc['check_ssr_'+house] = float(1 - (grid.sum() / demand.sum()))
         results_dc['bat_'+house] = float(bat.sum())
         results_dc['storage_cap_'+house] = energysystem.results[
             storage][storage].invest
+        results_dc['price_el_mix_'+house] = price_el_mix
+        results_dc['cost_pv_'+house] = pv_cost
+        results_dc['cost_storage_'+house] = storage_cost
+        results_dc['cost_sc_'+house] = sc_cost
+        results_dc['cost_grid_'+house] = grid_cost
+        results_dc['cost_fit_'+house] = fit_cost
         results_dc['objective'] = energysystem.results.objective
 
         if arguments['--write-results']:
@@ -385,6 +413,11 @@ def get_result_dict(energysystem, parameters, **arguments):
             w.writerow(x1)
             w.writerow(y1)
             f.close
+
+    pickle.dump(results_dc, open("save_results_dc.p", "wb"))
+    pickle.dump(myresults, open("save_myresults.p", "wb"))
+    #  reload: results_dc = pickle.load( open( "save_myresults.p", "rb" ) )
+#    energysystem.dump(dpath='data/')
 
     return(results_dc)
 
