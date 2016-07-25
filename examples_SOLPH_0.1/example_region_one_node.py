@@ -24,6 +24,7 @@ Options:
       --num-regions=NUM    Number of regions. [default: 24]
       --costopt            Cost optimization.
       --ssr=SSR            Self-sufficiency degree.
+      --write-results      write results to data/scenarioname_results.csv
       --dry-run            Do nothing. Only print what would be done.
 
 '''
@@ -34,6 +35,8 @@ Options:
 import matplotlib.pyplot as plt
 import pandas as pd
 import logging
+import csv
+import pickle
 
 try:
     from docopt import docopt
@@ -267,55 +270,51 @@ def get_result_dict(energysystem, parameters, **arguments):
 
     year = arguments['--year']
 
+    results_dc = {}
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
-    grid = myresults.slice_by(obj_label='gridsource',
-                              date_from=year+'-01-01 00:00:00',
-                              date_to=year+'-12-31 23:00:00')
+    for region in range(int(arguments['--num-regions'])):
+        region = region + 1  # as python ranges from 0
+        storage = energysystem.groups['region_'+str(region)+'_bat']
 
-    bat = myresults.slice_by(obj_label='bat',
-                             date_from=year+'-01-01 00:00:00',
-                             date_to=year+'-12-31 23:00:00')
+        demand = myresults.slice_by(obj_label='region_'+str(region)+'_demand',
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
 
-    storage = energysystem.groups['bat']
+        wind = myresults.slice_by(obj_label='region_'+str(region)+'_wind',
+                                  date_from=year+'-01-01 00:00:00',
+                                  date_to=year+'-12-31 23:00:00')
 
-    demand = myresults.slice_by(obj_label=house+'_demand',
+        pv = myresults.slice_by(obj_label='region_'+str(region)+'_pv',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
-    pv = myresults.slice_by(obj_label=house+'_pv',
-                            date_from=year+'-01-01 00:00:00',
-                            date_to=year+'-12-31 23:00:00')
+        grid = myresults.slice_by(obj_label='region_'+str(region)+'_gridsource',
+                                  date_from=year+'-01-01 00:00:00',
+                                  date_to=year+'-12-31 23:00:00')
 
-    excess = myresults.slice_by(obj_label=house+'_excess',
-                                date_from=year+'-01-01 00:00:00',
-                                date_to=year+'-12-31 23:00:00')
+        results_dc['demand_'+str(region)] = float(demand.sum())
+        results_dc['wind_max_'+str(region)] = float(wind.max())
+        results_dc['pv_max_'+str(region)] = float(pv.max())
+        results_dc['grid'+str(region)] = grid.sum()
+        results_dc['check_ssr'+str(region)] = 1 - (grid.sum() / demand.sum())
+        results_dc['storage_cap'+str(region)] = energysystem.results[
+            storage][storage].invest
+        results_dc['objective'] = energysystem.results.objective
 
-    # if arguments['--pv-costopt']:
-        # pv_inst = energysystem.results[pv][pv].invest
-        # results_dc['pv_inst'+house] = pv_inst
+        if arguments['--write-results']:
+            x = list(results_dc.keys())
+            y = list(results_dc.values())
+            f = open(
+                'data/'+arguments['--scenario']+'_results.csv',
+                'w', newline='')
+            w = csv.writer(f, delimiter=';')
+            w.writerow(x)
+            w.writerow(y)
+            f.close
 
-    results_dc['demand_'+house] = demand.sum()
-    results_dc['pv_'+house] = pv.sum()
-    results_dc['pv_max_'+house] = pv.max()
-    results_dc['excess_'+house] = excess.sum()
-    results_dc['self_con_'+house] = sc.sum() / 2
-    # TODO get in or oputflow of transformer
-    results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
-    results_dc['bat_'+house] = bat.sum()
-
-    results_dc['grid'] = grid.sum()
-    results_dc['storage_cap'] = energysystem.results[
-        storage][storage].invest
-    results_dc['objective'] = energysystem.results.objective
-# print('pp_gas_sum: ', pp_gas.sum())
-# print('demand_sum: ', demand.sum())
-# print('demand_max: ', demand.max())
-# print('wind_sum: ', wind.sum())
-# print('wind_max: ', wind.max())
-# print('pv_sum: ', pv.sum())
-# print('pv_max: ', pv.max()/0.7647)
-# print('biogas_pot: ', bhkw.sum()/0.38)
+    pickle.dump(results_dc, open("save_results_dc.p", "wb"))
+    pickle.dump(myresults, open("save_myresults.p", "wb"))
 
     return(results_dc)
 
