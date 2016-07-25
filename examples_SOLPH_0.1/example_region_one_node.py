@@ -149,6 +149,7 @@ def create_energysystem(energysystem, parameters,
     logging.info('Create oemof objects')
 
     for region in range(int(arguments['--num-regions'])):
+        region = region + 1  # as python ranges from 0
 
         # Create electricity bus for demand
         bel = solph.Bus(label='region_'+str(region)+'_bel')
@@ -179,7 +180,7 @@ def create_energysystem(energysystem, parameters,
                 outputs={bel: solph.Flow(
                     nominal_value=(float(parameters
                                    ['region_parameter'].loc
-                                   ['annual_demand_GWh'][region]) *
+                                   ['annual_demand_GWh'][str(region)]) *
                                    1e6 * parameters['grid_share']),
                     summed_max=1)})
 
@@ -210,7 +211,7 @@ def create_energysystem(energysystem, parameters,
                          outputs={bel: solph.Flow(
                                   actual_value=parameters['data_wind'],
                                   nominal_value=float(parameters['region_parameter'].
-                                  loc['wind_MW'][region])*1e3,
+                                  loc['wind_MW'][str(region)])*1e3,
                                   fixed=True)})
 
         # Create fixed source object for pv
@@ -229,7 +230,7 @@ def create_energysystem(energysystem, parameters,
                          outputs={bel: solph.Flow(
                                   actual_value=parameters['data_pv'],
                                   nominal_value=float(parameters['region_parameter'].
-                                  loc['pv_MW'][region])*1e3,
+                                  loc['pv_MW'][str(region)])*1e3,
                                   fixed=True)})
 
         # Create simple sink objects for demands
@@ -238,13 +239,11 @@ def create_energysystem(energysystem, parameters,
                            actual_value=(parameters['data_load'] /
                                          parameters['data_load'].sum() *
                                          float(parameters['region_parameter'].
-                                         loc['annual_demand_GWh'][region])*1e6),
+                                         loc['annual_demand_GWh'][str(region)])*1e6),
 
                            fixed=True,
                            nominal_value=1)})
 
-
-    print(test)
     # print(test).nominal_value
     # print(test2).nominal_value
     ##########################################################################
