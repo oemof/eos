@@ -128,18 +128,13 @@ def read_and_calculate_parameters(**arguments):
     # Define combinations of multi regions
     regions = np.arange(1, int(arguments['--num-regions']) + 1)
     if int(arguments['--multi-regions']) > 1:
+        i = 1
+        combinations = [0, 0, 0]
         for n in itertools.combinations(regions, int(arguments['--multi-regions'])):
-            print(n)
-
+            combinations = np.vstack((combinations, [i, n[0], n[1]]))
+            i = i + 1
     else:
-        print('None')
-
-
-    # Get annual demand
-
-    # Get wind installed capacity
-
-    # Get pv installed capacity
+        combinations = None
 
     parameters = {'region_parameter': region_parameter,
                   'cost_parameter': cost_parameter,
