@@ -24,6 +24,7 @@ Options:
       --num-regions=NUM    Number of regions. [default: 24]
       --costopt            Cost optimization.
       --ssr=SSR            Self-sufficiency degree.
+      --multi-regions=NUM  Number of regions to combine each. [default: 1]
       --write-results      write results to data/scenarioname_results.csv
       --dry-run            Do nothing. Only print what would be done.
 
@@ -34,6 +35,8 @@ Options:
 ###############################################################################
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
+import itertools
 import logging
 import csv
 import pickle
@@ -122,6 +125,22 @@ def read_and_calculate_parameters(**arguments):
     else:
         grid_share = None
 
+    # Define combinations of multi regions
+    regions = np.arange(1, int(arguments['--num-regions']) + 1)
+    if int(arguments['--multi-regions']) > 1:
+        for n in itertools.combinations(regions, int(arguments['--multi-regions'])):
+            print(n)
+
+    else:
+        print('None')
+
+
+    # Get annual demand
+
+    # Get wind installed capacity
+
+    # Get pv installed capacity
+
     parameters = {'region_parameter': region_parameter,
                   'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
@@ -131,6 +150,7 @@ def read_and_calculate_parameters(**arguments):
                   'data_pv': data_pv,
                   'storage_epc': storage_epc,
                   'grid_share': grid_share,
+                  'regions': regions,
                   }
 
     logging.info('Check parameters')
@@ -148,8 +168,7 @@ def create_energysystem(energysystem, parameters,
     ##########################################################################
     logging.info('Create oemof objects')
 
-    for region in range(int(arguments['--num-regions'])):
-        region = region + 1  # as python ranges from 0
+    for region in parameters['regions']:
 
         # Create electricity bus for demand
         bel = solph.Bus(label='region_'+str(region)+'_bel')
