@@ -127,7 +127,7 @@ def read_and_calculate_parameters(**arguments):
 
     # Define combinations of multi regions
     regions = np.arange(1, int(arguments['--num-regions']) + 1)
-    if int(arguments['--multi-regions']) > 1:
+    if int(arguments['--multi-regions']) == 2:
         i = 1
         combinations = [0, 0, 0]
         for n in itertools.combinations(regions, int(arguments['--multi-regions'])):
@@ -135,6 +135,9 @@ def read_and_calculate_parameters(**arguments):
             i = i + 1
     else:
         combinations = None
+
+    print('regions: ', regions)
+    print('combinations: ', combinations)
 
     parameters = {'region_parameter': region_parameter,
                   'cost_parameter': cost_parameter,
@@ -146,6 +149,7 @@ def read_and_calculate_parameters(**arguments):
                   'storage_epc': storage_epc,
                   'grid_share': grid_share,
                   'regions': regions,
+                  'combinations': combinations,
                   }
 
     logging.info('Check parameters')
@@ -163,14 +167,19 @@ def create_energysystem(energysystem, parameters,
     ##########################################################################
     logging.info('Create oemof objects')
 
-    for region in parameters['regions']:
+    if int(arguments['--multi-regions']) == 2:
+        loop = np.arange(1, len(parameters['combinations']))
+    else:
+        loop = parameters['regions']
 
+    for loopi in loop:
+        print(loopi)
         # Create electricity bus for demand
-        bel = solph.Bus(label='region_'+str(region)+'_bel')
+        bel = solph.Bus(label='region_'+str(loopi)+'_bel')
 
         # Create storage transformer object for storage
         solph.Storage(
-            label='region_'+str(region)+'_bat',
+            label='region_'+str(loopi)+'_bat',
             inputs={bel: solph.Flow(variable_costs=0)},
             outputs={bel: solph.Flow(variable_costs=0)},
             capacity_loss=parameters[
@@ -189,14 +198,32 @@ def create_energysystem(energysystem, parameters,
 
         # Create commodity object for import electricity resource
         if arguments['--ssr']:
-            solph.Source(
-                label='region_'+str(region)+'_gridsource',
-                outputs={bel: solph.Flow(
-                    nominal_value=(float(parameters
+            if int(arguments['--multi-regions']) == 2:
+
+                gridsource_nv = ((float(parameters
                                    ['region_parameter'].loc
-                                   ['annual_demand_GWh'][str(region)]) *
-                                   1e6 * parameters['grid_share']),
+                                   ['annual_demand_GWh'][str(parameters
+                                       ['combinations'][loopi][1])]) *
+                                   1e6 * parameters['grid_share']) +
+
+                                (float(parameters
+                                   ['region_parameter'].loc
+                                   ['annual_demand_GWh'][str(parameters
+                                       ['combinations'][loopi][2])]) *
+                                   1e6 * parameters['grid_share']))
+            else:
+                gridsource_nv = (float(parameters
+                                   ['region_parameter'].loc
+                                   ['annual_demand_GWh'][str(loopi)]) *
+                                   1e6 * parameters['grid_share'])
+
+            solph.Source(
+                label='region_'+str(loopi)+'_gridsource',
+                outputs={bel: solph.Flow(
+                    nominal_value=gridsource_nv,
                     summed_max=1)})
+
+            print('gridsource_nv: ', gridsource_nv)
 
         else:
             print('Cost optimization is not implemented yet')
@@ -205,7 +232,7 @@ def create_energysystem(energysystem, parameters,
             #         variable_costs=parameters['price_el'])})
 
         # Create excess component to allow overproduction
-        solph.Sink(label='region_'+str(region)+'__excess',
+        solph.Sink(label='region_'+str(loopi)+'__excess',
                    inputs={bel: solph.Flow()})
 
         # Create fixed source object for wind
@@ -221,12 +248,28 @@ def create_energysystem(energysystem, parameters,
             #                           ep_costs=parameters['wind_epc']))})
 
         else:
-            test=solph.Source(label='region_'+str(region)+'_wind',
+            if int(arguments['--multi-regions']) == 2:
+                wind_nv = (float(parameters['region_parameter'].
+                                 loc['wind_MW'][str(parameters
+                                                    ['combinations']
+                                                    [loopi][1])]) * 1e3 +
+
+                           float(parameters['region_parameter'].
+                                 loc['wind_MW'][str(parameters
+                                                    ['combinations']
+                                                    [loopi][2])]) * 1e3)
+
+            else:
+                wind_nv = float(parameters['region_parameter'].
+                                loc['wind_MW'][str(loopi)]) * 1e3
+
+            solph.Source(label='region_'+str(loopi)+'_wind',
                          outputs={bel: solph.Flow(
                                   actual_value=parameters['data_wind'],
-                                  nominal_value=float(parameters['region_parameter'].
-                                  loc['wind_MW'][str(region)])*1e3,
+                                  nominal_value=wind_nv,
                                   fixed=True)})
+
+            print('wind: ', wind_nv)
 
         # Create fixed source object for pv
         if arguments['--costopt']:
@@ -240,21 +283,57 @@ def create_energysystem(energysystem, parameters,
             #                           ep_costs=parameters['pv_epc']))})
 
         else:
-            test2=solph.Source(label='region_'+str(region)+'_pv',
+            if int(arguments['--multi-regions']) == 2:
+                pv_nv = (float(parameters['region_parameter'].
+                               loc['pv_MW'][str(parameters
+                                                ['combinations']
+                                                [loopi][1])]) * 1e3 +
+
+                         float(parameters['region_parameter'].
+                               loc['pv_MW'][str(parameters
+                                                ['combinations']
+                                                [loopi][2])]) * 1e3)
+
+            else:
+                pv_nv = float(parameters['region_parameter'].
+                              loc['pv_MW'][str(loopi)]) * 1e3
+
+            solph.Source(label='region_'+str(loopi)+'_pv',
                          outputs={bel: solph.Flow(
                                   actual_value=parameters['data_pv'],
-                                  nominal_value=float(parameters['region_parameter'].
-                                  loc['pv_MW'][str(region)])*1e3,
+                                  nominal_value=pv_nv,
                                   fixed=True)})
 
-        # Create simple sink objects for demands
-        solph.Sink(label='region_'+str(region)+'_demand',
-                   inputs={bel: solph.Flow(
-                           actual_value=(parameters['data_load'] /
-                                         parameters['data_load'].sum() *
-                                         float(parameters['region_parameter'].
-                                         loc['annual_demand_GWh'][str(region)])*1e6),
+            print('pv: ', pv_nv)
 
+        # Create simple sink objects for demands
+        if int(arguments['--multi-regions']) == 2:
+            demand_av = ((parameters['data_load'] /
+                          parameters['data_load'].sum() *
+                          float(parameters['region_parameter'].
+                          loc['annual_demand_GWh'][str(parameters
+                                                       ['combinations']
+                                                       [loopi][1])]) * 1e6) +
+
+                         (parameters['data_load'] /
+                          parameters['data_load'].sum() *
+                          float(parameters['region_parameter'].
+                          loc['annual_demand_GWh'][str(parameters
+                                                       ['combinations']
+                                                       [loopi][2])]) * 1e6))
+
+        else:
+            demand_av = (parameters['data_load'] /
+                         parameters['data_load'].sum() *
+                         float(parameters['region_parameter'].
+                         loc['annual_demand_GWh'][str(loopi)])*1e6)
+
+            print('demand: ', demand_av)
+
+        print(demand_av.sum())
+        solph.Sink(label='region_'+str(loopi)+'_demand',
+                   inputs={bel: solph.Flow(
+                           actual_value=demand_av,
                            fixed=True,
                            nominal_value=1)})
 
