@@ -223,8 +223,6 @@ def create_energysystem(energysystem, parameters,
                     nominal_value=gridsource_nv,
                     summed_max=1)})
 
-            print('gridsource_nv: ', gridsource_nv)
-
         else:
             print('Cost optimization is not implemented yet')
             # solph.Source(label='region_'+str(region)+'_gridsource', outputs={
@@ -269,8 +267,6 @@ def create_energysystem(energysystem, parameters,
                                   nominal_value=wind_nv,
                                   fixed=True)})
 
-            print('wind: ', wind_nv)
-
         # Create fixed source object for pv
         if arguments['--costopt']:
             print('Cost optimization is not implemented yet')
@@ -304,8 +300,6 @@ def create_energysystem(energysystem, parameters,
                                   nominal_value=pv_nv,
                                   fixed=True)})
 
-            print('pv: ', pv_nv)
-
         # Create simple sink objects for demands
         if int(arguments['--multi-regions']) == 2:
             demand_av = ((parameters['data_load'] /
@@ -328,17 +322,12 @@ def create_energysystem(energysystem, parameters,
                          float(parameters['region_parameter'].
                          loc['annual_demand_GWh'][str(loopi)])*1e6)
 
-            print('demand: ', demand_av)
-
-        print(demand_av.sum())
         solph.Sink(label='region_'+str(loopi)+'_demand',
                    inputs={bel: solph.Flow(
                            actual_value=demand_av,
                            fixed=True,
                            nominal_value=1)})
 
-    # print(test).nominal_value
-    # print(test2).nominal_value
     ##########################################################################
     # Optimise the energy system and plot the results
     ##########################################################################
