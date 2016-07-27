@@ -139,6 +139,11 @@ def read_and_calculate_parameters(**arguments):
     print('regions: ', regions)
     print('combinations: ', combinations)
 
+    if int(arguments['--multi-regions']) == 2:
+        loop = np.arange(1, len(combinations))
+    else:
+        loop = regions
+
     parameters = {'region_parameter': region_parameter,
                   'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
@@ -150,6 +155,7 @@ def read_and_calculate_parameters(**arguments):
                   'grid_share': grid_share,
                   'regions': regions,
                   'combinations': combinations,
+                  'loop': loop,
                   }
 
     logging.info('Check parameters')
@@ -167,13 +173,7 @@ def create_energysystem(energysystem, parameters,
     ##########################################################################
     logging.info('Create oemof objects')
 
-    if int(arguments['--multi-regions']) == 2:
-        loop = np.arange(1, len(parameters['combinations']))
-    else:
-        loop = parameters['regions']
-
-    for loopi in loop:
-        print(loopi)
+    for loopi in parameters['loop']:
         # Create electricity bus for demand
         bel = solph.Bus(label='region_'+str(loopi)+'_bel')
 
@@ -365,32 +365,31 @@ def get_result_dict(energysystem, parameters, **arguments):
     results_dc = {}
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
-    for region in range(int(arguments['--num-regions'])):
-        region = region + 1  # as python ranges from 0
-        storage = energysystem.groups['region_'+str(region)+'_bat']
+    for loopi in parameters['loop']:
+        storage = energysystem.groups['region_'+str(loopi)+'_bat']
 
-        demand = myresults.slice_by(obj_label='region_'+str(region)+'_demand',
+        demand = myresults.slice_by(obj_label='region_'+str(loopi)+'_demand',
                                     date_from=year+'-01-01 00:00:00',
                                     date_to=year+'-12-31 23:00:00')
 
-        wind = myresults.slice_by(obj_label='region_'+str(region)+'_wind',
+        wind = myresults.slice_by(obj_label='region_'+str(loopi)+'_wind',
                                   date_from=year+'-01-01 00:00:00',
                                   date_to=year+'-12-31 23:00:00')
 
-        pv = myresults.slice_by(obj_label='region_'+str(region)+'_pv',
+        pv = myresults.slice_by(obj_label='region_'+str(loopi)+'_pv',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
-        grid = myresults.slice_by(obj_label='region_'+str(region)+'_gridsource',
+        grid = myresults.slice_by(obj_label='region_'+str(loopi)+'_gridsource',
                                   date_from=year+'-01-01 00:00:00',
                                   date_to=year+'-12-31 23:00:00')
 
-        results_dc['demand_'+str(region)] = float(demand.sum())
-        results_dc['wind_max_'+str(region)] = float(wind.max())
-        results_dc['pv_max_'+str(region)] = float(pv.max())
-        results_dc['grid'+str(region)] = grid.sum()
-        results_dc['check_ssr'+str(region)] = 1 - (grid.sum() / demand.sum())
-        results_dc['storage_cap'+str(region)] = energysystem.results[
+        results_dc['demand_'+str(loopi)] = float(demand.sum())
+        results_dc['wind_max_'+str(loopi)] = float(wind.max())
+        results_dc['pv_max_'+str(loopi)] = float(pv.max())
+        results_dc['grid'+str(loopi)] = grid.sum()
+        results_dc['check_ssr'+str(loopi)] = 1 - (grid.sum() / demand.sum())
+        results_dc['storage_cap'+str(loopi)] = energysystem.results[
             storage][storage].invest
         results_dc['objective'] = energysystem.results.objective
 
@@ -405,8 +404,8 @@ def get_result_dict(energysystem, parameters, **arguments):
             w.writerow(y)
             f.close
 
-    pickle.dump(results_dc, open("save_results_dc.p", "wb"))
-    pickle.dump(myresults, open("save_myresults.p", "wb"))
+    pickle.dump(results_dc, open("../results/region_results_dc.p", "wb"))
+    # pickle.dump(myresults, open("save_myresults.p", "wb"))
 
     return(results_dc)
 
