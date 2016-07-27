@@ -101,7 +101,7 @@ def read_and_calculate_parameters(**arguments):
 
     pv_parameter = pd.read_csv(
         'data/' + arguments['--scenario'] + '_pv.csv',
-        delimiter=';', index_col=0)
+        delimiter=',', index_col=0)
 
     # Electricity from grid price
     price_el = cost_parameter.loc['grid']['opex_var']
