@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-''' Example for simulating pv-battery systems in quarters
+''' Example for simulating pv-battery systems in households.
 
-Usage: example_quartier_10hh_11_to_20.py [options]
+Usage: example_housholds.py [options]
 
 Options:
 

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-''' Example for simulating pv-battery systems in quarters
+''' Example for simulating wind-pv-battery systems in regions.
 
-Usage: example_quartier_10hh_11_to_20.py [options]
+Usage: example_region.py [options]
 
 Options:
 
@@ -22,9 +22,9 @@ Options:
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
       --num-regions=NUM    Number of regions. [default: 24]
+      --multi-regions=NUM  Number of regions to combine each. [default: 1]
       --costopt            Cost optimization.
       --ssr=SSR            Self-sufficiency degree.
-      --multi-regions=NUM  Number of regions to combine each. [default: 1]
       --write-results      write results to data/scenarioname_results.csv
       --dry-run            Do nothing. Only print what would be done.
 
