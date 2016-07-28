@@ -411,11 +411,11 @@ def get_result_dict(energysystem, parameters, **arguments):
             w.writerow(x)
             w.writerow(y)
             w.writerow(x1)
-            w.writerow(y1)
+            w, regions.writerow(y1)
             f.close
 
-    pickle.dump(results_dc, open("save_results_dc.p", "wb"))
-    pickle.dump(myresults, open("save_myresults.p", "wb"))
+    pickle.dump(results_dc, open('../results/households_results_dc_' + arguments['--ssr'] + str(arguments['--pv-costopt']) + '.p', 'wb'))
+    # pickle.dump(myresults, open("save_myresults.p", "wb"))
     #  reload: results_dc = pickle.load( open( "save_myresults.p", "rb" ) )
 #    energysystem.dump(dpath='data/')
 
