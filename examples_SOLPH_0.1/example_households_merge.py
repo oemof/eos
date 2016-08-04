@@ -44,6 +44,7 @@ import pandas as pd
 import logging
 import csv
 import pickle
+import pprint as pp
 
 try:
     from docopt import docopt
@@ -182,7 +183,7 @@ def read_and_calculate_parameters(**arguments):
     return parameters
 
 
-def create_energysystem(energysystem, parameters,
+def create_energysystem(energysystem, parameters, house, house_pv,
                         **arguments):
 
     ##########################################################################
@@ -190,107 +191,103 @@ def create_energysystem(energysystem, parameters,
     ##########################################################################
     logging.info('Create oemof objects')
 
-    house_pv = 0
-    for house in parameters['hh']:
-        house_pv = house_pv + 1
-        label_pv = 'pv_' + str(house_pv)
+    house_pv = house_pv + 1
+    label_pv = 'pv_' + str(house_pv)
 
-        # Create electricity bus for demand
-        bel_demand = solph.Bus(label=house+"_bel_demand")
+    # Create electricity bus for demand
+    bel_demand = solph.Bus(label=house+"_bel_demand")
 
-        # Create storage transformer object for storage
-        solph.Storage(
-            label=house + '_bat',
-            inputs={bel_demand: solph.Flow(variable_costs=0)},
-            outputs={bel_demand: solph.Flow(variable_costs=0)},
-            capacity_loss=parameters[
-                'tech_parameter'].loc['storage']['cap_loss'],
-            nominal_input_capacity_ratio=parameters[
-                'tech_parameter'].loc['storage']['c_rate'],
-            nominal_output_capacity_ratio=parameters[
-                'tech_parameter'].loc['storage']['c_rate'],
-            inflow_conversion_factor=parameters[
-                'tech_parameter'].loc['storage']['eta_in'],
-            outflow_conversion_factor=parameters[
-                'tech_parameter'].loc['storage']['eta_out'],
-            fixed_costs=parameters['opex_bat'],
-            investment=solph.Investment(ep_costs=parameters['storage_epc']))
+    # Create storage transformer object for storage
+    solph.Storage(
+        label=house + '_bat',
+        inputs={bel_demand: solph.Flow(variable_costs=0)},
+        outputs={bel_demand: solph.Flow(variable_costs=0)},
+        capacity_loss=parameters[
+            'tech_parameter'].loc['storage']['cap_loss'],
+        nominal_input_capacity_ratio=parameters[
+            'tech_parameter'].loc['storage']['c_rate'],
+        nominal_output_capacity_ratio=parameters[
+            'tech_parameter'].loc['storage']['c_rate'],
+        inflow_conversion_factor=parameters[
+            'tech_parameter'].loc['storage']['eta_in'],
+        outflow_conversion_factor=parameters[
+            'tech_parameter'].loc['storage']['eta_out'],
+        fixed_costs=parameters['opex_bat'],
+        investment=solph.Investment(ep_costs=parameters['storage_epc']))
 
-        # Create commodity object for import electricity resource
-        if arguments['--ssr']:
-            solph.Source(
-                label=house + '_gridsource',
-                outputs={bel_demand: solph.Flow(
-                    nominal_value=parameters['consumption_households']
-                    [house] *
-                    parameters['grid_share'],
-                    summed_max=1)})
+    # Create commodity object for import electricity resource
+    if arguments['--ssr']:
+        solph.Source(
+            label=house + '_gridsource',
+            outputs={bel_demand: solph.Flow(
+                nominal_value=parameters['consumption_households']
+                [house] *
+                parameters['grid_share'],
+                summed_max=1)})
 
-        else:
-            solph.Source(label=house+'_gridsource', outputs={
-                bel_demand: solph.Flow(
-                    variable_costs=parameters['price_el'])})
+    else:
+        solph.Source(label=house+'_gridsource', outputs={
+            bel_demand: solph.Flow(
+                variable_costs=parameters['price_el'])})
 
-        # Create electricity bus for pv
-        bel_pv = solph.Bus(label=house+"_bel_pv")
+    # Create electricity bus for pv
+    bel_pv = solph.Bus(label=house+"_bel_pv")
 
-        # Create excess component for bel_pv to allow overproduction
-        solph.Sink(label=house+"_excess", inputs={bel_pv: solph.Flow()})
+    # Create excess component for bel_pv to allow overproduction
+    solph.Sink(label=house+"_excess", inputs={bel_pv: solph.Flow()})
 
-        # Create sink component for the pv feedin
-        if arguments['--feedin']:
-            solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
-                variable_costs=parameters['fit'],
-                nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],  # TODO: abhängig von PV!
-                max=parameters['max_feedin'])})
+    # Create sink component for the pv feedin
+    if arguments['--feedin']:
+        solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
+            variable_costs=parameters['fit'],
+            nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],  # TODO: abhängig von PV!
+            max=parameters['max_feedin'])})
 
-        # Create linear transformer to connect pv and demand bus
-        solph.LinearTransformer(
-            label=house+"_sc_Transformer",
-            inputs={bel_pv: solph.Flow(variable_costs=parameters['sc_tax'])},
-            outputs={bel_demand: solph.Flow()},
-            conversion_factors={bel_demand: 1})
+    # Create linear transformer to connect pv and demand bus
+    solph.LinearTransformer(
+        label=house+"_sc_Transformer",
+        inputs={bel_pv: solph.Flow(variable_costs=parameters['sc_tax'])},
+        outputs={bel_demand: solph.Flow()},
+        conversion_factors={bel_demand: 1})
 
-        # Create fixed source object for pv
-        if arguments['--pv-costopt']:
-            solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=hlp.get_pv_generation(
-                    year=int(arguments['--year']),
-                    azimuth=parameters[
-                        'pv_parameter'].loc['azimuth'][label_pv],
-                    tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
-                    albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
-                    loc=parameters['loc']),
+    # Create fixed source object for pv
+    if arguments['--pv-costopt']:
+        solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
+            actual_value=hlp.get_pv_generation(
+                year=int(arguments['--year']),
+                azimuth=parameters[
+                    'pv_parameter'].loc['azimuth'][label_pv],
+                tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
+                albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
+                loc=parameters['loc']),
+            fixed=True,
+            fixed_costs=parameters['opex_pv'],
+            investment=solph.Investment(
+                maximum=parameters['pv_parameter'].loc['p_max'][label_pv],
+                ep_costs=parameters['pv_epc']))})
+
+    else:
+        solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
+            actual_value=hlp.get_pv_generation(
+                year=int(arguments['--year']),
+                azimuth=parameters[
+                    'pv_parameter'].loc['azimuth'][label_pv],
+                tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
+                albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
+                loc=parameters['loc']),
+            nominal_value=parameters[
+                'pv_parameter'].loc['p_max'][label_pv],
+            fixed=True,
+            fixed_costs=parameters['opex_pv'])})
+
+    # Create simple sink objects for demands
+    solph.Sink(
+        label=house+"_demand",
+        inputs={bel_demand: solph.Flow(
+            actual_value=parameters['data_load']
+                [str(parameters['hh'][house])],
                 fixed=True,
-                fixed_costs=parameters['opex_pv'],
-                investment=solph.Investment(
-                    maximum=parameters['pv_parameter'].loc['p_max'][label_pv],
-                    ep_costs=parameters['pv_epc']))})
-
-        else:
-            solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=hlp.get_pv_generation(
-                    year=int(arguments['--year']),
-                    azimuth=parameters[
-                        'pv_parameter'].loc['azimuth'][label_pv],
-                    tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
-                    albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
-                    loc=parameters['loc']),
-                nominal_value=parameters[
-                    'pv_parameter'].loc['p_max'][label_pv],
-                fixed=True,
-                fixed_costs=parameters['opex_pv'])})
-            parameters['pv_inst'+house] = parameters[
-                'pv_parameter'].loc['p_max'][label_pv]
-
-        # Create simple sink objects for demands
-        solph.Sink(
-            label=house+"_demand",
-            inputs={bel_demand: solph.Flow(
-                actual_value=parameters['data_load']
-                    [str(parameters['hh'][house])],
-                    fixed=True,
-                    nominal_value=1)})
+                nominal_value=1)})
 
     ##########################################################################
     # Optimise the energy system and plot the results
@@ -310,7 +307,7 @@ def create_energysystem(energysystem, parameters,
     return energysystem
 
 
-def get_result_dict(energysystem, parameters, **arguments):
+def get_result_dict(energysystem, parameters, house, **arguments):
     logging.info('Check the results')
 
     year = arguments['--year']
@@ -318,103 +315,112 @@ def get_result_dict(energysystem, parameters, **arguments):
     results_dc = {}
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
-    for house in parameters['hh']:
-        storage = energysystem.groups[house+'_bat']
-        pv_i = energysystem.groups[house+'_pv']
-        pv_bel = energysystem.groups[house+'_bel_pv']
+    storage = energysystem.groups[house+'_bat']
+    pv_i = energysystem.groups[house+'_pv']
+    pv_bel = energysystem.groups[house+'_bel_pv']
 
-        demand = myresults.slice_by(obj_label=house+'_demand',
-                                    date_from=year+'-01-01 00:00:00',
-                                    date_to=year+'-12-31 23:00:00')
-
-        pv = myresults.slice_by(obj_label=house+'_pv',
+    demand = myresults.slice_by(obj_label=house+'_demand',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
-        excess = myresults.slice_by(obj_label=house+'_excess',
-                                    date_from=year+'-01-01 00:00:00',
-                                    date_to=year+'-12-31 23:00:00')
+    pv = myresults.slice_by(obj_label=house+'_pv',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00')
 
-        sc = myresults.slice_by(obj_label=house+'_sc_Transformer',
-                                type='output',
+    excess = myresults.slice_by(obj_label=house+'_excess',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
-        grid = myresults.slice_by(obj_label=house+'_gridsource',
-                                  date_from=year+'-01-01 00:00:00',
-                                  date_to=year+'-12-31 23:00:00')
+    sc = myresults.slice_by(obj_label=house+'_sc_Transformer',
+                            type='output',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00')
 
-        bat = myresults.slice_by(obj_label=house+'_bat',
-                                 type='output',
-                                 date_from=year+'-01-01 00:00:00',
-                                 date_to=year+'-12-31 23:00:00')
+    grid = myresults.slice_by(obj_label=house+'_gridsource',
+                              date_from=year+'-01-01 00:00:00',
+                              date_to=year+'-12-31 23:00:00')
 
-        if arguments['--feedin']:
-            feedin = myresults.slice_by(obj_label=house+'_feedin',
-                                        date_from=year+'-01-01 00:00:00',
-                                        date_to=year+'-12-31 23:00:00')
-            results_dc['feedin_'+house] = float(feedin.sum())
-        else:
-            results_dc['feedin_'+house] = 0
+    bat = myresults.slice_by(obj_label=house+'_bat',
+                             type='output',
+                             date_from=year+'-01-01 00:00:00',
+                             date_to=year+'-12-31 23:00:00')
 
-        if arguments['--pv-costopt']:
-            pv_inst = energysystem.results[pv_i][pv_bel].invest
-            results_dc['pv_inst_'+house] = pv_inst
-        else:
-            results_dc['pv_inst_'+house] = parameters['pv_inst'+house]
+    if arguments['--feedin']:
+        feedin = myresults.slice_by(obj_label=house+'_feedin',
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00')
+        results_dc['feedin_'+house] = float(feedin.sum())
+    else:
+        results_dc['feedin_'+house] = 0
 
-        #  cost_calculation:
-        pv_cost = (parameters['pv_epc'] + parameters['opex_pv']) * \
-            results_dc['pv_inst_'+house]
-        storage_cost = (
-            parameters['storage_epc'] + parameters['opex_bat']) * \
-            energysystem.results[storage][storage].invest
-        sc_cost = float(sc.sum()) * parameters['sc_tax']
-        grid_cost = float(grid.sum()) * parameters['price_el']
-        fit_cost = results_dc['feedin_'+house] * parameters['fit']
-        whole_cost = storage_cost + sc_cost + grid_cost + fit_cost + pv_cost
-        price_el_mix = whole_cost / float(demand.sum())
+    if arguments['--pv-costopt']:
+        pv_inst = energysystem.results[pv_i][pv_bel].invest
+        results_dc['pv_inst_'+house] = pv_inst
+    else:
+        results_dc['pv_inst_'+house] = parameters['pv_inst_'+house]
 
-        results_dc['demand_'+house] = float(demand.sum())
-        results_dc['pv_'+house] = float(pv.sum())
-        results_dc['pv_max_'+house] = float(pv.max())
-        results_dc['excess_'+house] = float(excess.sum())
-        results_dc['self_con_'+house] = float(sc.sum())
-        results_dc['grid_'+house] = float(grid.sum())
-        results_dc['check_ssr_'+house] = float(1 - (grid.sum() / demand.sum()))
-        results_dc['bat_'+house] = float(bat.sum())
-        results_dc['storage_cap_'+house] = energysystem.results[
-            storage][storage].invest
-        results_dc['price_el_mix_'+house] = price_el_mix
-        results_dc['cost_pv_'+house] = pv_cost
-        results_dc['cost_storage_'+house] = storage_cost
-        results_dc['cost_sc_'+house] = sc_cost
-        results_dc['cost_grid_'+house] = grid_cost
-        results_dc['cost_fit_'+house] = fit_cost
-        results_dc['objective'] = energysystem.results.objective
+    #  cost_calculation:
+    pv_cost = (parameters['pv_epc'] + parameters['opex_pv']) * \
+        results_dc['pv_inst_'+house]
+    storage_cost = (
+        parameters['storage_epc'] + parameters['opex_bat']) * \
+        energysystem.results[storage][storage].invest
+    sc_cost = float(sc.sum()) * parameters['sc_tax']
+    grid_cost = float(grid.sum()) * parameters['price_el']
+    fit_cost = results_dc['feedin_'+house] * parameters['fit']
+    whole_cost = storage_cost + sc_cost + grid_cost + fit_cost + pv_cost
+    price_el_mix = whole_cost / float(demand.sum())
 
-        if arguments['--write-results']:
-            parameter_dc = {}
-            parameter_dc['cost_parameter'] = parameters['cost_parameter']
-            parameter_dc['tech_parameter'] = parameters['tech_parameter']
-            parameter_dc['pv_parameter'] = parameters['pv_parameter']
-            parameter_dc['options'] = arguments
+    results_dc['demand_'+house] = float(demand.sum())
+    results_dc['pv_'+house] = float(pv.sum())
+    results_dc['pv_max_'+house] = float(pv.max())
+    results_dc['excess_'+house] = float(excess.sum())
+    results_dc['self_con_'+house] = float(sc.sum())
+    results_dc['grid_'+house] = float(grid.sum())
+    results_dc['check_ssr_'+house] = float(1 - (grid.sum() / demand.sum()))
+    results_dc['bat_'+house] = float(bat.sum())
+    results_dc['storage_cap_'+house] = energysystem.results[
+        storage][storage].invest
+    results_dc['price_el_mix_'+house] = price_el_mix
+    results_dc['cost_pv_'+house] = pv_cost
+    results_dc['cost_storage_'+house] = storage_cost
+    results_dc['cost_sc_'+house] = sc_cost
+    results_dc['cost_grid_'+house] = grid_cost
+    results_dc['cost_fit_'+house] = fit_cost
+    results_dc['objective'] = energysystem.results.objective
 
-            x = list(results_dc.keys())
-            x1 = list(parameter_dc.keys())
-            y = list(results_dc.values())
-            y1 = list(parameter_dc.values())
-            f = open(
-                'data/'+arguments['--scenario']+'_results.csv',
-                'w', newline='')
-            w = csv.writer(f, delimiter=';')
-            w.writerow(x)
-            w.writerow(y)
-            w.writerow(x1)
-            w, regions.writerow(y1)
-            f.close
+    if arguments['--write-results']:
+        parameter_dc = {}
+        parameter_dc['cost_parameter'] = parameters['cost_parameter']
+        parameter_dc['tech_parameter'] = parameters['tech_parameter']
+        parameter_dc['pv_parameter'] = parameters['pv_parameter']
+        parameter_dc['options'] = arguments
 
-    pickle.dump(results_dc, open('../results/households_results_dc_' + arguments['--ssr'] + str(arguments['--pv-costopt']) + '.p', 'wb'))
+        x = list(results_dc.keys())
+        x1 = list(parameter_dc.keys())
+        y = list(results_dc.values())
+        y1 = list(parameter_dc.values())
+        f = open(
+            'data/'+arguments['--scenario']+'_results.csv',
+            'w', newline='')
+        w = csv.writer(f, delimiter=';')
+        w.writerow(x)
+        w.writerow(y)
+        w.writerow(x1)
+        w, regions.writerow(y1)
+        f.close
+
+    if arguments['--pv-costopt']:
+        pickle.dump(results_dc, open('../results/households_results_dc_' +
+                    arguments['--ssr'] + '_' +
+                    str(house) + '_' +
+                    'costopt_' + '.p', 'wb'))
+    else:
+        pickle.dump(results_dc, open('../results/households_results_dc_' +
+                    arguments['--ssr'] + '_' +
+                    str(house) + '_' +
+                    '.p', 'wb'))
+
     # pickle.dump(myresults, open("save_myresults.p", "wb"))
     #  reload: results_dc = pickle.load( open( "save_myresults.p", "rb" ) )
 #    energysystem.dump(dpath='data/')
@@ -453,14 +459,17 @@ def main(**arguments):
                                    number_timesteps=int(
                                        arguments['--timesteps']))
     parameters = read_and_calculate_parameters(**arguments)
-    esys = create_energysystem(esys,
-                               parameters,
-                               **arguments)
-    esys.dump()
-    # esys.restore()
-    import pprint as pp
-    results = get_result_dict(esys, parameters, **arguments)
-    pp.pprint(results)
+    house_pv = 0
+    for house in parameters['hh']:
+        esys = create_energysystem(esys,
+                                   parameters,
+                                   house,
+                                   house_pv,
+                                   **arguments)
+        esys.dump()
+        # esys.restore()
+        results = get_result_dict(esys, parameters, house, **arguments)
+        pp.pprint(results)
 #    create_plots(esys, year=arguments['--year'])
 
 
