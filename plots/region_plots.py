@@ -56,13 +56,13 @@ def scatter_plot(combinations):
                      res_combinations['storage_cap' + str(i)]]))
 
     print('results: ', results)  # results in MWh
-    results_GWh = results/1e3
+    results_MWh = results/1e3
 
-    plt.scatter(results_GWh[:, 1], results_GWh[:, 2])
-    plt.plot([0, results_GWh.max()], [0, results_GWh.max()], 'r-')
-    plt.axis([-10, results_GWh.max()+10, -10, results_GWh.max()+10])
-    plt.xlabel('Storage capacity (single regions summed) in GWh', size=16)
-    plt.ylabel('Storage capacity (both regions connected) in GWh', size=16)
+    plt.scatter(results_MWh[:, 1], results_MWh[:, 2])
+    plt.plot([0, results_MWh.max()], [0, results_MWh.max()], 'r-')
+    plt.axis([-10, results_MWh.max()+10, -10, results_MWh.max()+10])
+    plt.xlabel('Storage capacity (single regions summed) in MWh', size=16)
+    plt.ylabel('Storage capacity (both regions connected) in MWh', size=16)
     plt.rcParams.update({'font.size': 18})
 
     plt.show()
