@@ -40,6 +40,7 @@ import itertools
 import logging
 import csv
 import pickle
+import pprint as pp
 
 try:
     from docopt import docopt
@@ -165,7 +166,7 @@ def read_and_calculate_parameters(**arguments):
     return parameters
 
 
-def create_energysystem(energysystem, parameters,
+def create_energysystem(energysystem, parameters, loopi,
                         **arguments):
 
     ##########################################################################
@@ -173,101 +174,100 @@ def create_energysystem(energysystem, parameters,
     ##########################################################################
     logging.info('Create oemof objects')
 
-    for loopi in parameters['loop']:
-        # Create electricity bus for demand
-        bel = solph.Bus(label='region_'+str(loopi)+'_bel')
+    # Create electricity bus for demand
+    bel = solph.Bus(label='region_'+str(loopi)+'_bel')
 
-        # Create storage transformer object for storage
-        solph.Storage(
-            label='region_'+str(loopi)+'_bat',
-            inputs={bel: solph.Flow(variable_costs=0)},
-            outputs={bel: solph.Flow(variable_costs=0)},
-            capacity_loss=parameters[
-                'tech_parameter'].loc['storage']['cap_loss'],
-            nominal_input_capacity_ratio=parameters[
-                'tech_parameter'].loc['storage']['c_rate'],
-            nominal_output_capacity_ratio=parameters[
-                'tech_parameter'].loc['storage']['c_rate'],
-            inflow_conversion_factor=parameters[
-                'tech_parameter'].loc['storage']['eta_in'],
-            outflow_conversion_factor=parameters[
-                'tech_parameter'].loc['storage']['eta_out'],
-            fixed_costs=parameters[
-                'cost_parameter'].loc['storage']['opex_fix'],
-            investment=solph.Investment(ep_costs=parameters['storage_epc']))
+    # Create storage transformer object for storage
+    solph.Storage(
+        label='region_'+str(loopi)+'_bat',
+        inputs={bel: solph.Flow(variable_costs=0)},
+        outputs={bel: solph.Flow(variable_costs=0)},
+        capacity_loss=parameters[
+            'tech_parameter'].loc['storage']['cap_loss'],
+        nominal_input_capacity_ratio=parameters[
+            'tech_parameter'].loc['storage']['c_rate'],
+        nominal_output_capacity_ratio=parameters[
+            'tech_parameter'].loc['storage']['c_rate'],
+        inflow_conversion_factor=parameters[
+            'tech_parameter'].loc['storage']['eta_in'],
+        outflow_conversion_factor=parameters[
+            'tech_parameter'].loc['storage']['eta_out'],
+        fixed_costs=parameters[
+            'cost_parameter'].loc['storage']['opex_fix'],
+        investment=solph.Investment(ep_costs=parameters['storage_epc']))
 
-        # Create commodity object for import electricity resource
-        if arguments['--ssr']:
-            if int(arguments['--multi-regions']) == 2:
+    # Create commodity object for import electricity resource
+    if arguments['--ssr']:
+        if int(arguments['--multi-regions']) == 2:
 
-                gridsource_nv = ((float(parameters
-                                   ['region_parameter'].loc
-                                   ['annual_demand_GWh'][str(parameters
-                                       ['combinations'][loopi][1])]) *
-                                   1e6 * parameters['grid_share']) +
+            gridsource_nv = ((float(parameters
+                               ['region_parameter'].loc
+                               ['annual_demand_GWh'][str(parameters
+                                   ['combinations'][loopi][1])]) *
+                               1e6 * parameters['grid_share']) +
 
-                                (float(parameters
-                                   ['region_parameter'].loc
-                                   ['annual_demand_GWh'][str(parameters
-                                       ['combinations'][loopi][2])]) *
-                                   1e6 * parameters['grid_share']))
-            else:
-                gridsource_nv = (float(parameters
-                                   ['region_parameter'].loc
-                                   ['annual_demand_GWh'][str(loopi)]) *
-                                   1e6 * parameters['grid_share'])
+                            (float(parameters
+                               ['region_parameter'].loc
+                               ['annual_demand_GWh'][str(parameters
+                                   ['combinations'][loopi][2])]) *
+                               1e6 * parameters['grid_share']))
+        else:
+            gridsource_nv = (float(parameters
+                               ['region_parameter'].loc
+                               ['annual_demand_GWh'][str(loopi)]) *
+                               1e6 * parameters['grid_share'])
 
-            solph.Source(
-                label='region_'+str(loopi)+'_gridsource',
-                outputs={bel: solph.Flow(
-                    nominal_value=gridsource_nv,
-                    summed_max=1)})
+        solph.Source(
+            label='region_'+str(loopi)+'_gridsource',
+            outputs={bel: solph.Flow(
+                nominal_value=gridsource_nv,
+                summed_max=1)})
+
+    else:
+        print('Cost optimization is not implemented yet')
+        # solph.Source(label='region_'+str(region)+'_gridsource', outputs={
+        #     bel: solph.Flow(
+        #         variable_costs=parameters['price_el'])})
+
+    # Create excess component to allow overproduction
+    solph.Sink(label='region_'+str(loopi)+'__excess',
+               inputs={bel: solph.Flow()})
+
+    # Create fixed source object for wind
+
+    if arguments['--costopt']:
+        print('Cost optimization is not implemented yet')
+        # solph.Source(label='region_'+str(region)+'_wind',
+        #              outputs={bel: solph.Flow(
+        #                       actual_value=parameters['data_wind'],
+        #                       fixed=True,
+        #                       fixed_costs=parameters['opex_wind'],
+        #                       investment=solph.Investment(
+        #                           ep_costs=parameters['wind_epc']))})
+
+    else:
+        if int(arguments['--multi-regions']) == 2:
+            wind_nv = (float(parameters['region_parameter'].
+                             loc['wind_MW'][str(parameters
+                                                ['combinations']
+                                                [loopi][1])]) * 1e3 +
+
+                       float(parameters['region_parameter'].
+                             loc['wind_MW'][str(parameters
+                                                ['combinations']
+                                                [loopi][2])]) * 1e3)
 
         else:
-            print('Cost optimization is not implemented yet')
-            # solph.Source(label='region_'+str(region)+'_gridsource', outputs={
-            #     bel: solph.Flow(
-            #         variable_costs=parameters['price_el'])})
+            wind_nv = float(parameters['region_parameter'].
+                            loc['wind_MW'][str(loopi)]) * 1e3
 
-        # Create excess component to allow overproduction
-        solph.Sink(label='region_'+str(loopi)+'__excess',
-                   inputs={bel: solph.Flow()})
+        solph.Source(label='region_'+str(loopi)+'_wind',
+                     outputs={bel: solph.Flow(
+                              actual_value=parameters['data_wind'],
+                              nominal_value=wind_nv,
+                              fixed=True)})
 
-        # Create fixed source object for wind
-
-        if arguments['--costopt']:
-            print('Cost optimization is not implemented yet')
-            # solph.Source(label='region_'+str(region)+'_wind',
-            #              outputs={bel: solph.Flow(
-            #                       actual_value=parameters['data_wind'],
-            #                       fixed=True,
-            #                       fixed_costs=parameters['opex_wind'],
-            #                       investment=solph.Investment(
-            #                           ep_costs=parameters['wind_epc']))})
-
-        else:
-            if int(arguments['--multi-regions']) == 2:
-                wind_nv = (float(parameters['region_parameter'].
-                                 loc['wind_MW'][str(parameters
-                                                    ['combinations']
-                                                    [loopi][1])]) * 1e3 +
-
-                           float(parameters['region_parameter'].
-                                 loc['wind_MW'][str(parameters
-                                                    ['combinations']
-                                                    [loopi][2])]) * 1e3)
-
-            else:
-                wind_nv = float(parameters['region_parameter'].
-                                loc['wind_MW'][str(loopi)]) * 1e3
-
-            solph.Source(label='region_'+str(loopi)+'_wind',
-                         outputs={bel: solph.Flow(
-                                  actual_value=parameters['data_wind'],
-                                  nominal_value=wind_nv,
-                                  fixed=True)})
-
-        # Create fixed source object for pv
+    # Create fixed source object for pv
         if arguments['--costopt']:
             print('Cost optimization is not implemented yet')
             # solph.Source(label='region_'+str(region)+'_pv',
@@ -300,33 +300,33 @@ def create_energysystem(energysystem, parameters,
                                   nominal_value=pv_nv,
                                   fixed=True)})
 
-        # Create simple sink objects for demands
-        if int(arguments['--multi-regions']) == 2:
-            demand_av = ((parameters['data_load'] /
-                          parameters['data_load'].sum() *
-                          float(parameters['region_parameter'].
-                          loc['annual_demand_GWh'][str(parameters
+    # Create simple sink objects for demands
+    if int(arguments['--multi-regions']) == 2:
+        demand_av = ((parameters['data_load'] /
+                      parameters['data_load'].sum() *
+                      float(parameters['region_parameter'].
+                      loc['annual_demand_GWh'][str(parameters
                                                        ['combinations']
                                                        [loopi][1])]) * 1e6) +
 
-                         (parameters['data_load'] /
-                          parameters['data_load'].sum() *
-                          float(parameters['region_parameter'].
-                          loc['annual_demand_GWh'][str(parameters
+                     (parameters['data_load'] /
+                      parameters['data_load'].sum() *
+                      float(parameters['region_parameter'].
+                      loc['annual_demand_GWh'][str(parameters
                                                        ['combinations']
                                                        [loopi][2])]) * 1e6))
 
-        else:
-            demand_av = (parameters['data_load'] /
-                         parameters['data_load'].sum() *
-                         float(parameters['region_parameter'].
-                         loc['annual_demand_GWh'][str(loopi)])*1e6)
+    else:
+        demand_av = (parameters['data_load'] /
+                     parameters['data_load'].sum() *
+                     float(parameters['region_parameter'].
+                     loc['annual_demand_GWh'][str(loopi)])*1e6)
 
-        solph.Sink(label='region_'+str(loopi)+'_demand',
-                   inputs={bel: solph.Flow(
-                           actual_value=demand_av,
-                           fixed=True,
-                           nominal_value=1)})
+    solph.Sink(label='region_'+str(loopi)+'_demand',
+               inputs={bel: solph.Flow(
+                       actual_value=demand_av,
+                       fixed=True,
+                       nominal_value=1)})
 
     ##########################################################################
     # Optimise the energy system and plot the results
@@ -346,7 +346,7 @@ def create_energysystem(energysystem, parameters,
     return energysystem
 
 
-def get_result_dict(energysystem, parameters, **arguments):
+def get_result_dict(energysystem, parameters, loopi, **arguments):
     logging.info('Check the results')
 
     year = arguments['--year']
@@ -354,46 +354,48 @@ def get_result_dict(energysystem, parameters, **arguments):
     results_dc = {}
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
-    for loopi in parameters['loop']:
-        storage = energysystem.groups['region_'+str(loopi)+'_bat']
+    storage = energysystem.groups['region_'+str(loopi)+'_bat']
 
-        demand = myresults.slice_by(obj_label='region_'+str(loopi)+'_demand',
-                                    date_from=year+'-01-01 00:00:00',
-                                    date_to=year+'-12-31 23:00:00')
-
-        wind = myresults.slice_by(obj_label='region_'+str(loopi)+'_wind',
-                                  date_from=year+'-01-01 00:00:00',
-                                  date_to=year+'-12-31 23:00:00')
-
-        pv = myresults.slice_by(obj_label='region_'+str(loopi)+'_pv',
+    demand = myresults.slice_by(obj_label='region_'+str(loopi)+'_demand',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
-        grid = myresults.slice_by(obj_label='region_'+str(loopi)+'_gridsource',
-                                  date_from=year+'-01-01 00:00:00',
-                                  date_to=year+'-12-31 23:00:00')
+    wind = myresults.slice_by(obj_label='region_'+str(loopi)+'_wind',
+                              date_from=year+'-01-01 00:00:00',
+                              date_to=year+'-12-31 23:00:00')
 
-        results_dc['demand_'+str(loopi)] = float(demand.sum())
-        results_dc['wind_max_'+str(loopi)] = float(wind.max())
-        results_dc['pv_max_'+str(loopi)] = float(pv.max())
-        results_dc['grid'+str(loopi)] = grid.sum()
-        results_dc['check_ssr'+str(loopi)] = 1 - (grid.sum() / demand.sum())
-        results_dc['storage_cap'+str(loopi)] = energysystem.results[
-            storage][storage].invest
-        results_dc['objective'] = energysystem.results.objective
+    pv = myresults.slice_by(obj_label='region_'+str(loopi)+'_pv',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00')
 
-        if arguments['--write-results']:
-            x = list(results_dc.keys())
-            y = list(results_dc.values())
-            f = open(
-                'data/'+arguments['--scenario']+'_results.csv',
-                'w', newline='')
-            w = csv.writer(f, delimiter=';')
-            w.writerow(x)
-            w.writerow(y)
-            f.close
+    grid = myresults.slice_by(obj_label='region_'+str(loopi)+'_gridsource',
+                              date_from=year+'-01-01 00:00:00',
+                              date_to=year+'-12-31 23:00:00')
 
-    pickle.dump(results_dc, open('../results/region_results_dc_' + arguments['--ssr'] + '.p', "wb"))
+    results_dc['demand_'+str(loopi)] = float(demand.sum())
+    results_dc['wind_max_'+str(loopi)] = float(wind.max())
+    results_dc['pv_max_'+str(loopi)] = float(pv.max())
+    results_dc['grid'+str(loopi)] = grid.sum()
+    results_dc['check_ssr'+str(loopi)] = 1 - (grid.sum() / demand.sum())
+    results_dc['storage_cap'+str(loopi)] = energysystem.results[
+        storage][storage].invest
+    results_dc['objective'] = energysystem.results.objective
+
+    if arguments['--write-results']:
+        x = list(results_dc.keys())
+        y = list(results_dc.values())
+        f = open(
+            'data/'+arguments['--scenario']+'_results.csv',
+            'w', newline='')
+        w = csv.writer(f, delimiter=';')
+        w.writerow(x)
+        w.writerow(y)
+        f.close
+
+    pickle.dump(results_dc, open('../results/region_results_dc_' +
+        arguments['--ssr'] + '_' +
+        str(loopi) + '_' +
+        '.p', "wb"))
     # pickle.dump(myresults, open("save_myresults.p", "wb"))
 
     return(results_dc)
@@ -419,14 +421,15 @@ def main(**arguments):
                                    number_timesteps=int(
                                        arguments['--timesteps']))
     parameters = read_and_calculate_parameters(**arguments)
-    esys = create_energysystem(esys,
-                               parameters,
-                               **arguments)
-    esys.dump()
-    # esys.restore()
-    import pprint as pp
-    pp.pprint(get_result_dict(esys, parameters, **arguments))
-#    create_plots(esys, year=arguments['--year'])
+    for loopi in parameters['loop']:
+        esys = create_energysystem(esys,
+                                   parameters,
+                                   loopi,
+                                   **arguments)
+        esys.dump()
+        # esys.restore()
+        pp.pprint(get_result_dict(esys, parameters, loopi, **arguments))
+        # create_plots(esys, year=arguments['--year'])
 
 
 if __name__ == "__main__":
