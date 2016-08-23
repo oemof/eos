@@ -24,12 +24,14 @@ Options:
                            from start-hh, see next option.
                            [default: 1]
       --num-hh=NUM         Number of households to choose. [default: 2]
+      --random-hh          Set if you want to run simulation with random
+                           choice of households.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
       --pv-costopt         Cost optimization for pv plants.
       --feedin             Option with different pv plants (will need
                            scenario_pv.csv) and max feedin
-      --write-results      write results to data/scenarioname_results.csv
+      --write-results      Write results to data/scenarioname_results.csv
       --ssr=SSR            Self-sufficiency degree.
       --dry-run            Do nothing. Only print what would be done.
 
@@ -128,11 +130,18 @@ def read_and_calculate_parameters(**arguments):
                          pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
 
     # Choose households according to simulation options
-    hh_start = int(arguments['--start-hh'])
-    hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
-    hh = {}
-    for i in np.arange(int(arguments['--num-hh'])):
-        hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
+    if arguments['--random-hh']:
+        hh_list = range(1, 81, 1)
+        hh_to_choose = np.random.choice(hh_list, int(arguments['--num-hh']))
+        hh = {}
+        for i in np.arange(int(arguments['--num-hh'])):
+            hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
+    else:
+        hh_start = int(arguments['--start-hh'])
+        hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
+        hh = {}
+        for i in np.arange(int(arguments['--num-hh'])):
+            hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
 
     # Read load data in kW
     data_load = \
