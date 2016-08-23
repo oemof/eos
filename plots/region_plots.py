@@ -17,6 +17,7 @@ import pprint as pp
 import itertools
 import numpy as np
 import matplotlib.pyplot as plt
+import pprint as pp
 from docopt import docopt
 
 # res = pickle.load(open('../results/households_results_dc_0.7.p', 'rb'))
@@ -38,25 +39,30 @@ def calculate_combinations(num_regions):
 
 def scatter_plot(combinations):
 
-    res_single_regions = pickle.load(open('../results/results_single_regions.p', 'rb'))
-    res_combinations = pickle.load(open('../results/results_combinations.p', 'rb'))
-# --num-regions
+    res_single_regions = pickle.load(open('../results/results_single_regions_85.p', 'rb'))
+# --ssr
 
     results = [0, 0, 0]
 
     for i in np.arange(1, len(combinations)):
+        print(i)
+        print(combinations[i][1])
+        print(combinations[i][2])
+        res_combinations = pickle.load(open
+                ('../results/region_results_dc_0.85_' + str(i) + '_.p', 'rb'))
         results = np.vstack((results,
                 [i, (res_single_regions['storage_cap' + str(combinations[i][1])] +
                      res_single_regions['storage_cap' + str(combinations[i][2])]),
                      res_combinations['storage_cap' + str(i)]]))
 
     print('results: ', results)  # results in MWh
+    results_GWh = results/1e3
 
-    plt.scatter(results[:, 1]/1e3, results[:, 2]/1e3)
-    plt.plot([0, 160], [0, 160], 'r-')
-    plt.axis([-10, 170, -10, 170])
-    plt.xlabel('Storage capacity (single regions summed) in GWh', size=20)
-    plt.ylabel('Storage capacity (two regions connected) in GWh', size=20)
+    plt.scatter(results_GWh[:, 1], results_GWh[:, 2])
+    plt.plot([0, results_GWh.max()], [0, results_GWh.max()], 'r-')
+    plt.axis([-10, results_GWh.max()+10, -10, results_GWh.max()+10])
+    plt.xlabel('Storage capacity (single regions summed) in GWh', size=16)
+    plt.ylabel('Storage capacity (both regions connected) in GWh', size=16)
     plt.rcParams.update({'font.size': 18})
 
     plt.show()
