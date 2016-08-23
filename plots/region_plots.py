@@ -40,14 +40,10 @@ def calculate_combinations(num_regions):
 def scatter_plot(combinations):
 
     res_single_regions = pickle.load(open('../results/results_single_regions_85.p', 'rb'))
-# --ssr
 
     results = [0, 0, 0]
 
     for i in np.arange(1, len(combinations)):
-        print(i)
-        print(combinations[i][1])
-        print(combinations[i][2])
         res_combinations = pickle.load(open
                 ('../results/region_results_dc_0.85_' + str(i) + '_.p', 'rb'))
         results = np.vstack((results,
