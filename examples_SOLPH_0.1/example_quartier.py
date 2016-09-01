@@ -26,6 +26,10 @@ Options:
       --num-hh=NUM         Number of households to choose. [default: 2]
       --random-hh          Set if you want to run simulation with random
                            choice of households.
+      --load-hh            Set if you want to load your former choice of
+                           random households.
+      --scale-dem          Set if you want to scale profiles from given
+                           demand data.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
       --pv-costopt         Cost optimization for pv plants.
@@ -43,6 +47,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import logging
+import pickle
+from collections import OrderedDict
 
 try:
     from docopt import docopt
@@ -129,17 +135,23 @@ def read_and_calculate_parameters(**arguments):
     if arguments['--random-hh']:
         hh_list = range(1, 81, 1)
         hh_to_choose = np.random.choice(hh_list, int(arguments['--num-hh']))
-        hh = {}
+        print(np.sort(hh_to_choose))
+        hh = OrderedDict()
         for i in np.arange(int(arguments['--num-hh'])):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
-        print(hh)
+        pickle.dump(hh, open('hh_' + arguments['--scenario'] + '.p', "wb"))
+
+    elif arguments['--load-hh']:
+        hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
+
     else:
         hh_start = int(arguments['--start-hh'])
         hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
-        hh = {}
+        hh = OrderedDict()
         for i in np.arange(int(arguments['--num-hh'])):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
-        print(hh)
+
+    print(hh)
 
     # Read load data in kW
     data_load = \
@@ -147,10 +159,19 @@ def read_and_calculate_parameters(**arguments):
                  "../example/example_data/example_data_load_hourly_mean.csv",
                  sep=",") / 1000
 
-    consumption_of_chosen_households = {}
-    for i in np.arange(int(arguments['--num-hh'])):
-        consumption_of_chosen_households['house_' + str(i+1)] = \
-                data_load[str(hh['house_' + str(i+1)])].sum()
+    if arguments['--scale-dem']:
+        consumption_of_chosen_households = {}
+        for i in np.arange(int(arguments['--num-hh'])):
+            consumption_of_chosen_households['house_' + str(i+1)] = \
+                    pv_parameter.loc['annual_demand_MWh']['pv_' + str(i+1)] * 1e3
+
+    else:
+        consumption_of_chosen_households = {}
+        for i in np.arange(int(arguments['--num-hh'])):
+            consumption_of_chosen_households['house_' + str(i+1)] = \
+                    data_load[str(hh['house_' + str(i+1)])].sum()
+
+    print(sum(consumption_of_chosen_households.values()))
 
     # Read standardized feed-in from pv
     loc = {
@@ -285,13 +306,26 @@ def create_energysystem(energysystem, parameters,
                 fixed_costs=parameters['opex_pv'])})
 
         # Create simple sink objects for demands
-        solph.Sink(
-            label=house+"_demand",
-            inputs={bel_demand: solph.Flow(
-                actual_value=parameters['data_load']
-                    [str(parameters['hh'][house])],
-                    fixed=True,
-                    nominal_value=1)})
+        if arguments['--scale-dem']:
+            solph.Sink(
+                label=house+"_demand",
+                inputs={bel_demand: solph.Flow(
+                    actual_value=(parameters['data_load']
+                        [str(parameters['hh'][house])] /
+                        sum(parameters['data_load']
+                            [str(parameters['hh'][house])]) *
+                            parameters['pv_parameter'].loc['annual_demand_MWh']
+                            [label_pv] * 1e3),
+                        fixed=True,
+                        nominal_value=1)})
+        else:
+            solph.Sink(
+                label=house+"_demand",
+                inputs={bel_demand: solph.Flow(
+                    actual_value=parameters['data_load']
+                        [str(parameters['hh'][house])],
+                        fixed=True,
+                        nominal_value=1)})
 
     ##########################################################################
     # Optimise the energy system and plot the results
