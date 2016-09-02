@@ -402,6 +402,7 @@ def get_result_dict(energysystem, parameters, **arguments):
     storage = energysystem.groups['bat']
 
     results_dc = {}
+    demand_total = 0
 
     for house in parameters['hh']:
         demand = myresults.slice_by(obj_label=house+'_demand',
@@ -428,23 +429,40 @@ def get_result_dict(energysystem, parameters, **arguments):
         else:
             results_dc['feedin_'+house] = 0
 
-        # if arguments['--pv-costopt']:
-            # pv_inst = energysystem.results[pv][pv].invest
-            # results_dc['pv_inst'+house] = pv_inst
+        if arguments['--pv-costopt']:
+            pv_inst = energysystem.results[pv][pv].invest
+            results_dc['pv_inst'+house] = pv_inst
 
         results_dc['demand_'+house] = demand.sum()
+        demand_total = demand_total + demand.sum()
         results_dc['pv_'+house] = pv.sum()
         results_dc['pv_max_'+house] = pv.max()
         results_dc['excess_'+house] = excess.sum()
         results_dc['self_con_'+house] = sc.sum() / 2
         # TODO get in or oputflow of transformer
-        results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
         results_dc['bat_'+house] = bat.sum()
 
     results_dc['grid'] = grid.sum()
+    results_dc['check_ssr'] = 1 - (grid.sum() / demand_total)
     results_dc['storage_cap'] = energysystem.results[
         storage][storage].invest
     results_dc['objective'] = energysystem.results.objective
+
+    if arguments['--profile']:
+        pickle.dump(results_dc, open('../results/quartier_results_' +
+                    str(arguments['--num-hh']) + '_' +
+                    str(arguments['--cost']) + '_' +
+                    str(arguments['--year']) + '_' +
+                    str(arguments['--ssr']) + '_' +
+                    str(arguments['--profile']) + '.p', 'wb'))
+
+    else:
+        pickle.dump(results_dc, open('../results/quartier_results_' +
+                    str(arguments['--num-hh']) + '_' +
+                    str(arguments['--cost']) + '_' +
+                    str(arguments['--year']) + '_' +
+                    str(arguments['--ssr']) + '_' +
+                    'random' + '.p', 'wb'))
 
     return(results_dc)
 
@@ -475,7 +493,11 @@ def main(**arguments):
     esys.dump()
     # esys.restore()
     import pprint as pp
-    pp.pprint(get_result_dict(esys, parameters, **arguments))
+    results = get_result_dict(esys, parameters, **arguments)
+    print('grid: ', results['grid'])
+    print('check_ssr: ', results['check_ssr'])
+    print('storage_cap: ', results['storage_cap'])
+    print('objective: ', results['objective'])
 #    create_plots(esys, year=arguments['--year'])
 
 
