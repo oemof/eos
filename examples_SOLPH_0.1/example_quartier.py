@@ -27,6 +27,7 @@ Options:
       --num-hh=NUM         Number of households to choose. [default: 2]
       --random-hh          Set if you want to run simulation with random
                            choice of households.
+      --profile=PROFILE    Choose between summer, winter, day and night.
       --load-hh            Set if you want to load your former choice of
                            random households.
       --scale-dem          Set if you want to scale profiles from given
@@ -135,7 +136,7 @@ def read_and_calculate_parameters(**arguments):
 
     # Choose households according to simulation options
     if arguments['--random-hh']:
-        hh_list = range(1, 81, 1)
+        hh_list = range(1, 75, 1)
         hh_to_choose = np.random.choice(hh_list, int(arguments['--num-hh']))
         print(np.sort(hh_to_choose))
         hh = OrderedDict()
@@ -143,8 +144,21 @@ def read_and_calculate_parameters(**arguments):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
         pickle.dump(hh, open('hh_' + arguments['--scenario'] + '.p', "wb"))
 
+    elif arguments['--profile']:
+        hh_list = range(1, 4, 1)
+        hh_to_choose = np.random.choice(hh_list, int(arguments['--num-hh']))
+        print(np.sort(hh_to_choose))
+        hh = OrderedDict()
+        for i in np.arange(int(arguments['--num-hh'])):
+            hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
+        pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_special_profiles' + '.p', "wb"))
+
+
     elif arguments['--load-hh']:
         hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
+
+        if arguments['--profile']:
+            hh = pickle.load(open('hh_' + arguments['--scenario'] + '_special_profiles' +'.p', 'rb'))
 
     else:
         hh_start = int(arguments['--start-hh'])
@@ -155,11 +169,34 @@ def read_and_calculate_parameters(**arguments):
 
     print(hh)
 
-    # Read load data in kW
+    # Read load data and calculate total demand
     data_load = \
         pd.read_csv(
-                 "../example/example_data/example_data_load_hourly_mean.csv",
+             "../example/example_data/example_data_load_hourly_mean_74_profiles.csv",
                  sep=",") / 1000
+    if arguments['--profile'] == 'summer':
+        data_load = \
+            pd.read_csv(
+                 "../example/example_data/example_data_load_hourly_mean_SUMMER.csv",
+                     sep=",") / 1000
+
+    if arguments['--profile'] == 'winter':
+        data_load = \
+            pd.read_csv(
+                     "../example/example_data/example_data_load_hourly_mean_WINTER.csv",
+                     sep=",") / 1000
+
+    if arguments['--profile'] == 'day':
+        data_load = \
+            pd.read_csv(
+                     "../example/example_data/example_data_load_hourly_mean_DAY.csv",
+                     sep=",") / 1000
+
+    if arguments['--profile'] == 'night':
+        data_load = \
+            pd.read_csv(
+                     "../example/example_data/example_data_load_hourly_mean_NIGHT.csv",
+                     sep=",") / 1000
 
     if arguments['--scale-dem']:
         consumption_of_chosen_households = {}
