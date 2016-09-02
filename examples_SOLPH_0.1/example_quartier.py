@@ -7,6 +7,7 @@ Usage: example_quartier_10hh_11_to_20.py [options]
 Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario_parchim]
+  -c, --cost=COST          The cost scenario. [default: 1]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
@@ -97,15 +98,16 @@ def read_and_calculate_parameters(**arguments):
 
     # Read parameter csv files
     cost_parameter = pd.read_csv(
-        'data/' + arguments['--scenario'] + '_cost_parameter.csv',
+        'scenarios/' + arguments['--scenario'] +
+            '_cost_parameter_' + str(arguments['--cost']) + '.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        'data/' + arguments['--scenario'] + '_tech_parameter.csv',
+        'scenarios/' + arguments['--scenario'] + '_tech_parameter.csv',
         delimiter=',', index_col=0)
 
     pv_parameter = pd.read_csv(
-        'data/' + arguments['--scenario'] + '_pv.csv',
+        'scenarios/' + arguments['--scenario'] + '_pv.csv',
         delimiter=';', index_col=0)
 
     # Electricity from grid price
