@@ -2,6 +2,8 @@
 /.spyderworkspace
 /.spyderproject
 /doc/Makefile
+*.sh
+*.p
 *.py[cod]
 *.py.orig
 *.nja
