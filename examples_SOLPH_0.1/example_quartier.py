@@ -135,7 +135,14 @@ def read_and_calculate_parameters(**arguments):
                          pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
 
     # Choose households according to simulation options
-    if arguments['--random-hh']:
+    if arguments['--load-hh']:
+        if arguments['--profile']:
+            hh = pickle.load(open('hh_' + arguments['--scenario'] + '_' + str(arguments['--profile']) +'.p', 'rb'))
+
+        else:
+            hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
+
+    elif arguments['--random-hh']:
         hh_list = range(1, 75, 1)
         hh_to_choose = np.random.choice(hh_list, int(arguments['--num-hh']))
         print(np.sort(hh_to_choose))
@@ -151,14 +158,7 @@ def read_and_calculate_parameters(**arguments):
         hh = OrderedDict()
         for i in np.arange(int(arguments['--num-hh'])):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
-        pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_special_profiles' + '.p', "wb"))
-
-
-    elif arguments['--load-hh']:
-        hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
-
-        if arguments['--profile']:
-            hh = pickle.load(open('hh_' + arguments['--scenario'] + '_special_profiles' +'.p', 'rb'))
+        pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + str(arguments['--profile']) + '.p', "wb"))
 
     else:
         hh_start = int(arguments['--start-hh'])
