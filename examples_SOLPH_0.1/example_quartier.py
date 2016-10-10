@@ -213,10 +213,15 @@ def read_and_calculate_parameters(**arguments):
     print(sum(consumption_of_chosen_households.values()))
 
     # Read standardized feed-in from pv
-    loc = {
-        'tz': 'Europe/Berlin',
-        'latitude': float(arguments['--lat']),
-        'longitude': float(arguments['--lon'])}
+    # loc = {
+    #     'tz': 'Europe/Berlin',
+    #     'latitude': float(arguments['--lat']),
+    #     'longitude': float(arguments['--lon'])}
+
+    pv_generation = pd.read_csv(
+              '../example/example_data/pv_generation_' + str(arguments['--year']) + '.csv', sep=",")
+
+    pv_generation = pv_generation['pv']
 
     # Calculate grid share
     if arguments['--ssr']:
@@ -240,7 +245,8 @@ def read_and_calculate_parameters(**arguments):
                   'grid_share': grid_share,
                   'hh': hh,
                   'consumption_households': consumption_of_chosen_households,
-                  'loc': loc}
+                  # 'loc': loc,
+                  'pv_generation': pv_generation}
 
     logging.info('Check parameters')
     print('cost parameter:\n', parameters['cost_parameter'])
@@ -320,29 +326,44 @@ def create_energysystem(energysystem, parameters,
             conversion_factors={bel_demand: 1})
 
         # Create fixed source object for pv
+        # if arguments['--pv-costopt']:
+        #     solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
+        #         actual_value=hlp.get_pv_generation(
+        #             year=int(arguments['--year']),
+        #             azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
+        #             tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
+        #             albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
+        #             loc=parameters['loc']),
+        #         fixed=True,
+        #         fixed_costs=parameters['opex_pv'],
+        #         investment=solph.Investment(ep_costs=parameters['pv_epc']))})
+
         if arguments['--pv-costopt']:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=hlp.get_pv_generation(
-                    year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
-                    tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
-                    albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
-                    loc=parameters['loc']),
+                actual_value=parameters['pv_generation'],
                 fixed=True,
                 fixed_costs=parameters['opex_pv'],
                 investment=solph.Investment(ep_costs=parameters['pv_epc']))})
 
+        # else:
+        #     solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
+        #         actual_value=hlp.get_pv_generation(
+        #             year=int(arguments['--year']),
+        #             azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
+        #             tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
+        #             albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
+        #             loc=parameters['loc']),
+        #         nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],
+        #         fixed=True,
+        #         fixed_costs=parameters['opex_pv'])})
+
         else:
             solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=hlp.get_pv_generation(
-                    year=int(arguments['--year']),
-                    azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
-                    tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
-                    albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
-                    loc=parameters['loc']),
+                actual_value=parameters['pv_generation'],
                 nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],
                 fixed=True,
                 fixed_costs=parameters['opex_pv'])})
+            print(parameters['pv_parameter'].loc['p_max'][label_pv])
 
         # Create simple sink objects for demands
         if arguments['--scale-dem']:
