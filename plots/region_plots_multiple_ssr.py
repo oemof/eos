@@ -77,10 +77,10 @@ def scatter_plot(combinations_85, combinations_70):
     plt.scatter(results_85_GWh[:, 1], results_85_GWh[:, 2], c='blue', label='SSR = 85%', edgecolor='none')
     plt.plot([0, results_85_GWh.max()], [0, results_85_GWh.max()], 'r-')
     plt.axis([-10, results_85_GWh.max()+10, -10, results_85_GWh.max()+10])
-    plt.xlabel('Storage capacity (single regions summed) in GWh', size=16)
-    plt.ylabel('Storage capacity (both regions connected) in GWh', size=16)
+    plt.xlabel('Storage capacity (single regions summed) in MWh', size=16)
+    plt.ylabel('Storage capacity (both regions connected) in MWh', size=16)
     plt.rcParams.update({'font.size': 18})
-    plt.legend()
+    plt.legend(loc='upper left')
 
     plt.show()
 
