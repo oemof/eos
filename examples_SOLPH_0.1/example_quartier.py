@@ -32,6 +32,11 @@ Options:
                            random households.
       --scale-dem          Set if you want to scale profiles from given
                            demand data.
+      --only-slp-h0        Use only the H0 standard load profile for all
+                           households.
+      --only-slp           Use all standard load profiles (H0, G0, L0).
+      --include-g0-l0      Include the standard load profiles G0 and L0. The
+                           loads for household buildings are chosen randomly.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
       --pv-costopt         Cost optimization for pv plants.
@@ -50,6 +55,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import logging
 import pickle
+from demandlib import bdew as bdew
 from collections import OrderedDict
 
 try:
@@ -139,6 +145,12 @@ def read_and_calculate_parameters(**arguments):
         if arguments['--profile']:
             hh = pickle.load(open('hh_' + arguments['--scenario'] + '_' + str(arguments['--profile']) +'.p', 'rb'))
 
+        elif arguments['--include-g0-l0']:
+            if arguments['--num-hh'] == '84':
+                hh = pickle.load(open('hh_' + arguments['--scenario'] + 'random_part_84.p', 'rb'))
+            elif arguments['--num-hh'] == '375':
+                hh = pickle.load(open('hh_' + arguments['--scenario'] + 'random_part_375.p', 'rb'))
+
         else:
             hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
 
@@ -159,6 +171,61 @@ def read_and_calculate_parameters(**arguments):
         for i in np.arange(int(arguments['--num-hh'])):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
         pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + str(arguments['--profile']) + '.p', "wb"))
+
+    elif arguments['--include-g0-l0']:
+        if arguments['--num-hh'] == '84':
+            hh_list = range(1, 75, 1)
+            num_hh = 53
+            hh_to_choose = np.random.choice(hh_list, num_hh)
+            print(np.sort(hh_to_choose))
+            total_buildings = np.arange(1, 85, 1)
+            business = np.array([4, 5, 23, 26, 28, 31, 35, 48, 54, 61, 62, 63,
+                                 65, 67, 77, 78, 81])
+            agriculture = np.array([2, 8, 9, 12, 13, 22, 24, 29, 30, 34, 37,
+                                    38, 39, 59])
+            household_dict = np.setdiff1d(total_buildings,
+                                          np.append(business, agriculture))
+            print(household_dict)
+            print(household_dict.size)
+            hh = OrderedDict()
+            for i in np.arange(int(household_dict.size)):
+                hh['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
+            pickle.dump(hh, open('hh_' + arguments['--scenario'] + 'random_part_84.p', "wb"))
+
+            e_slp = bdew.ElecSlp(int(arguments['--year']))
+            g0_l0_slp_15_min = e_slp.get_profile({'g0': 1, 'l0': 1})
+            # g0_l0_slp_15_min = e_slp.get_profile({'g0': 1296000, 'l0': 95000})
+            g0_l0_slp = g0_l0_slp_15_min.resample('H').mean()
+
+            print(g0_l0_slp)
+
+        elif arguments['--num-hh'] == '375':
+            hh_list = range(1, 75, 1)
+            num_hh = 308
+            hh_to_choose = np.random.choice(hh_list, num_hh)
+            print(np.sort(hh_to_choose))
+            total_buildings = np.arange(1, 376, 1)
+            business = np.array([4, 7, 8, 12, 14, 80, 129, 133, 135, 136, 146,
+                                 156, 160, 172, 173, 186, 201, 216, 251, 279,
+                                 289, 291, 298, 299, 300, 304, 310, 316, 349,
+                                 350, 352, 358, 359, 366])
+            agriculture = np.array([2, 9, 25, 26, 27, 31, 32, 56, 58, 123, 130,
+                                    131, 137, 138, 142, 143, 144, 157, 162,
+                                    169, 170, 174, 183, 188, 192, 194, 217,
+                                    220, 234, 243, 253, 288, 296])
+            household_dict = np.setdiff1d(total_buildings,
+                                          np.append(business, agriculture))
+            print(household_dict)
+            print(household_dict.size)
+            hh = OrderedDict()
+            for i in np.arange(int(household_dict.size)):
+                hh['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
+            pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + 'include-g0l0' + '.p', "wb"))
+
+            e_slp = bdew.ElecSlp(int(arguments['--year']))
+            g0_l0_slp_15_min = e_slp.get_profile({'g0': 1, 'l0': 1})
+            # g0_l0_slp_15_min = e_slp.get_profile({'g0': 1507000, 'l0': 209000})
+            g0_l0_slp = g0_l0_slp_15_min.resample('H').mean()
 
     else:
         hh_start = int(arguments['--start-hh'])
@@ -197,6 +264,16 @@ def read_and_calculate_parameters(**arguments):
             pd.read_csv(
                      "../example/example_data/example_data_load_hourly_mean_NIGHT.csv",
                      sep=",") / 1000
+
+    if arguments['--only-slp-h0']:
+        e_slp = bdew.ElecSlp(int(arguments['--year']))
+        h0_slp_15_min = e_slp.get_profile({'h0': 1})
+        h0_slp = h0_slp_15_min.resample('H').mean()
+
+    if arguments['--only-slp']:
+        e_slp = bdew.ElecSlp(int(arguments['--year']))
+        slp_15_min = e_slp.get_profile({'h0': 1, 'g0': 1, 'l0': 1})
+        slp = slp_15_min.resample('H').mean()
 
     if arguments['--scale-dem']:
         consumption_of_chosen_households = {}
@@ -247,6 +324,18 @@ def read_and_calculate_parameters(**arguments):
                   'consumption_households': consumption_of_chosen_households,
                   # 'loc': loc,
                   'pv_generation': pv_generation}
+
+    if arguments['--only-slp-h0']:
+        parameters.update({'h0_slp': h0_slp['h0']})
+
+    if arguments['--only-slp']:
+        parameters.update({'h0_slp': slp['h0'],
+                           'g0_slp': slp['g0'],
+                           'l0_slp': slp['l0']})
+
+    if arguments['--include-g0-l0']:
+        parameters.update({'g0_slp': g0_l0_slp['g0'],
+                           'l0_slp': g0_l0_slp['l0']})
 
     logging.info('Check parameters')
     print('cost parameter:\n', parameters['cost_parameter'])
@@ -367,17 +456,95 @@ def create_energysystem(energysystem, parameters,
 
         # Create simple sink objects for demands
         if arguments['--scale-dem']:
-            solph.Sink(
-                label=house+"_demand",
-                inputs={bel_demand: solph.Flow(
-                    actual_value=(parameters['data_load']
-                        [str(parameters['hh'][house])] /
-                        sum(parameters['data_load']
-                            [str(parameters['hh'][house])]) *
-                            parameters['pv_parameter'].loc['annual_demand_MWh']
-                            [label_pv] * 1e3),
-                        fixed=True,
-                        nominal_value=1)})
+            if arguments['--only-slp-h0']:
+                solph.Sink(
+                    label=house+"_demand",
+                    inputs={bel_demand: solph.Flow(
+                        actual_value=(parameters['h0_slp'] /
+                            sum(parameters['h0_slp']) *
+                                parameters['pv_parameter'].loc['annual_demand_MWh']
+                                [label_pv] * 1e3),
+                            fixed=True,
+                            nominal_value=1)})
+
+            elif arguments['--only-slp']:
+                if parameters['pv_parameter'].loc['profile_type'][label_pv] == 4:
+                    solph.Sink(
+                        label=house+"_demand",
+                        inputs={bel_demand: solph.Flow(
+                            actual_value=(parameters['g0_slp'] /
+                                sum(parameters['g0_slp']) *
+                                    parameters['pv_parameter'].loc['annual_demand_MWh']
+                                    [label_pv] * 1e3),
+                                fixed=True,
+                                nominal_value=1)})
+                elif parameters['pv_parameter'].loc['profile_type'][label_pv] == 7:
+                    solph.Sink(
+                        label=house+"_demand",
+                        inputs={bel_demand: solph.Flow(
+                            actual_value=(parameters['l0_slp'] /
+                                sum(parameters['l0_slp']) *
+                                    parameters['pv_parameter'].loc['annual_demand_MWh']
+                                    [label_pv] * 1e3),
+                                fixed=True,
+                                nominal_value=1)})
+                else:
+                    solph.Sink(
+                        label=house+"_demand",
+                        inputs={bel_demand: solph.Flow(
+                            actual_value=(parameters['h0_slp'] /
+                                sum(parameters['h0_slp']) *
+                                    parameters['pv_parameter'].loc['annual_demand_MWh']
+                                    [label_pv] * 1e3),
+                                fixed=True,
+                                nominal_value=1)})
+
+            elif arguments['--include-g0-l0']:
+                if parameters['pv_parameter'].loc['profile_type'][label_pv] == 4:
+                    solph.Sink(
+                        label=house+"_demand",
+                        inputs={bel_demand: solph.Flow(
+                            actual_value=(parameters['g0_slp'] /
+                                sum(parameters['g0_slp']) *
+                                    parameters['pv_parameter'].loc['annual_demand_MWh']
+                                    [label_pv] * 1e3),
+                                fixed=True,
+                                nominal_value=1)})
+                elif parameters['pv_parameter'].loc['profile_type'][label_pv] == 7:
+                    solph.Sink(
+                        label=house+"_demand",
+                        inputs={bel_demand: solph.Flow(
+                            actual_value=(parameters['l0_slp'] /
+                                sum(parameters['l0_slp']) *
+                                    parameters['pv_parameter'].loc['annual_demand_MWh']
+                                    [label_pv] * 1e3),
+                                fixed=True,
+                                nominal_value=1)})
+                else:
+                    solph.Sink(
+                        label=house+"_demand",
+                        inputs={bel_demand: solph.Flow(
+                            actual_value=(parameters['data_load']
+                                [str(parameters['hh'][house])] /
+                                sum(parameters['data_load']
+                                    [str(parameters['hh'][house])]) *
+                                    parameters['pv_parameter'].loc['annual_demand_MWh']
+                                    [label_pv] * 1e3),
+                                fixed=True,
+                                nominal_value=1)})
+
+            else:
+                solph.Sink(
+                    label=house+"_demand",
+                    inputs={bel_demand: solph.Flow(
+                        actual_value=(parameters['data_load']
+                            [str(parameters['hh'][house])] /
+                            sum(parameters['data_load']
+                                [str(parameters['hh'][house])]) *
+                                parameters['pv_parameter'].loc['annual_demand_MWh']
+                                [label_pv] * 1e3),
+                            fixed=True,
+                            nominal_value=1)})
         else:
             solph.Sink(
                 label=house+"_demand",
@@ -476,6 +643,30 @@ def get_result_dict(energysystem, parameters, **arguments):
                     str(arguments['--year']) + '_' +
                     str(arguments['--ssr']) + '_' +
                     str(arguments['--profile']) + '.p', 'wb'))
+
+    elif arguments['--only-slp-h0']:
+        pickle.dump(results_dc, open('../results/quartier_results_' +
+                    str(arguments['--num-hh']) + '_' +
+                    str(arguments['--cost']) + '_' +
+                    str(arguments['--year']) + '_' +
+                    str(arguments['--ssr']) + '_' +
+                    'slp_h0' + '.p', 'wb'))
+
+    elif arguments['--only-slp']:
+        pickle.dump(results_dc, open('../results/quartier_results_' +
+                    str(arguments['--num-hh']) + '_' +
+                    str(arguments['--cost']) + '_' +
+                    str(arguments['--year']) + '_' +
+                    str(arguments['--ssr']) + '_' +
+                    'slp' + '.p', 'wb'))
+
+    elif arguments['--include-g0-l0']:
+        pickle.dump(results_dc, open('../results/quartier_results_' +
+                    str(arguments['--num-hh']) + '_' +
+                    str(arguments['--cost']) + '_' +
+                    str(arguments['--year']) + '_' +
+                    str(arguments['--ssr']) + '_' +
+                    'incl-g0-l0' + '.p', 'wb'))
 
     else:
         pickle.dump(results_dc, open('../results/quartier_results_' +
