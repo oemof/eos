@@ -276,18 +276,18 @@ def read_and_calculate_parameters(**arguments):
         slp = slp_15_min.resample('H').mean()
 
     if arguments['--scale-dem']:
-        consumption_of_chosen_households = {}
+        consumption_total = {}
         for i in np.arange(int(arguments['--num-hh'])):
-            consumption_of_chosen_households['house_' + str(i+1)] = \
+            consumption_total['house_' + str(i+1)] = \
                     pv_parameter.loc['annual_demand_MWh']['pv_' + str(i+1)] * 1e3
 
     else:
-        consumption_of_chosen_households = {}
+        consumption_total = {}
         for i in np.arange(int(arguments['--num-hh'])):
-            consumption_of_chosen_households['house_' + str(i+1)] = \
+            consumption_total['house_' + str(i+1)] = \
                     data_load[str(hh['house_' + str(i+1)])].sum()
 
-    print(sum(consumption_of_chosen_households.values()))
+    print(sum(consumption_total.values()))
 
     # Read standardized feed-in from pv
     # loc = {
@@ -321,7 +321,7 @@ def read_and_calculate_parameters(**arguments):
                   'data_load': data_load,
                   'grid_share': grid_share,
                   'hh': hh,
-                  'consumption_households': consumption_of_chosen_households,
+                  'consumption_total': consumption_total,
                   # 'loc': loc,
                   'pv_generation': pv_generation}
 
@@ -380,7 +380,7 @@ def create_energysystem(energysystem, parameters,
             label='gridsource',
             outputs={bel_demand: solph.Flow(
                 nominal_value=sum(
-                    parameters['consumption_households'].values()) *
+                    parameters['consumption_total'].values()) *
                 parameters['grid_share'],
                 summed_max=1)})
 
