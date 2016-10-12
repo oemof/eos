@@ -7,10 +7,11 @@ Usage: quartier_plots.py [options]
 Options:
 
   -c, --cost=COST          The cost scenario. [default: 1]
-      --num-hh=NUM    Number of households. [default: 84]
+      --num-hh=NUM         Number of households. [default: 84]
       --year=YEAR          Weather year. [default: 2010]
       --ssr=SSR            Self-sufficiency degree. [default: None]
-      --profile=PROFILE    Choose between random, summer, winter, day and night.
+      --profile=PROFILE    Choose between random, summer, winter,
+                           day, night, slp_h0, slp and include_g0_l0.
                            [default: random]
   -h, --help               Display this help.
 
@@ -24,21 +25,30 @@ from docopt import docopt
 import numpy as np
 
 
-def get_results(arguments):
-    results = pickle.load(open('../results/quartier_results_' +
-                               str(arguments['--num-hh']) + '_' +
-                               str(arguments['--cost']) + '_' +
-                               str(arguments['--year']) + '_' +
-                               str(arguments['--ssr']) + '_' +
-                               str(arguments['--profile']) + '.p', 'rb'))
+class Quartier:
+    """
+    A quartier class.
+    """
 
-    return results
+    def __init__(self, name=None):
+        self.name = name
+
+    def get_results(arguments):
+        results = pickle.load(open('../results/quartier_results_' +
+                                   str(arguments['--num-hh']) + '_' +
+                                   str(arguments['--cost']) + '_' +
+                                   str(arguments['--year']) + '_' +
+                                   str(arguments['--ssr']) + '_' +
+                                   str(arguments['--profile']) + '.p', 'rb'))
+
+        return results
 
 
 if __name__ == '__main__':
     arguments = docopt(__doc__)
     print(arguments)
-    results = get_results(arguments)
+    quar = Quartier
+    results = quar.get_results(arguments)
     print('check_ssr: ', results['check_ssr'])
     print('storage_cap: ', results['storage_cap'])
     print('objective: ', results['objective'])
@@ -48,4 +58,5 @@ if __name__ == '__main__':
    #      print('pv_max_' + str(house) + ':',
    #              results['pv_max_house_' + str(house)])
     # print('hh: ', results['hh'])
-    # print('pv_max: ', results['pv_max_house_1' ])
+# print('pv_max: ', results['pv_max_house_1' ])
+
