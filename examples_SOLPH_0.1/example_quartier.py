@@ -147,9 +147,9 @@ def read_and_calculate_parameters(**arguments):
 
         elif arguments['--include-g0-l0']:
             if arguments['--num-hh'] == '84':
-                hh = pickle.load(open('hh_' + arguments['--scenario'] + 'random_part_84.p', 'rb'))
+                hh = pickle.load(open('hh_' + arguments['--scenario'] + '_random_part_84.p', 'rb'))
             elif arguments['--num-hh'] == '375':
-                hh = pickle.load(open('hh_' + arguments['--scenario'] + 'random_part_375.p', 'rb'))
+                hh = pickle.load(open('hh_' + arguments['--scenario'] + '_random_part_375.p', 'rb'))
 
         else:
             hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
@@ -190,7 +190,7 @@ def read_and_calculate_parameters(**arguments):
             hh = OrderedDict()
             for i in np.arange(int(household_dict.size)):
                 hh['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
-            pickle.dump(hh, open('hh_' + arguments['--scenario'] + 'random_part_84.p', "wb"))
+            pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_random_part_84.p', "wb"))
 
             e_slp = bdew.ElecSlp(int(arguments['--year']))
             g0_l0_slp_15_min = e_slp.get_profile({'g0': 1, 'l0': 1})
@@ -220,7 +220,7 @@ def read_and_calculate_parameters(**arguments):
             hh = OrderedDict()
             for i in np.arange(int(household_dict.size)):
                 hh['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
-            pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + 'include-g0l0' + '.p', "wb"))
+            pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_random_part_375.p', "wb"))
 
             e_slp = bdew.ElecSlp(int(arguments['--year']))
             g0_l0_slp_15_min = e_slp.get_profile({'g0': 1, 'l0': 1})
@@ -666,7 +666,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                     str(arguments['--cost']) + '_' +
                     str(arguments['--year']) + '_' +
                     str(arguments['--ssr']) + '_' +
-                    'incl-g0-l0' + '.p', 'wb'))
+                    'incl_g0_l0' + '.p', 'wb'))
 
     else:
         pickle.dump(results_dc, open('../results/quartier_results_' +
