@@ -591,6 +591,7 @@ def get_result_dict(energysystem, parameters, **arguments):
 
     results_dc = {}
     demand_total = 0
+    ts_demand_total = 0
 
     for house in parameters['hh']:
         demand = myresults.slice_by(obj_label=house+'_demand',
@@ -614,6 +615,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                                         date_from=year+'-01-01 00:00:00',
                                         date_to=year+'-12-31 23:00:00')
             results_dc['feedin_'+house] = float(feedin.sum())
+            results_dc['ts_feedin_'+house] = float(feedin)
         else:
             results_dc['feedin_'+house] = 0
 
@@ -622,10 +624,14 @@ def get_result_dict(energysystem, parameters, **arguments):
             results_dc['pv_inst'+house] = pv_inst
 
         results_dc['demand_'+house] = demand.sum()
+        results_dc['ts_demand_'+house] = demand
         demand_total = demand_total + demand.sum()
+        ts_demand_total = ts_demand_total + demand
         results_dc['pv_'+house] = pv.sum()
         results_dc['pv_max_'+house] = pv.max()
+        results_dc['ts_pv_'+house] = pv
         results_dc['excess_'+house] = excess.sum()
+        results_dc['ts_excess_'+house] = excess
         results_dc['self_con_'+house] = sc.sum() / 2
         # TODO get in or oputflow of transformer
         results_dc['bat_'+house] = bat.sum()
@@ -635,6 +641,13 @@ def get_result_dict(energysystem, parameters, **arguments):
     results_dc['storage_cap'] = energysystem.results[
         storage][storage].invest
     results_dc['objective'] = energysystem.results.objective
+
+    results_dc['cost_parameter'] = parameters['cost_parameter']
+    results_dc['tech_parameter'] = parameters['tech_parameter']
+    results_dc['pv_parameter'] = parameters['pv_parameter']
+    results_dc['hh'] = parameters['hh']
+
+    results_dc['ts_demand_total'] = ts_demand_total
 
     if arguments['--profile']:
         pickle.dump(results_dc, open('../results/quartier_results_' +
