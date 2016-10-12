@@ -172,7 +172,14 @@ def read_and_calculate_parameters(**arguments):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
         pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + str(arguments['--profile']) + '.p', "wb"))
 
-    elif arguments['--include-g0-l0']:
+    else:
+        hh_start = int(arguments['--start-hh'])
+        hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
+        hh = OrderedDict()
+        for i in np.arange(int(arguments['--num-hh'])):
+            hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
+
+    if arguments['--include-g0-l0']:
         if arguments['--num-hh'] == '84':
             hh_list = range(1, 75, 1)
             num_hh = 53
@@ -226,13 +233,6 @@ def read_and_calculate_parameters(**arguments):
             g0_l0_slp_15_min = e_slp.get_profile({'g0': 1, 'l0': 1})
             # g0_l0_slp_15_min = e_slp.get_profile({'g0': 1507000, 'l0': 209000})
             g0_l0_slp = g0_l0_slp_15_min.resample('H').mean()
-
-    else:
-        hh_start = int(arguments['--start-hh'])
-        hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
-        hh = OrderedDict()
-        for i in np.arange(int(arguments['--num-hh'])):
-            hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
 
     print(hh)
 
