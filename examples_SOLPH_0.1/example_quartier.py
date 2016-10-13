@@ -642,6 +642,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         results_dc['ts_excess_'+house] = excess
         results_dc['self_con_'+house] = sc.sum() / 2
         # TODO get in or oputflow of transformer
+        results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
         results_dc['bat_'+house] = bat.sum()
 
     results_dc['grid'] = grid.sum()
