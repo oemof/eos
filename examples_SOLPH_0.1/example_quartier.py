@@ -589,41 +589,79 @@ def get_result_dict(energysystem, parameters, **arguments):
 
     grid = myresults.slice_by(obj_label='gridsource',
                               date_from=year+'-01-01 00:00:00',
-                              date_to=year+'-12-31 23:00:00')
+                              date_to=year+'-12-31 23:00:00').reset_index(
+                                                  ['bus_label', 'type', 'obj_label'],
+                                                  drop=True)
 
-    bat = myresults.slice_by(obj_label='bat',
-                             date_from=year+'-01-01 00:00:00',
-                             date_to=year+'-12-31 23:00:00')
+    bat_input = myresults.slice_by(obj_label='bat', type='input',
+                                   date_from=year+'-01-01 00:00:00',
+                                   date_to=year+'-12-31 23:00:00').reset_index(
+                                                  ['bus_label', 'type', 'obj_label'],
+                                                  drop=True)
+
+    bat_output = myresults.slice_by(obj_label='bat', type='output',
+                                    date_from=year+'-01-01 00:00:00',
+                                    date_to=year+'-12-31 23:00:00').reset_index(
+                                                   ['bus_label', 'type', 'obj_label'],
+                                                   drop=True)
+
+    bat_soc = myresults.slice_by(obj_label='bat', type='other',
+                                 date_from=year+'-01-01 00:00:00',
+                                 date_to=year+'-12-31 23:00:00').reset_index(
+                                                 ['bus_label', 'type', 'obj_label'],
+                                                 drop=True)
 
     storage = energysystem.groups['bat']
 
     results_dc = {}
     demand_total = 0
-    ts_demand_total = 0
+    ts_demand_list = []
+    ts_pv_list = []
+    ts_excess_list = []
+    ts_sc_list = []
+    ts_feedin_list = []
+
+    results_dc['grid'] = grid
+    results_dc['ts_bat_input'] = bat_input
+    results_dc['ts_bat_output'] = bat_output
+    results_dc['ts_bat_soc'] = bat_soc
 
     for house in parameters['hh']:
         demand = myresults.slice_by(obj_label=house+'_demand',
                                     date_from=year+'-01-01 00:00:00',
-                                    date_to=year+'-12-31 23:00:00')
+                                    date_to=year+'-12-31 23:00:00').reset_index(
+                                            ['bus_label', 'type', 'obj_label'],
+                                            drop=True)
 
         pv = myresults.slice_by(obj_label=house+'_pv',
                                 date_from=year+'-01-01 00:00:00',
-                                date_to=year+'-12-31 23:00:00')
+                                date_to=year+'-12-31 23:00:00').reset_index(
+                                            ['bus_label', 'type', 'obj_label'],
+                                            drop=True)
 
         excess = myresults.slice_by(obj_label=house+'_excess',
                                     date_from=year+'-01-01 00:00:00',
-                                    date_to=year+'-12-31 23:00:00')
+                                    date_to=year+'-12-31 23:00:00').reset_index(
+                                            ['bus_label', 'type', 'obj_label'],
+                                            drop=True)
 
         sc = myresults.slice_by(obj_label=house+'_sc_Transformer',
                                 date_from=year+'-01-01 00:00:00',
-                                date_to=year+'-12-31 23:00:00')
+                                date_to=year+'-12-31 23:00:00').reset_index(
+                                            ['bus_label', 'type', 'obj_label'],
+                                            drop=True)
 
         if arguments['--feedin']:
             feedin = myresults.slice_by(obj_label=house+'_feedin',
                                         date_from=year+'-01-01 00:00:00',
-                                        date_to=year+'-12-31 23:00:00')
+                                        date_to=year+'-12-31 23:00:00').reset_index(
+                                            ['bus_label', 'type', 'obj_label'],
+                                            drop=True)
             results_dc['feedin_'+house] = float(feedin.sum())
             results_dc['ts_feedin_'+house] = float(feedin)
+            ts_feedin_list.append(feedin)
+            ts_feedin_all = pd.concat(ts_feedin_list, axis=1)
+            results_dc['ts_feedin_all'] = ts_feedin_all
         else:
             results_dc['feedin_'+house] = 0
 
@@ -634,7 +672,6 @@ def get_result_dict(energysystem, parameters, **arguments):
         results_dc['demand_'+house] = demand.sum()
         results_dc['ts_demand_'+house] = demand
         demand_total = demand_total + demand.sum()
-        ts_demand_total = ts_demand_total + demand
         results_dc['pv_'+house] = pv.sum()
         results_dc['pv_max_'+house] = pv.max()
         results_dc['ts_pv_'+house] = pv
@@ -643,7 +680,11 @@ def get_result_dict(energysystem, parameters, **arguments):
         results_dc['self_con_'+house] = sc.sum() / 2
         # TODO get in or oputflow of transformer
         results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
-        results_dc['bat_'+house] = bat.sum()
+
+        ts_demand_list.append(demand)
+        ts_pv_list.append(pv)
+        ts_excess_list.append(excess)
+        ts_sc_list.append(sc)
 
     results_dc['grid'] = grid.sum()
     results_dc['check_ssr'] = 1 - (grid.sum() / demand_total)
@@ -656,7 +697,15 @@ def get_result_dict(energysystem, parameters, **arguments):
     results_dc['pv_parameter'] = parameters['pv_parameter']
     results_dc['hh'] = parameters['hh']
 
-    results_dc['ts_demand_total'] = ts_demand_total
+    ts_demand_all = pd.concat(ts_demand_list, axis=1)
+    ts_pv_all = pd.concat(ts_pv_list, axis=1)
+    ts_excess_all = pd.concat(ts_excess_list, axis=1)
+    ts_sc_all = pd.concat(ts_sc_list, axis=1)
+
+    results_dc['ts_demand_all'] = ts_demand_all
+    results_dc['ts_pv_all'] = ts_pv_all
+    results_dc['ts_excess_all'] = ts_excess_all
+    results_dc['ts_sc_all'] = ts_sc_all
 
     if arguments['--profile']:
         pickle.dump(results_dc, open('../results/quartier_results_' +
