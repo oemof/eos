@@ -194,10 +194,16 @@ def read_and_calculate_parameters(**arguments):
                                           np.append(business, agriculture))
             print(household_dict)
             print(household_dict.size)
-            hh = OrderedDict()
+            hh_random = OrderedDict()
             for i in np.arange(int(household_dict.size)):
-                hh['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
-            pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_random_part_84.p', "wb"))
+                hh_random['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
+            pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_84.p', "wb"))
+
+            # This is only a dummy dictionary for a proper object creation
+            # (with the right number of households)
+            hh = OrderedDict()
+            for i in np.arange(int(arguments['--num-hh'])):
+                hh['house_' + str(i+1)] = 'hh_' + str(i+1)
 
             e_slp = bdew.ElecSlp(int(arguments['--year']))
             g0_l0_slp_15_min = e_slp.get_profile({'g0': 1, 'l0': 1})
@@ -344,7 +350,8 @@ def read_and_calculate_parameters(**arguments):
 
     if arguments['--include-g0-l0']:
         parameters.update({'g0_slp': g0_l0_slp['g0'],
-                           'l0_slp': g0_l0_slp['l0']})
+                           'l0_slp': g0_l0_slp['l0'],
+                           'hh_random': hh_random})
 
     logging.info('Check parameters')
     print('cost parameter:\n', parameters['cost_parameter'])
@@ -533,9 +540,9 @@ def create_energysystem(energysystem, parameters,
                         label=house+"_demand",
                         inputs={bel_demand: solph.Flow(
                             actual_value=(parameters['data_load']
-                                [str(parameters['hh'][house])] /
+                                [str(parameters['hh_random'][house])] /
                                 sum(parameters['data_load']
-                                    [str(parameters['hh'][house])]) *
+                                    [str(parameters['hh_random'][house])]) *
                                     parameters['pv_parameter'].loc['annual_demand_MWh']
                                     [label_pv] * 1e3),
                                 fixed=True,
