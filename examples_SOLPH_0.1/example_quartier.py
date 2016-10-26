@@ -230,14 +230,53 @@ def read_and_calculate_parameters(**arguments):
                                           np.append(business, agriculture))
             print(household_dict)
             print(household_dict.size)
-            hh = OrderedDict()
+            hh_random = OrderedDict()
             for i in np.arange(int(household_dict.size)):
-                hh['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
-            pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_random_part_375.p', "wb"))
+                hh_random['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
+            pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_375.p', "wb"))
+
+            # This is only a dummy dictionary for a proper object creation
+            # (with the right number of households)
+            hh = OrderedDict()
+            for i in np.arange(int(arguments['--num-hh'])):
+                hh['house_' + str(i+1)] = 'hh_' + str(i+1)
 
             e_slp = bdew.ElecSlp(int(arguments['--year']))
             g0_l0_slp_15_min = e_slp.get_profile({'g0': 1, 'l0': 1})
             # g0_l0_slp_15_min = e_slp.get_profile({'g0': 1507000, 'l0': 209000})
+            g0_l0_slp = g0_l0_slp_15_min.resample('H').mean()
+
+        elif arguments['--num-hh'] == '446':
+            hh_list = range(1, 75, 1)
+            num_hh = 373
+            hh_to_choose = np.random.choice(hh_list, num_hh)
+            print(np.sort(hh_to_choose))
+            total_buildings = np.arange(1, 447, 1)
+            business = np.array([4, 7, 8, 12, 14, 80, 129, 133, 135, 136, 146,
+                                 156, 160, 172, 173, 186, 201, 216, 251, 279,
+                                 289, 291, 298, 299, 300, 304, 310, 316, 349,
+                                 350, 352, 358, 359, 366, 423, 424, 431, 442])
+            agriculture = np.array([2, 9, 25, 26, 27, 31, 32, 56, 58, 123, 130,
+                                    131, 137, 138, 142, 143, 144, 157, 162,
+                                    169, 170, 174, 183, 188, 192, 194, 217,
+                                    220, 234, 243, 253, 288, 296, 407, 439])
+            household_dict = np.setdiff1d(total_buildings,
+                                          np.append(business, agriculture))
+            print(household_dict)
+            print(household_dict.size)
+            hh_random = OrderedDict()
+            for i in np.arange(int(household_dict.size)):
+                hh_random['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
+            pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_446.p', "wb"))
+
+            # This is only a dummy dictionary for a proper object creation
+            # (with the right number of households)
+            hh = OrderedDict()
+            for i in np.arange(int(arguments['--num-hh'])):
+                hh['house_' + str(i+1)] = 'hh_' + str(i+1)
+
+            e_slp = bdew.ElecSlp(int(arguments['--year']))
+            g0_l0_slp_15_min = e_slp.get_profile({'g0': 1, 'l0': 1})
             g0_l0_slp = g0_l0_slp_15_min.resample('H').mean()
 
     print(hh)
@@ -288,6 +327,8 @@ def read_and_calculate_parameters(**arguments):
                 consumption_total = 1668058
             elif arguments['--num-hh'] == '375':
                 consumption_total = 3389786
+            elif arguments['--num-hh'] == '446':
+                consumption_total = 3719347
         else:
             consumption_total = {}
             for i in np.arange(int(arguments['--num-hh'])):
