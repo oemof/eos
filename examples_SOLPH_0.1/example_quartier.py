@@ -669,7 +669,7 @@ def get_result_dict(energysystem, parameters, **arguments):
     ts_sc_list = []
     ts_feedin_list = []
 
-    results_dc['grid'] = grid
+    results_dc['ts_grid'] = grid
     results_dc['ts_bat_input'] = bat_input
     results_dc['ts_bat_output'] = bat_output
     results_dc['ts_bat_soc'] = bat_soc
