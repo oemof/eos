@@ -693,7 +693,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                                             ['bus_label', 'type', 'obj_label'],
                                             drop=True)
 
-        sc = myresults.slice_by(obj_label=house+'_sc_Transformer',
+        sc = myresults.slice_by(obj_label=house+'_sc_Transformer', type='output',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00').reset_index(
                                             ['bus_label', 'type', 'obj_label'],
@@ -725,8 +725,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         results_dc['ts_pv_'+house] = pv
         results_dc['excess_'+house] = excess.sum()
         results_dc['ts_excess_'+house] = excess
-        results_dc['self_con_'+house] = sc.sum() / 2
-        # TODO get in or oputflow of transformer
+        results_dc['self_con_'+house] = sc.sum()
         results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
 
         ts_demand_list.append(demand)
