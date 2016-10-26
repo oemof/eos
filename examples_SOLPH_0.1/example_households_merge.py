@@ -47,6 +47,7 @@ import logging
 import csv
 import pickle
 import pprint as pp
+from collections import OrderedDict
 
 try:
     from docopt import docopt
@@ -139,15 +140,23 @@ def read_and_calculate_parameters(**arguments):
     else:
         hh_start = int(arguments['--start-hh'])
         hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
-        hh = {}
+        print(hh_to_choose)
+        hh = OrderedDict()
         for i in np.arange(int(arguments['--num-hh'])):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
+        print(hh)
 
     # Read load data in kW
-    data_load = \
-        pd.read_csv(
-            "../example/example_data/example_data_load_hourly_mean.csv",
-            sep=",") / 1000
+    if arguments['--scenario'] == 'brunnenfeld':
+        data_load = \
+            pd.read_csv(
+                "data/Brunnenfeld_loads.csv", sep=",")
+
+    else:
+        data_load = \
+            pd.read_csv(
+                "../example/example_data/example_data_load_hourly_mean.csv",
+                sep=",") / 1000
 
     consumption_of_chosen_households = {}
     for i in np.arange(int(arguments['--num-hh'])):
@@ -202,6 +211,7 @@ def create_energysystem(energysystem, parameters, house, house_pv,
 
     house_pv = house_pv + 1
     label_pv = 'pv_' + str(house_pv)
+    print(label_pv)
 
     # Create electricity bus for demand
     bel_demand = solph.Bus(label=house+"_bel_demand")
@@ -252,10 +262,15 @@ def create_energysystem(energysystem, parameters, house, house_pv,
             nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],  # TODO: abhängig von PV!
             max=parameters['max_feedin'])})
 
-    # Create linear transformer to connect pv and demand bus
+        # Create linear transformer to connect pv and demand bus
+    if parameters['pv_parameter'].loc['p_max'][label_pv] >= 10:
+        sc_tax = parameters['sc_tax']
+    else:
+        sc_tax = 0
+
     solph.LinearTransformer(
         label=house+"_sc_Transformer",
-        inputs={bel_pv: solph.Flow(variable_costs=parameters['sc_tax'])},
+        inputs={bel_pv: solph.Flow(variable_costs=sc_tax)},
         outputs={bel_demand: solph.Flow()},
         conversion_factors={bel_demand: 1})
 
@@ -288,6 +303,8 @@ def create_energysystem(energysystem, parameters, house, house_pv,
                 'pv_parameter'].loc['p_max'][label_pv],
             fixed=True,
             fixed_costs=parameters['opex_pv'])})
+        parameters['pv_inst_'+house] = parameters[
+                'pv_parameter'].loc['p_max'][label_pv]
 
     # Create simple sink objects for demands
     solph.Sink(
@@ -316,12 +333,11 @@ def create_energysystem(energysystem, parameters, house, house_pv,
     return energysystem
 
 
-def get_result_dict(energysystem, parameters, house, **arguments):
+def get_result_dict(energysystem, parameters, house, results_dc, **arguments):
     logging.info('Check the results')
 
     year = arguments['--year']
 
-    results_dc = {}
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
     storage = energysystem.groups[house+'_bat']
@@ -398,37 +414,16 @@ def get_result_dict(energysystem, parameters, house, **arguments):
     results_dc['cost_fit_'+house] = fit_cost
     results_dc['objective'] = energysystem.results.objective
 
-    if arguments['--write-results']:
-        parameter_dc = {}
-        parameter_dc['cost_parameter'] = parameters['cost_parameter']
-        parameter_dc['tech_parameter'] = parameters['tech_parameter']
-        parameter_dc['pv_parameter'] = parameters['pv_parameter']
-        parameter_dc['options'] = arguments
-
-        x = list(results_dc.keys())
-        x1 = list(parameter_dc.keys())
-        y = list(results_dc.values())
-        y1 = list(parameter_dc.values())
-        f = open(
-            'data/'+arguments['--scenario']+'_results.csv',
-            'w', newline='')
-        w = csv.writer(f, delimiter=';')
-        w.writerow(x)
-        w.writerow(y)
-        w.writerow(x1)
-        w, regions.writerow(y1)
-        f.close
-
     if arguments['--pv-costopt']:
         pickle.dump(results_dc, open('../results/households_results_dc_' +
                     arguments['--ssr'] + '_' +
                     str(house) + '_' +
                     'costopt_' + '.p', 'wb'))
-    else:
-        pickle.dump(results_dc, open('../results/households_results_dc_' +
-                    arguments['--ssr'] + '_' +
-                    str(house) + '_' +
-                    '.p', 'wb'))
+#    else:
+#        pickle.dump(results_dc, open('../results/households_results_dc_' +
+#                    arguments['--ssr'] + '_' +
+#                    house + '_' +
+#                    '.p', 'wb'))
 
     # pickle.dump(myresults, open("save_myresults.p", "wb"))
     #  reload: results_dc = pickle.load( open( "save_myresults.p", "rb" ) )
@@ -469,7 +464,13 @@ def main(**arguments):
                                        arguments['--timesteps']))
     parameters = read_and_calculate_parameters(**arguments)
     house_pv = 0
+    results_dc = {}
     for house in parameters['hh']:
+        print('house')
+        print(house)
+#        house_pv = int(house[6:])
+#        print('pv')
+#        print(house_pv)
         esys = create_energysystem(esys,
                                    parameters,
                                    house,
@@ -477,8 +478,29 @@ def main(**arguments):
                                    **arguments)
         esys.dump()
         # esys.restore()
-        results = get_result_dict(esys, parameters, house, **arguments)
+        results = get_result_dict(
+                esys, parameters, house, results_dc, **arguments)
         pp.pprint(results)
+    if arguments['--write-results']:
+        parameter_dc = {}
+        parameter_dc['cost_parameter'] = parameters['cost_parameter']
+        parameter_dc['tech_parameter'] = parameters['tech_parameter']
+        parameter_dc['pv_parameter'] = parameters['pv_parameter']
+        parameter_dc['options'] = arguments
+
+        x = list(results_dc.keys())
+        x1 = list(parameter_dc.keys())
+        y = list(results_dc.values())
+        y1 = list(parameter_dc.values())
+        f = open(
+            'data/'+arguments['--scenario']+'_results.csv',
+            'w', newline='')
+        w = csv.writer(f, delimiter=';')
+        w.writerow(x)
+        w.writerow(y)
+        w.writerow(x1)
+        w.writerow(y1)
+        f.close
 #    create_plots(esys, year=arguments['--year'])
 
 
