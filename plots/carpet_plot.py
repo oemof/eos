@@ -11,7 +11,7 @@ Options:
       --year=YEAR          Weather year. [default: 2010]
       --ssr=SSR            Self-sufficiency degree. [default: None]
       --profile=PROFILE    Choose between random, summer, winter,
-                           day and night.
+                           day, night, slp_h0, slp and include_g0_l0.
                            [default: random]
   -h, --help               Display this help.
 
@@ -34,27 +34,54 @@ class Carpet:
     def __init__(self, name=None):
         self.name = name
 
-    def carpet_plot(res):
+    def carpet_plot(res, res_name, show=True):
         '''
         Empty docstring.
         '''
-        print(res.max())
+        # print(res.max())
         matrix = np.reshape(res, (365, 24))
         a = np.transpose(matrix)
         b = np.flipud(a)
 
         print(b)
 
-        ax = plt.subplots()
-
+        fig = plt.figure()
         # plt.scatter(a)
-        plt.imshow(b, cmap='PuRd', interpolation='nearest',
+        # cmap: 'RdPu', 'YlOrBr', 'PuBu', 'Greens'
+        plt.imshow(b, cmap='YlOrBr', interpolation='nearest',
                    aspect='auto')
-        # ax.set_xlabel('Days of year')
-        # ax.set_ylabel('Hours of day')
+        plt.xlabel('Days of year')
+        plt.ylabel('Hours of day')
         clb = plt.colorbar()
-        clb.set_label('results in xx/xxx')
-        plt.show()
+        clb.set_label(res_name)
+
+        if show:
+            plt.show()
+
+        return fig
+
+
+class Line:
+    """
+    A line class.
+    """
+
+    def __init__(self, name=None):
+        self.name = name
+
+    def line_plot(res, res_name, show=True):
+        '''
+        Empty docstring.
+        '''
+        fig = plt.figure()
+        plt.plot(res)
+        plt.xlabel('Hours of the year')
+        plt.ylabel(res_name)
+
+        if show:
+            plt.show()
+
+        return fig
 
 
 if __name__ == '__main__':
@@ -64,3 +91,5 @@ if __name__ == '__main__':
     results = quartier_results.get_results(arguments)
     carpet = Carpet
     carpet.carpet_plot(results)
+    line = Line
+    line.line_plot(results)
