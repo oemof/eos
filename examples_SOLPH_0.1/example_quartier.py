@@ -766,6 +766,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         pickle.dump(results_dc, open('../results/quartier_results_' +
                     str(arguments['--num-hh']) + '_' +
                     str(arguments['--cost']) + '_' +
+                    str(arguments['--tech']) + '_' +
                     str(arguments['--year']) + '_' +
                     str(arguments['--ssr']) + '_' +
                     str(arguments['--profile']) + '.p', 'wb'))
@@ -774,6 +775,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         pickle.dump(results_dc, open('../results/quartier_results_' +
                     str(arguments['--num-hh']) + '_' +
                     str(arguments['--cost']) + '_' +
+                    str(arguments['--tech']) + '_' +
                     str(arguments['--year']) + '_' +
                     str(arguments['--ssr']) + '_' +
                     'slp_h0' + '.p', 'wb'))
@@ -782,6 +784,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         pickle.dump(results_dc, open('../results/quartier_results_' +
                     str(arguments['--num-hh']) + '_' +
                     str(arguments['--cost']) + '_' +
+                    str(arguments['--tech']) + '_' +
                     str(arguments['--year']) + '_' +
                     str(arguments['--ssr']) + '_' +
                     'slp' + '.p', 'wb'))
@@ -790,6 +793,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         pickle.dump(results_dc, open('../results/quartier_results_' +
                     str(arguments['--num-hh']) + '_' +
                     str(arguments['--cost']) + '_' +
+                    str(arguments['--tech']) + '_' +
                     str(arguments['--year']) + '_' +
                     str(arguments['--ssr']) + '_' +
                     'incl_g0_l0' + '.p', 'wb'))
@@ -798,6 +802,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         pickle.dump(results_dc, open('../results/quartier_results_' +
                     str(arguments['--num-hh']) + '_' +
                     str(arguments['--cost']) + '_' +
+                    str(arguments['--tech']) + '_' +
                     str(arguments['--year']) + '_' +
                     str(arguments['--ssr']) + '_' +
                     'random' + '.p', 'wb'))
