@@ -716,8 +716,10 @@ def get_result_dict(energysystem, parameters, **arguments):
             results_dc['feedin_'+house] = 0
 
         if arguments['--pv-costopt']:
-            pv_inst = energysystem.results[pv][pv].invest
-            results_dc['pv_inst'+house] = pv_inst
+            pv_i = energysystem.groups[house+'_pv']
+            pv_bel = energysystem.groups[house+'_bel_pv']
+            pv_inst = energysystem.results[pv_i][pv_bel].invest
+            results_dc['pv_inst_'+house] = pv_inst
 
         results_dc['demand_'+house] = demand.sum()
         results_dc['ts_demand_'+house] = demand
@@ -728,7 +730,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         results_dc['excess_'+house] = excess.sum()
         results_dc['ts_excess_'+house] = excess
         results_dc['self_con_'+house] = sc.sum()
-        results_dc['check_ssr'+house] = 1 - (grid.sum() / demand.sum())
+        # results_dc['check_ssr_'+house] = 1 - (grid.sum() / demand.sum())
 
         ts_demand_list.append(demand)
         ts_pv_list.append(pv)
