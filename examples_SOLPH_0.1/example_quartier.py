@@ -8,14 +8,15 @@ Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario_parchim]
   -c, --cost=COST          The cost scenario. [default: 1]
+  -t, --tech=TECH          The tech scenario. [default: 1]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
   -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
                            WARNING, ERROR or CRITICAL.
                            [default: ERROR]
-  -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
   -h, --help               Display this help.
+      --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
       --lat=LAT            Sets the simulation longitude to choose the right
                            weather data set. [default: 53.41] # Parchim
       --lon=LON            Sets the simulation latitude to choose the right
@@ -110,7 +111,8 @@ def read_and_calculate_parameters(**arguments):
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        'scenarios/' + arguments['--scenario'] + '_tech_parameter.csv',
+        'scenarios/' + arguments['--scenario'] +
+            '_tech_parameter_' + str(arguments['--tech']) + '.csv',
         delimiter=',', index_col=0)
 
     pv_parameter = pd.read_csv(
