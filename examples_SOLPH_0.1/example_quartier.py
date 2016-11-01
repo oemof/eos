@@ -753,9 +753,19 @@ def get_result_dict(energysystem, parameters, **arguments):
     ts_excess_all = pd.concat(ts_excess_list, axis=1)
     ts_sc_all = pd.concat(ts_sc_list, axis=1)
 
-    residual = ts_demand_all.sum() - ts_pv_all.sum()
-    positive_residual = residual.where(residual > 0, 0)
-    results_dc['check_ssr_pv'] = positive_residual.sum() / ts_demand_all.sum()
+    residual = ts_demand_all.sum(axis=1) - ts_pv_all.sum(axis=1)
+    positive_residual = residual.where(residual >= 0, 0)
+    covered_by_pv = ts_demand_all.sum(axis=1) - positive_residual
+#     fig = plt.figure()
+#     plt.plot(residual)
+#     plt.plot(positive_residual)
+#     plt.plot(ts_demand_all.sum(axis=1))
+#     plt.plot(ts_pv_all.sum(axis=1))
+#     plt.plot(covered_by_pv)
+#     plt.legend(['residual', 'positive_residual', 'demand', 'pv', 'covered_by_pv'])
+#     plt.show()
+
+    results_dc['check_ssr_pv'] = covered_by_pv.sum() / demand_total
 
     results_dc['ts_demand_all'] = ts_demand_all
     results_dc['ts_pv_all'] = ts_pv_all
