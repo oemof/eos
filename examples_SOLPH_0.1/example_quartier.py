@@ -513,7 +513,6 @@ def create_energysystem(energysystem, parameters,
                 nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],
                 fixed=True,
                 fixed_costs=parameters['opex_pv'])})
-            print(parameters['pv_parameter'].loc['p_max'][label_pv])
 
         # Create simple sink objects for demands
         if arguments['--scale-dem']:
