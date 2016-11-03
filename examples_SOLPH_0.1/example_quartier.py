@@ -614,6 +614,11 @@ def create_energysystem(energysystem, parameters,
                         fixed=True,
                         nominal_value=1)})
 
+    return energysystem
+
+
+def optimize_energysystem(energysystem):
+
     ##########################################################################
     # Optimise the energy system and plot the results
     ##########################################################################
@@ -846,7 +851,8 @@ def main(**arguments):
     esys = create_energysystem(esys,
                                parameters,
                                **arguments)
-    esys.dump()
+    esys = optimize_energysystem(esys)
+    # esys.dump()
     # esys.restore()
     import pprint as pp
     results = get_result_dict(esys, parameters, **arguments)
