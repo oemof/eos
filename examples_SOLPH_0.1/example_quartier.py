@@ -75,7 +75,9 @@ from oemof.tools import logger
 import oemof.solph as solph
 
 # import helper to read coastdat data
-from eos import helper_coastdat as hlp
+import sys
+sys.path.append('/home/caro/rlihome/Git')
+# from eos import helper_coastdat as hlp
 
 
 def initialise_energysystem(year, number_timesteps):
