@@ -54,7 +54,21 @@ if __name__ == '__main__':
     print('check_ssr: ', results['check_ssr'])
     print('storage_cap: ', results['storage_cap'])
     print('objective: ', results['objective'])
-    print(np.arange(1, 85))
+    print('check_ssr_pv: ', results['check_ssr_pv'])
+    print(results['hh'])
+    # pv_inst_total = 0
+    # for house in parameters['hh']:
+        # pv_inst_total =
+    # excess = results['ts_excess_all'].sum(axis=1)
+    # print(excess.sum())
+    # sc = results['ts_sc_all'].sum(axis=1)
+    # print(sc.sum())
+    # print(results['excess_house_7'])
+    # print(results['self_con_house_7'])
+    # print(results['pv_house_7'])
+    # print(results['demand_house_7'])
+    # print(results['feedin_house_7'])
+    #'] print(np.arange(1, 85))
    #  for house in np.arange(1, 85):
    #      print(house)
    #      print('pv_max_' + str(house) + ':',
