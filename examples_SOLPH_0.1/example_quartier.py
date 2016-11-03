@@ -829,18 +829,70 @@ def get_result_dict(energysystem, parameters, **arguments):
 
 
 def create_plots(energysystem, year):
+
     logging.info('Plot results')
-    myresults = outputlib.DataFramePlot(energy_system=energysystem)
-    gridsource = myresults.slice_by(obj_label='gridsource', type='input',
-                                    date_from=year + '-01-01 00:00:00',
-                                    date_to=year + '-12-31 23:00:00')
 
-    imp = gridsource.sort_values(by='val', ascending=False).reset_index()
+    cdict = {'wind': '#5b5bae',
+             'pv': '#ffde32',
+             'storage': '#42c77a',
+             'demand': '#ce4aff',
+             'excess_bel': '#555555'}
 
-    imp.plot(linewidth=1.5)
+    # Plotting the input flows of the electricity bus for January
+    myplot = outputlib.DataFramePlot(energy_system=energysystem)
+    myplot.slice_unstacked(bus_label="bel_demand", type="input",
+                           date_from=year + "-01-01 00:00:00",
+                           date_to=year + "-01-31 00:00:00")
+    colorlist = myplot.color_from_dict(cdict)
+    myplot.plot(color=colorlist, linewidth=2, title="January 2012")
+    myplot.ax.legend(loc='upper right')
+    myplot.ax.set_ylabel('Power in MW')
+    myplot.ax.set_xlabel('Date')
+    myplot.set_datetime_ticks(date_format='%d-%m-%Y', tick_distance=24*7)
+
+    # Plotting the output flows of the electricity bus for January
+    myplot.slice_unstacked(bus_label="bel_demand", type="output")
+    myplot.plot(title="Year 2016", colormap='Spectral', linewidth=2)
+    myplot.ax.legend(loc='upper right')
+    myplot.ax.set_ylabel('Power in MW')
+    myplot.ax.set_xlabel('Date')
+    myplot.set_datetime_ticks()
 
     plt.show()
 
+    # Plotting a combined stacked plot
+    fig = plt.figure(figsize=(24, 14))
+    plt.rc('legend', **{'fontsize': 19})
+    plt.rcParams.update({'font.size': 19})
+    plt.style.use('grayscale')
+
+    handles, labels = myplot.io_plot(
+        bus_label='bel_demand', cdict=cdict,
+        barorder=['pv', 'wind', 'storage'],
+        lineorder=['demand', 'storage', 'excess_bel'],
+        line_kwa={'linewidth': 4},
+        ax=fig.add_subplot(1, 1, 1),
+        date_from=year + "-06-01 00:00:00",
+        date_to=year + "-06-8 00:00:00",
+        )
+    myplot.ax.set_ylabel('Power in MW')
+    myplot.ax.set_xlabel('Date')
+    myplot.ax.set_title("Electricity bus")
+    myplot.set_datetime_ticks(tick_distance=24, date_format='%d-%m-%Y')
+    myplot.outside_legend(handles=handles, labels=labels)
+
+    plt.show()
+
+#     gridsource = myresults.slice_by(obj_label='gridsource', type='input',
+#                                     date_from=year + '-01-01 00:00:00',
+#                                     date_to=year + '-12-31 23:00:00')
+#
+#     imp = gridsource.sort_values(by='val', ascending=False).reset_index()
+#
+#     imp.plot(linewidth=1.5)
+#
+#     plt.show()
+#
 
 def main(**arguments):
     logger.define_logging()
@@ -861,7 +913,7 @@ def main(**arguments):
     print('storage_cap: ', results['storage_cap'])
     print('objective: ', results['objective'])
     print('check_ssr_pv: ', results['check_ssr_pv'])
-#    create_plots(esys, year=arguments['--year'])
+    # create_plots(esys, year=arguments['--year'])
 
 
 if __name__ == "__main__":
