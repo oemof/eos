@@ -7,6 +7,7 @@ Usage: quartier_plots.py [options]
 Options:
 
   -c, --cost=COST          The cost scenario. [default: 1]
+  -t, --tech=TECH          The tech scenario. [default: 1]
       --num-hh=NUM         Number of households. [default: 84]
       --year=YEAR          Weather year. [default: 2010]
       --ssr=SSR            Self-sufficiency degree. [default: None]
@@ -37,6 +38,7 @@ class Quartier:
         results = pickle.load(open('../results/quartier_results_' +
                                    str(arguments['--num-hh']) + '_' +
                                    str(arguments['--cost']) + '_' +
+                                   str(arguments['--tech']) + '_' +
                                    str(arguments['--year']) + '_' +
                                    str(arguments['--ssr']) + '_' +
                                    str(arguments['--profile']) + '.p', 'rb'))
