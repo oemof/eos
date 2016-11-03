@@ -44,6 +44,7 @@ Options:
       --feedin             Option with different pv plants (will need
                            scenario_pv.csv) and max feedin
       --ssr=SSR            Self-sufficiency degree.
+      --save               Save results.
       --dry-run            Do nothing. Only print what would be done.
 
 '''
@@ -772,50 +773,51 @@ def get_result_dict(energysystem, parameters, **arguments):
     results_dc['ts_excess_all'] = ts_excess_all
     results_dc['ts_sc_all'] = ts_sc_all
 
-    if arguments['--profile']:
-        pickle.dump(results_dc, open('../results/quartier_results_' +
-                    str(arguments['--num-hh']) + '_' +
-                    str(arguments['--cost']) + '_' +
-                    str(arguments['--tech']) + '_' +
-                    str(arguments['--year']) + '_' +
-                    str(arguments['--ssr']) + '_' +
-                    str(arguments['--profile']) + '.p', 'wb'))
+    if arguments['--save']:
+        if arguments['--profile']:
+            pickle.dump(results_dc, open('../results/quartier_results_' +
+                        str(arguments['--num-hh']) + '_' +
+                        str(arguments['--cost']) + '_' +
+                        str(arguments['--tech']) + '_' +
+                        str(arguments['--year']) + '_' +
+                        str(arguments['--ssr']) + '_' +
+                        str(arguments['--profile']) + '.p', 'wb'))
 
-    elif arguments['--only-slp-h0']:
-        pickle.dump(results_dc, open('../results/quartier_results_' +
-                    str(arguments['--num-hh']) + '_' +
-                    str(arguments['--cost']) + '_' +
-                    str(arguments['--tech']) + '_' +
-                    str(arguments['--year']) + '_' +
-                    str(arguments['--ssr']) + '_' +
-                    'slp_h0' + '.p', 'wb'))
+        elif arguments['--only-slp-h0']:
+            pickle.dump(results_dc, open('../results/quartier_results_' +
+                        str(arguments['--num-hh']) + '_' +
+                        str(arguments['--cost']) + '_' +
+                        str(arguments['--tech']) + '_' +
+                        str(arguments['--year']) + '_' +
+                        str(arguments['--ssr']) + '_' +
+                        'slp_h0' + '.p', 'wb'))
 
-    elif arguments['--only-slp']:
-        pickle.dump(results_dc, open('../results/quartier_results_' +
-                    str(arguments['--num-hh']) + '_' +
-                    str(arguments['--cost']) + '_' +
-                    str(arguments['--tech']) + '_' +
-                    str(arguments['--year']) + '_' +
-                    str(arguments['--ssr']) + '_' +
-                    'slp' + '.p', 'wb'))
+        elif arguments['--only-slp']:
+            pickle.dump(results_dc, open('../results/quartier_results_' +
+                        str(arguments['--num-hh']) + '_' +
+                        str(arguments['--cost']) + '_' +
+                        str(arguments['--tech']) + '_' +
+                        str(arguments['--year']) + '_' +
+                        str(arguments['--ssr']) + '_' +
+                        'slp' + '.p', 'wb'))
 
-    elif arguments['--include-g0-l0']:
-        pickle.dump(results_dc, open('../results/quartier_results_' +
-                    str(arguments['--num-hh']) + '_' +
-                    str(arguments['--cost']) + '_' +
-                    str(arguments['--tech']) + '_' +
-                    str(arguments['--year']) + '_' +
-                    str(arguments['--ssr']) + '_' +
-                    'incl_g0_l0' + '.p', 'wb'))
+        elif arguments['--include-g0-l0']:
+            pickle.dump(results_dc, open('../results/quartier_results_' +
+                        str(arguments['--num-hh']) + '_' +
+                        str(arguments['--cost']) + '_' +
+                        str(arguments['--tech']) + '_' +
+                        str(arguments['--year']) + '_' +
+                        str(arguments['--ssr']) + '_' +
+                        'incl_g0_l0' + '.p', 'wb'))
 
-    else:
-        pickle.dump(results_dc, open('../results/quartier_results_' +
-                    str(arguments['--num-hh']) + '_' +
-                    str(arguments['--cost']) + '_' +
-                    str(arguments['--tech']) + '_' +
-                    str(arguments['--year']) + '_' +
-                    str(arguments['--ssr']) + '_' +
-                    'random' + '.p', 'wb'))
+        else:
+            pickle.dump(results_dc, open('../results/quartier_results_' +
+                        str(arguments['--num-hh']) + '_' +
+                        str(arguments['--cost']) + '_' +
+                        str(arguments['--tech']) + '_' +
+                        str(arguments['--year']) + '_' +
+                        str(arguments['--ssr']) + '_' +
+                        'random' + '.p', 'wb'))
 
     return(results_dc)
 
