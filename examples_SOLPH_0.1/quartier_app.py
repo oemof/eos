@@ -10,9 +10,6 @@ Options:
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
-  -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
-                           WARNING, ERROR or CRITICAL.
-                           [default: ERROR]
   -h, --help               Display this help.
       --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
       --lat=LAT            Sets the simulation longitude to choose the right
@@ -79,13 +76,6 @@ def initialise_energysystem(year, number_timesteps):
 
     return solph.EnergySystem(groupings=solph.GROUPINGS,
                               timeindex=date_time_index)
-
-
-def validate(**arguments):
-    valid = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    if arguments["--loglevel"] not in valid:
-        exit("Invalid loglevel: " + arguments["--loglevel"])
-    return arguments
 
 
 def read_and_calculate_parameters(**arguments):
@@ -647,5 +637,4 @@ if __name__ == "__main__":
     if arguments["--dry-run"]:
         print("This is a dry run. Exiting before doing anything.")
         exit(0)
-    # arguments = validate(**arguments)
     main(**arguments)
