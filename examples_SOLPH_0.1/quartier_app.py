@@ -35,7 +35,6 @@ Options:
       --pv-costopt         Cost optimization for pv plants.
       --feedin             Option with different pv plants (will need
                            scenario_pv.csv) and max feedin
-      --ssr=SSR            Self-sufficiency degree.
       --save               Save results.
       --dry-run            Do nothing. Only print what would be done.
 
@@ -196,13 +195,6 @@ def read_and_calculate_parameters(**arguments):
 
     pv_generation = pv_generation['pv']
 
-    # Calculate grid share
-    if arguments['--ssr']:
-        grid_share = 1 - float(arguments['--ssr'])
-
-    else:
-        grid_share = None
-
     parameters = {'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
                   'pv_parameter': pv_parameter,
@@ -215,7 +207,6 @@ def read_and_calculate_parameters(**arguments):
                   'storage_epc': storage_epc,
                   'pv_epc': pv_epc,
                   'data_load': data_load,
-                  'grid_share': grid_share,
                   'hh': hh,
                   'consumption_total': consumption_total,
                   # 'loc': loc,
@@ -267,18 +258,9 @@ def create_energysystem(energysystem, parameters,
         investment=solph.Investment(ep_costs=parameters['storage_epc']))
 
     # Create commodity object for import electricity resource
-    if arguments['--ssr']:
-        solph.Source(
-            label='gridsource',
-            outputs={bel_demand: solph.Flow(
-                nominal_value=parameters['consumption_total'] *
-                parameters['grid_share'],
-                summed_max=1)})
-
-    else:
-        solph.Source(label='gridsource', outputs={
-            bel_demand: solph.Flow(
-                variable_costs=parameters['price_el'])})
+    solph.Source(label='gridsource', outputs={
+        bel_demand: solph.Flow(
+            variable_costs=parameters['price_el'])})
 
     house_pv = 0
     for house in parameters['hh']:
@@ -581,21 +563,18 @@ def get_result_dict(energysystem, parameters, **arguments):
             pickle.dump(results_dc, open('../results/quartier_results_' +
                         str(arguments['--num-hh']) + '_' +
                         str(arguments['--year']) + '_' +
-                        str(arguments['--ssr']) + '_' +
                         'slp_h0' + '.p', 'wb'))
 
         elif arguments['--only-slp']:
             pickle.dump(results_dc, open('../results/quartier_results_' +
                         str(arguments['--num-hh']) + '_' +
                         str(arguments['--year']) + '_' +
-                        str(arguments['--ssr']) + '_' +
                         'slp' + '.p', 'wb'))
 
         else:
             pickle.dump(results_dc, open('../results/quartier_results_' +
                         str(arguments['--num-hh']) + '_' +
                         str(arguments['--year']) + '_' +
-                        str(arguments['--ssr']) + '_' +
                         'random' + '.p', 'wb'))
 
     return(results_dc)
