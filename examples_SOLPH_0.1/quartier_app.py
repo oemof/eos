@@ -33,8 +33,6 @@ Options:
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
       --pv-costopt         Cost optimization for pv plants.
-      --feedin             Option with different pv plants (will need
-                           scenario_pv.csv) and max feedin
       --save               Save results.
       --dry-run            Do nothing. Only print what would be done.
 
@@ -120,8 +118,6 @@ def read_and_calculate_parameters(**arguments):
     opex_pv = cost_parameter.loc['pv']['opex_fix']
     opex_bat = cost_parameter.loc['storage']['opex_fix']
 
-    max_feedin = tech_parameter.loc['pv']['max_feedin']
-
     # Calculate ep_costs from capex
     storage_capex = cost_parameter.loc['storage']['capex']
     storage_lifetime = cost_parameter.loc['storage']['lifetime']
@@ -201,7 +197,6 @@ def read_and_calculate_parameters(**arguments):
                   'price_el': price_el,
                   'fit': fit,
                   'sc_tax': sc_tax,
-                  'max_feedin': max_feedin,
                   'opex_pv': opex_pv,
                   'opex_bat': opex_bat,
                   'storage_epc': storage_epc,
@@ -272,13 +267,6 @@ def create_energysystem(energysystem, parameters,
 
         # Create excess component for bel_pv to allow overproduction
         solph.Sink(label=house+"_excess", inputs={bel_pv: solph.Flow()})
-
-        # Create sink component for the pv feedin
-        if arguments['--feedin']:
-            solph.Sink(label=house+'_feedin', inputs={bel_pv: solph.Flow(
-                variable_costs=parameters['fit'],
-                nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],  # TODO: abhängig von PV!
-                max=parameters['max_feedin'])})
 
         # Create linear transformer to connect pv and demand bus
         solph.LinearTransformer(
@@ -455,7 +443,6 @@ def get_result_dict(energysystem, parameters, **arguments):
     ts_pv_list = []
     ts_excess_list = []
     ts_sc_list = []
-    ts_feedin_list = []
 
     results_dc['ts_grid'] = grid
     results_dc['ts_bat_input'] = bat_input
@@ -486,20 +473,6 @@ def get_result_dict(energysystem, parameters, **arguments):
                                 date_to=year+'-12-31 23:00:00').reset_index(
                                             ['bus_label', 'type', 'obj_label'],
                                             drop=True)
-
-        if arguments['--feedin']:
-            feedin = myresults.slice_by(obj_label=house+'_feedin',
-                                        date_from=year+'-01-01 00:00:00',
-                                        date_to=year+'-12-31 23:00:00').reset_index(
-                                            ['bus_label', 'type', 'obj_label'],
-                                            drop=True)
-            results_dc['feedin_'+house] = float(feedin.sum())
-            results_dc['ts_feedin_'+house] = feedin
-            ts_feedin_list.append(feedin)
-            ts_feedin_all = pd.concat(ts_feedin_list, axis=1)
-            results_dc['ts_feedin_all'] = ts_feedin_all
-        else:
-            results_dc['feedin_'+house] = 0
 
         if arguments['--pv-costopt']:
             pv_i = energysystem.groups[house+'_pv']
