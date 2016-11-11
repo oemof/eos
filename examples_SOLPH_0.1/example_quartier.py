@@ -717,7 +717,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                                             ['bus_label', 'type', 'obj_label'],
                                             drop=True)
             results_dc['feedin_'+house] = float(feedin.sum())
-            results_dc['ts_feedin_'+house] = float(feedin)
+            results_dc['ts_feedin_'+house] = feedin
             ts_feedin_list.append(feedin)
             ts_feedin_all = pd.concat(ts_feedin_list, axis=1)
             results_dc['ts_feedin_all'] = ts_feedin_all
