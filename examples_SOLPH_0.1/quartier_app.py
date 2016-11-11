@@ -7,8 +7,6 @@ Usage: example_quartier_10hh_11_to_20.py [options]
 Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario_parchim]
-  -c, --cost=COST          The cost scenario. [default: 1]
-  -t, --tech=TECH          The tech scenario. [default: 1]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
@@ -110,12 +108,12 @@ def read_and_calculate_parameters(**arguments):
     # Read parameter csv files
     cost_parameter = pd.read_csv(
         'scenarios/' + arguments['--scenario'] +
-            '_cost_parameter_' + str(arguments['--cost']) + '.csv',
+            '_cost_parameter.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
         'scenarios/' + arguments['--scenario'] +
-            '_tech_parameter_' + str(arguments['--tech']) + '.csv',
+            '_tech_parameter.csv',
         delimiter=',', index_col=0)
 
     pv_parameter = pd.read_csv(
@@ -785,8 +783,6 @@ def get_result_dict(energysystem, parameters, **arguments):
         if arguments['--profile']:
             pickle.dump(results_dc, open('../results/quartier_results_' +
                         str(arguments['--num-hh']) + '_' +
-                        str(arguments['--cost']) + '_' +
-                        str(arguments['--tech']) + '_' +
                         str(arguments['--year']) + '_' +
                         str(arguments['--ssr']) + '_' +
                         str(arguments['--profile']) + '.p', 'wb'))
@@ -794,8 +790,6 @@ def get_result_dict(energysystem, parameters, **arguments):
         elif arguments['--only-slp-h0']:
             pickle.dump(results_dc, open('../results/quartier_results_' +
                         str(arguments['--num-hh']) + '_' +
-                        str(arguments['--cost']) + '_' +
-                        str(arguments['--tech']) + '_' +
                         str(arguments['--year']) + '_' +
                         str(arguments['--ssr']) + '_' +
                         'slp_h0' + '.p', 'wb'))
@@ -803,8 +797,6 @@ def get_result_dict(energysystem, parameters, **arguments):
         elif arguments['--only-slp']:
             pickle.dump(results_dc, open('../results/quartier_results_' +
                         str(arguments['--num-hh']) + '_' +
-                        str(arguments['--cost']) + '_' +
-                        str(arguments['--tech']) + '_' +
                         str(arguments['--year']) + '_' +
                         str(arguments['--ssr']) + '_' +
                         'slp' + '.p', 'wb'))
@@ -812,8 +804,6 @@ def get_result_dict(energysystem, parameters, **arguments):
         elif arguments['--include-g0-l0']:
             pickle.dump(results_dc, open('../results/quartier_results_' +
                         str(arguments['--num-hh']) + '_' +
-                        str(arguments['--cost']) + '_' +
-                        str(arguments['--tech']) + '_' +
                         str(arguments['--year']) + '_' +
                         str(arguments['--ssr']) + '_' +
                         'incl_g0_l0' + '.p', 'wb'))
@@ -821,8 +811,6 @@ def get_result_dict(energysystem, parameters, **arguments):
         else:
             pickle.dump(results_dc, open('../results/quartier_results_' +
                         str(arguments['--num-hh']) + '_' +
-                        str(arguments['--cost']) + '_' +
-                        str(arguments['--tech']) + '_' +
                         str(arguments['--year']) + '_' +
                         str(arguments['--ssr']) + '_' +
                         'random' + '.p', 'wb'))
