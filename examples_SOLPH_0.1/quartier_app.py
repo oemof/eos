@@ -19,10 +19,6 @@ Options:
                            weather data set. [default: 53.41] # Parchim
       --lon=LON            Sets the simulation latitude to choose the right
                            weather data set. [default: 11.84] # Parchim
-      --start-hh=START     Household to start when choosing from household
-                           pool. Counts a chosen number of households up
-                           from start-hh, see next option.
-                           [default: 1]
       --num-hh=NUM         Number of households to choose. [default: 2]
       --random-hh          Set if you want to run simulation with random
                            choice of households.
@@ -176,13 +172,6 @@ def read_and_calculate_parameters(**arguments):
         for i in np.arange(int(arguments['--num-hh'])):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
         pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + str(arguments['--profile']) + '.p', "wb"))
-
-    else:
-        hh_start = int(arguments['--start-hh'])
-        hh_to_choose = np.arange(hh_start, hh_start+int(arguments['--num-hh']))
-        hh = OrderedDict()
-        for i in np.arange(int(arguments['--num-hh'])):
-            hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
 
     if arguments['--include-g0-l0']:
         if arguments['--num-hh'] == '84':
