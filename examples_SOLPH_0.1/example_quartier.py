@@ -155,6 +155,8 @@ def read_and_calculate_parameters(**arguments):
                 hh = pickle.load(open('hh_' + arguments['--scenario'] + '_random_part_84.p', 'rb'))
             elif arguments['--num-hh'] == '375':
                 hh = pickle.load(open('hh_' + arguments['--scenario'] + '_random_part_375.p', 'rb'))
+            elif arguments['--num-hh'] == 446:
+                hh = pickle.load(open('hh_' + arguments['--scenario'] + '_random_part_446.p', "wb"))
 
         else:
             hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
