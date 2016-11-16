@@ -16,16 +16,8 @@ Options:
                            weather data set. [default: 53.41] # Parchim
       --lon=LON            Sets the simulation latitude to choose the right
                            weather data set. [default: 11.84] # Parchim
-      --num-hh=NUM         Number of households to choose. [default: 2]
-      --random-hh          Set if you want to run simulation with random
-                           choice of households.
-      --load-hh            Set if you want to load your former choice of
-                           random households.
-      --scale-dem          Set if you want to scale profiles from given
-                           demand data.
-      --only-slp-h0        Use only the H0 standard load profile for all
-                           households.
-      --only-slp           Use all standard load profiles (H0, G0, L0).
+      --demand=DEM         Annual electric energy demand in MWh.
+      --pv-installed=PV    Installed PV capacity in kWp.
       --profile=PROFILE    Load an own profile.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
@@ -88,18 +80,14 @@ def read_and_calculate_parameters(**arguments):
 
     # Read parameter csv files
     cost_parameter = pd.read_csv(
-        'scenarios/' + arguments['--scenario'] +
+        'data/' + arguments['--scenario'] +
             '_cost_parameter.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        'scenarios/' + arguments['--scenario'] +
+        'data/' + arguments['--scenario'] +
             '_tech_parameter.csv',
         delimiter=',', index_col=0)
-
-    pv_parameter = pd.read_csv(
-        'scenarios/' + arguments['--scenario'] + '_pv.csv',
-        delimiter=';', index_col=0)
 
     # Electricity from grid price
     price_el = cost_parameter.loc['grid']['opex_var']
@@ -122,53 +110,15 @@ def read_and_calculate_parameters(**arguments):
     pv_epc = pv_capex * (pv_wacc * (1 + pv_wacc) **
                          pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
 
-    # Choose households according to simulation options
-    if arguments['--load-hh']:
-
-        hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
-
-    elif arguments['--random-hh']:
-        hh_list = range(1, 75, 1)
-        hh_to_choose = np.random.choice(hh_list, int(arguments['--num-hh']))
-        print(np.sort(hh_to_choose))
-        hh = OrderedDict()
-        for i in np.arange(int(arguments['--num-hh'])):
-            hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
-        pickle.dump(hh, open('hh_' + arguments['--scenario'] + '.p', "wb"))
-
-
     # Read load data and calculate total demand
     data_load = \
         pd.read_csv(
              "../example/example_data/example_data_load_hourly_mean_74_profiles.csv",
                  sep=",") / 1000
 
-    if arguments['--only-slp-h0']:
-        e_slp = bdew.ElecSlp(int(arguments['--year']))
-        h0_slp_15_min = e_slp.get_profile({'h0': 1})
-        h0_slp = h0_slp_15_min.resample('H').mean()
-
-    if arguments['--only-slp']:
-        e_slp = bdew.ElecSlp(int(arguments['--year']))
-        slp_15_min = e_slp.get_profile({'h0': 1, 'g0': 1, 'l0': 1})
-        slp = slp_15_min.resample('H').mean()
-
-    if arguments['--scale-dem']:
-
-        consumption_total = {}
-        for i in np.arange(int(arguments['--num-hh'])):
-            consumption_total['house_' + str(i+1)] = \
-                    pv_parameter.loc['annual_demand_MWh']['pv_' + str(i+1)] * 1e3
-
-        consumption_total = sum(consumption_total.values())
-
-    else:
-        consumption_total = {}
-        for i in np.arange(int(arguments['--num-hh'])):
-            consumption_total['house_' + str(i+1)] = \
-                    data_load[str(hh['house_' + str(i+1)])].sum()
-
-        consumption_total = sum(consumption_total.values())
+    e_slp = bdew.ElecSlp(int(arguments['--year']))
+    h0_slp_15_min = e_slp.get_profile({'h0': 1})
+    h0_slp = h0_slp_15_min.resample('H').mean()
 
     # Read standardized feed-in from pv
     # loc = {
@@ -183,7 +133,6 @@ def read_and_calculate_parameters(**arguments):
 
     parameters = {'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
-                  'pv_parameter': pv_parameter,
                   'price_el': price_el,
                   'fit': fit,
                   'sc_tax': sc_tax,
@@ -192,23 +141,13 @@ def read_and_calculate_parameters(**arguments):
                   'storage_epc': storage_epc,
                   'pv_epc': pv_epc,
                   'data_load': data_load,
-                  'hh': hh,
-                  'consumption_total': consumption_total,
+                  'h0_slp': h0_slp['h0'],
                   # 'loc': loc,
                   'pv_generation': pv_generation}
-
-    if arguments['--only-slp-h0']:
-        parameters.update({'h0_slp': h0_slp['h0']})
-
-    if arguments['--only-slp']:
-        parameters.update({'h0_slp': slp['h0'],
-                           'g0_slp': slp['g0'],
-                           'l0_slp': slp['l0']})
 
     logging.info('Check parameters')
     print('cost parameter:\n', parameters['cost_parameter'])
     print('tech parameter:\n', parameters['tech_parameter'])
-    print('pv parameter:\n', parameters['pv_parameter'])
 
     return parameters
 
@@ -247,129 +186,42 @@ def create_energysystem(energysystem, parameters,
         bel_demand: solph.Flow(
             variable_costs=parameters['price_el'])})
 
-    house_pv = 0
-    for house in parameters['hh']:
-        house_pv = house_pv + 1
-        label_pv = 'pv_' + str(house_pv)
+    # Create electricity bus for pv
+    bel_pv = solph.Bus(label="bel_pv")
 
-        # Create electricity bus for pv
-        bel_pv = solph.Bus(label=house+"_bel_pv")
+    # Create excess component for bel_pv to allow overproduction
+    solph.Sink(label="excess", inputs={bel_pv: solph.Flow()})
 
-        # Create excess component for bel_pv to allow overproduction
-        solph.Sink(label=house+"_excess", inputs={bel_pv: solph.Flow()})
+    # Create linear transformer to connect pv and demand bus
+    solph.LinearTransformer(
+        label="sc_Transformer",
+        inputs={bel_pv: solph.Flow(variable_costs=parameters['sc_tax'])},
+        outputs={bel_demand: solph.Flow()},
+        conversion_factors={bel_demand: 1})
 
-        # Create linear transformer to connect pv and demand bus
-        solph.LinearTransformer(
-            label=house+"_sc_Transformer",
-            inputs={bel_pv: solph.Flow(variable_costs=parameters['sc_tax'])},
-            outputs={bel_demand: solph.Flow()},
-            conversion_factors={bel_demand: 1})
+    if arguments['--pv-costopt']:
+        solph.Source(label='pv', outputs={bel_pv: solph.Flow(
+            actual_value=parameters['pv_generation'],
+            fixed=True,
+            fixed_costs=parameters['opex_pv'],
+            investment=solph.Investment(ep_costs=parameters['pv_epc']))})
 
-        # Create fixed source object for pv
-        # if arguments['--pv-costopt']:
-        #     solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-        #         actual_value=hlp.get_pv_generation(
-        #             year=int(arguments['--year']),
-        #             azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
-        #             tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
-        #             albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
-        #             loc=parameters['loc']),
-        #         fixed=True,
-        #         fixed_costs=parameters['opex_pv'],
-        #         investment=solph.Investment(ep_costs=parameters['pv_epc']))})
+    else:
+        solph.Source(label='pv', outputs={bel_pv: solph.Flow(
+            actual_value=parameters['pv_generation'],
+            nominal_value=float(arguments['--pv-installed']),
+            fixed=True,
+            fixed_costs=parameters['opex_pv'])})
 
-        if arguments['--pv-costopt']:
-            solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=parameters['pv_generation'],
+    # Create simple sink objects for demands
+    solph.Sink(
+        label="demand",
+        inputs={bel_demand: solph.Flow(
+            actual_value=(parameters['h0_slp'] /
+                sum(parameters['h0_slp']) *
+                    float(arguments['--demand']) * 1e3),
                 fixed=True,
-                fixed_costs=parameters['opex_pv'],
-                investment=solph.Investment(ep_costs=parameters['pv_epc']))})
-
-        # else:
-        #     solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-        #         actual_value=hlp.get_pv_generation(
-        #             year=int(arguments['--year']),
-        #             azimuth=parameters['pv_parameter'].loc['azimuth'][label_pv],
-        #             tilt=parameters['pv_parameter'].loc['tilt'][label_pv],
-        #             albedo=parameters['pv_parameter'].loc['albedo'][label_pv],
-        #             loc=parameters['loc']),
-        #         nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],
-        #         fixed=True,
-        #         fixed_costs=parameters['opex_pv'])})
-
-        else:
-            solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
-                actual_value=parameters['pv_generation'],
-                nominal_value=parameters['pv_parameter'].loc['p_max'][label_pv],
-                fixed=True,
-                fixed_costs=parameters['opex_pv'])})
-
-        # Create simple sink objects for demands
-        if arguments['--scale-dem']:
-            if arguments['--only-slp-h0']:
-                solph.Sink(
-                    label=house+"_demand",
-                    inputs={bel_demand: solph.Flow(
-                        actual_value=(parameters['h0_slp'] /
-                            sum(parameters['h0_slp']) *
-                                parameters['pv_parameter'].loc['annual_demand_MWh']
-                                [label_pv] * 1e3),
-                            fixed=True,
-                            nominal_value=1)})
-
-            elif arguments['--only-slp']:
-                if parameters['pv_parameter'].loc['profile_type'][label_pv] == 4:
-                    solph.Sink(
-                        label=house+"_demand",
-                        inputs={bel_demand: solph.Flow(
-                            actual_value=(parameters['g0_slp'] /
-                                sum(parameters['g0_slp']) *
-                                    parameters['pv_parameter'].loc['annual_demand_MWh']
-                                    [label_pv] * 1e3),
-                                fixed=True,
-                                nominal_value=1)})
-                elif parameters['pv_parameter'].loc['profile_type'][label_pv] == 7:
-                    solph.Sink(
-                        label=house+"_demand",
-                        inputs={bel_demand: solph.Flow(
-                            actual_value=(parameters['l0_slp'] /
-                                sum(parameters['l0_slp']) *
-                                    parameters['pv_parameter'].loc['annual_demand_MWh']
-                                    [label_pv] * 1e3),
-                                fixed=True,
-                                nominal_value=1)})
-                else:
-                    solph.Sink(
-                        label=house+"_demand",
-                        inputs={bel_demand: solph.Flow(
-                            actual_value=(parameters['h0_slp'] /
-                                sum(parameters['h0_slp']) *
-                                    parameters['pv_parameter'].loc['annual_demand_MWh']
-                                    [label_pv] * 1e3),
-                                fixed=True,
-                                nominal_value=1)})
-
-
-            else:
-                solph.Sink(
-                    label=house+"_demand",
-                    inputs={bel_demand: solph.Flow(
-                        actual_value=(parameters['data_load']
-                            [str(parameters['hh'][house])] /
-                            sum(parameters['data_load']
-                                [str(parameters['hh'][house])]) *
-                                parameters['pv_parameter'].loc['annual_demand_MWh']
-                                [label_pv] * 1e3),
-                            fixed=True,
-                            nominal_value=1)})
-        else:
-            solph.Sink(
-                label=house+"_demand",
-                inputs={bel_demand: solph.Flow(
-                    actual_value=parameters['data_load']
-                        [str(parameters['hh'][house])],
-                        fixed=True,
-                        nominal_value=1)})
+                nominal_value=1)})
 
     return energysystem
 
@@ -407,13 +259,13 @@ def get_result_dict(energysystem, parameters, **arguments):
                                                   ['bus_label', 'type', 'obj_label'],
                                                   drop=True)
 
-    bat_input = myresults.slice_by(obj_label='bat', type='input',
+    bat_input = myresults.slice_by(obj_label='bat', type='from_bus',
                                    date_from=year+'-01-01 00:00:00',
                                    date_to=year+'-12-31 23:00:00').reset_index(
                                                   ['bus_label', 'type', 'obj_label'],
                                                   drop=True)
 
-    bat_output = myresults.slice_by(obj_label='bat', type='output',
+    bat_output = myresults.slice_by(obj_label='bat', type='to_bus',
                                     date_from=year+'-01-01 00:00:00',
                                     date_to=year+'-12-31 23:00:00').reset_index(
                                                    ['bus_label', 'type', 'obj_label'],
@@ -439,52 +291,51 @@ def get_result_dict(energysystem, parameters, **arguments):
     results_dc['ts_bat_output'] = bat_output
     results_dc['ts_bat_soc'] = bat_soc
 
-    for house in parameters['hh']:
-        demand = myresults.slice_by(obj_label=house+'_demand',
-                                    date_from=year+'-01-01 00:00:00',
-                                    date_to=year+'-12-31 23:00:00').reset_index(
-                                            ['bus_label', 'type', 'obj_label'],
-                                            drop=True)
-
-        pv = myresults.slice_by(obj_label=house+'_pv',
+    demand = myresults.slice_by(obj_label='demand',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00').reset_index(
-                                            ['bus_label', 'type', 'obj_label'],
-                                            drop=True)
+                                        ['bus_label', 'type', 'obj_label'],
+                                        drop=True)
 
-        excess = myresults.slice_by(obj_label=house+'_excess',
-                                    date_from=year+'-01-01 00:00:00',
-                                    date_to=year+'-12-31 23:00:00').reset_index(
-                                            ['bus_label', 'type', 'obj_label'],
-                                            drop=True)
+    pv = myresults.slice_by(obj_label='pv',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00').reset_index(
+                                        ['bus_label', 'type', 'obj_label'],
+                                        drop=True)
 
-        sc = myresults.slice_by(obj_label=house+'_sc_Transformer', type='output',
+    excess = myresults.slice_by(obj_label='excess',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00').reset_index(
-                                            ['bus_label', 'type', 'obj_label'],
-                                            drop=True)
+                                        ['bus_label', 'type', 'obj_label'],
+                                        drop=True)
 
-        if arguments['--pv-costopt']:
-            pv_i = energysystem.groups[house+'_pv']
-            pv_bel = energysystem.groups[house+'_bel_pv']
-            pv_inst = energysystem.results[pv_i][pv_bel].invest
-            results_dc['pv_inst_'+house] = pv_inst
+    sc = myresults.slice_by(obj_label='sc_Transformer', type='to_bus',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00').reset_index(
+                                        ['bus_label', 'type', 'obj_label'],
+                                        drop=True)
 
-        results_dc['demand_'+house] = demand.sum()
-        results_dc['ts_demand_'+house] = demand
-        demand_total = demand_total + demand.sum()
-        results_dc['pv_'+house] = pv.sum()
-        results_dc['pv_max_'+house] = pv.max()
-        results_dc['ts_pv_'+house] = pv
-        results_dc['excess_'+house] = excess.sum()
-        results_dc['ts_excess_'+house] = excess
-        results_dc['self_con_'+house] = sc.sum()
-        # results_dc['check_ssr_'+house] = 1 - (grid.sum() / demand.sum())
+    if arguments['--pv-costopt']:
+        pv_i = energysystem.groups['pv']
+        pv_bel = energysystem.groups['bel_pv']
+        pv_inst = energysystem.results[pv_i][pv_bel].invest
+        results_dc['pv_inst'] = pv_inst
 
-        ts_demand_list.append(demand)
-        ts_pv_list.append(pv)
-        ts_excess_list.append(excess)
-        ts_sc_list.append(sc)
+    results_dc['demand'] = demand.sum()
+    results_dc['ts_demand'] = demand
+    demand_total = demand_total + demand.sum()
+    results_dc['pv'] = pv.sum()
+    results_dc['pv_max'] = pv.max()
+    results_dc['ts_pv'] = pv
+    results_dc['excess'] = excess.sum()
+    results_dc['ts_excess'] = excess
+    results_dc['self_con'] = sc.sum()
+    # results_dc['check_ssr'] = 1 - (grid.sum() / demand.sum())
+
+    ts_demand_list.append(demand)
+    ts_pv_list.append(pv)
+    ts_excess_list.append(excess)
+    ts_sc_list.append(sc)
 
     results_dc['grid'] = grid.sum()
     results_dc['check_ssr'] = 1 - (grid.sum() / demand_total)
@@ -494,8 +345,6 @@ def get_result_dict(energysystem, parameters, **arguments):
 
     results_dc['cost_parameter'] = parameters['cost_parameter']
     results_dc['tech_parameter'] = parameters['tech_parameter']
-    results_dc['pv_parameter'] = parameters['pv_parameter']
-    results_dc['hh'] = parameters['hh']
 
     ts_demand_all = pd.concat(ts_demand_list, axis=1)
     ts_pv_all = pd.concat(ts_pv_list, axis=1)
@@ -522,23 +371,9 @@ def get_result_dict(energysystem, parameters, **arguments):
     results_dc['ts_sc_all'] = ts_sc_all
 
     if arguments['--save']:
-        if arguments['--only-slp-h0']:
-            pickle.dump(results_dc, open('../results/quartier_results_' +
-                        str(arguments['--num-hh']) + '_' +
-                        str(arguments['--year']) + '_' +
-                        'slp_h0' + '.p', 'wb'))
-
-        elif arguments['--only-slp']:
-            pickle.dump(results_dc, open('../results/quartier_results_' +
-                        str(arguments['--num-hh']) + '_' +
-                        str(arguments['--year']) + '_' +
-                        'slp' + '.p', 'wb'))
-
-        else:
-            pickle.dump(results_dc, open('../results/quartier_results_' +
-                        str(arguments['--num-hh']) + '_' +
-                        str(arguments['--year']) + '_' +
-                        'random' + '.p', 'wb'))
+        pickle.dump(results_dc, open('../results/quartier_results_' +
+                    str(arguments['--year']) + '_' +
+                    'slp_h0' + '.p', 'wb'))
 
     return(results_dc)
 
@@ -555,7 +390,7 @@ def create_plots(energysystem, year):
 
     # Plotting the input flows of the electricity bus for January
     myplot = outputlib.DataFramePlot(energy_system=energysystem)
-    myplot.slice_unstacked(bus_label="bel_demand", type="input",
+    myplot.slice_unstacked(bus_label="bel_demand", type="from_bus",
                            date_from=year + "-01-01 00:00:00",
                            date_to=year + "-01-31 00:00:00")
     colorlist = myplot.color_from_dict(cdict)
