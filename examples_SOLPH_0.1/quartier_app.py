@@ -7,6 +7,7 @@ Usage: example_quartier_10hh_11_to_20.py [options]
 Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario_parchim]
+  -c, --cost=COST          The cost scenario. [default: 1]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
@@ -81,7 +82,7 @@ def read_and_calculate_parameters(**arguments):
     # Read parameter csv files
     cost_parameter = pd.read_csv(
         'data/' + arguments['--scenario'] +
-            '_cost_parameter.csv',
+            '_cost_parameter_' + str(arguments['--cost']) + '.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
@@ -372,6 +373,7 @@ def get_result_dict(energysystem, parameters, **arguments):
 
     if arguments['--save']:
         pickle.dump(results_dc, open('../results/quartier_results_' +
+                    str(arguments['--cost']) + '_' +
                     str(arguments['--year']) + '_' +
                     'slp_h0' + '.p', 'wb'))
 
