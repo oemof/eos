@@ -18,7 +18,7 @@ Options:
       --lon=LON            Sets the simulation latitude to choose the right
                            weather data set. [default: 11.84] # Parchim
       --demand=DEM         Annual electric energy demand in MWh.
-      --pv-installed=PV    Installed PV capacity in kWp.
+      --pv_installed=PV    Installed PV capacity in kWp.
       --profile=PROFILE    Load an own profile.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
@@ -210,7 +210,7 @@ def create_energysystem(energysystem, parameters,
     else:
         solph.Source(label='pv', outputs={bel_pv: solph.Flow(
             actual_value=parameters['pv_generation'],
-            nominal_value=float(arguments['--pv-installed']),
+            nominal_value=float(arguments['--pv_installed']),
             fixed=True,
             fixed_costs=parameters['opex_pv'])})
 
@@ -375,6 +375,7 @@ def get_result_dict(energysystem, parameters, **arguments):
         pickle.dump(results_dc, open('../results/quartier_results_' +
                     str(arguments['--cost']) + '_' +
                     str(arguments['--year']) + '_' +
+                    str(arguments['--pv_installed']) + '_' +
                     'slp_h0' + '.p', 'wb'))
 
     return(results_dc)
