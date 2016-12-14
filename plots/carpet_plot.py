@@ -111,12 +111,70 @@ class Line:
         # res_3_patch = mpatches.Patch(color='green', label='OS + LKOS')
 
         # plt.legend(handles=[res_1_patch, res_2_patch, res_3_patch])
-        plt.legend()
+        plt.legend(loc='lower left', prop={'size': 16})
+        plt.tight_layout()
 
         if show:
             plt.show()
 
         return fig
+
+class Bar:
+    """
+    A bar class.
+    """
+
+    def __init__(self, name=None):
+        self.name = name
+
+    def bar_plot(res_name, show=True, **kwargs):
+
+        fig = plt.figure()
+
+        n = 12
+        X = np.arange(n)
+
+        # Y1 = (1-X/float(n)) * np.random.uniform(0.5, 1.0, n)
+        # Y2 = (1-X/float(n)) * np.random.uniform(0.5, 1.0, n)
+
+        Y1 = kwargs.get('Y1') / 1e3
+        Y2 = kwargs.get('Y2') / 1e3
+        Y3 = kwargs.get('Y3') / 1e3
+
+        # plt.axes([0.025, 0.025, 0.95, 0.95])
+        plt.bar(X, Y3, facecolor='lightsteelblue', edgecolor='white',
+                label='Demand')
+        plt.bar(X, Y1, facecolor='#9999ff', edgecolor='white',
+                label='Covered demand')
+        plt.bar(X, Y2, facecolor='#ff9999', edgecolor='white',
+                label='Excess')
+
+        # plt.xlabel('Monhts')
+        plt.ylabel(res_name)
+        plt.xticks(X+0.5, ['Jan', 'Feb', 'Mar', 'Apr',
+            'Mai', 'Jun', 'Jul', 'Aug', 'Sep',
+            'Oct', 'Nov', 'Dec'])
+
+        plt.legend(loc='lower center', prop={'size': 16})
+        plt.rcParams.update({'font.size': 18})
+        # plt.tight_layout()
+
+        # for x, y in zip(X, Y1):
+        #     plt.text(x+0.4, y+0.05, '%.2f' % y, ha='center', va='bottom')
+
+        # for x, y in zip(X, Y2):
+        #     plt.text(x+0.4, -y-0.05, '%.2f' % y, ha='center', va='top')
+
+        # plt.xlim(-.5, n)  # plt.xticks([])
+        # plt.ylim(-10, +110),  # plt.yticks([])
+        # plt.yticks([0, 40, 80])
+
+        if show:
+            plt.show()
+
+        return fig
+
+
 
 
 if __name__ == '__main__':
