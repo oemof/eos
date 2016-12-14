@@ -64,8 +64,10 @@ def main(**arguments):
 
     results = {}
 
-    data = pd.read_csv("../example/example_data/storage_invest_load_12h_verschoben.csv", sep=',')
+    # Read weather data
+    data_weather = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
 
+    # Get load profile data
     if arguments['--entsoe']:
         data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
         data_load = data['demand_el']  # demand in kW
@@ -117,14 +119,14 @@ def main(**arguments):
           + masterplan_osna.loc['pv'][str(arguments['--year'])])  # installed pv in MW
 
         demand_ts_MW = data_load/data_load.sum() * demand * 1e3
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW)
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
-        print('kombi_1' + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print('kombi_1' + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print('kombi_1' + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print('kombi_1' + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print('kombi_1' + '_positive_GWh: ', positive.sum()/1e3)
         print('kombi_1' + '_negative_GWh: ', negative.sum()/1e3)
         print('kombi_1' + '_max_positive_MW: ', positive.max())
@@ -167,8 +169,8 @@ def main(**arguments):
               + masterplan_osna.loc['pv'][str(arguments['--year'])])  # installed pv in MW
 
         demand_ts_MW = data_load/data_load.sum() * demand * 1e3
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW)
 
         positive = residual_MW.where(residual_MW > 0, 0)
@@ -293,8 +295,8 @@ def main(**arguments):
             okt_covered_demand.sum(), nov_covered_demand.sum(),
             dez_covered_demand.sum()])
 
-        print('kombi_3' + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print('kombi_3' + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print('kombi_3' + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print('kombi_3' + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print('kombi_3' + '_positive_GWh: ', positive.sum()/1e3)
         print('kombi_3' + '_negative_GWh: ', negative.sum()/1e3)
         print('kombi_3' + '_max_positive_MW: ', positive.max())
@@ -302,8 +304,8 @@ def main(**arguments):
         print('kombi_3' + '_hours_positive: ', len(positive.nonzero()[0]))
         print('kombi_3' + '_hours_negative: ', len(negative.nonzero()[0]))
 
-        # print('kombi_5' + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        # print('kombi_5' + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        # print('kombi_5' + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        # print('kombi_5' + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         # print('kombi_5' + '_positive_GWh: ', positive.sum()/1e3)
         # print('kombi_5' + '_negative_GWh: ', negative.sum()/1e3)
         # print('kombi_5' + '_max_positive_MW: ', positive.max())
@@ -439,8 +441,8 @@ def main(**arguments):
             * demand_stein_lkos * 1e3)
         demand_ts_osna_MW = (data_load_osna/data_load_osna.sum()
             * demand_osna * 1e3)
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = (demand_ts_stein_lkos_MW + demand_ts_osna_MW
             - (wind_ts_MW + pv_ts_MW))
 
@@ -590,8 +592,8 @@ def main(**arguments):
             okt_covered_demand.sum(), nov_covered_demand.sum(),
             dez_covered_demand.sum()])
 
-        print('kombi_3_1' + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print('kombi_3_1' + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print('kombi_3_1' + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print('kombi_3_1' + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print('kombi_3_1' + '_positive_GWh: ', positive.sum()/1e3)
         print('kombi_3_1' + '_negative_GWh: ', negative.sum()/1e3)
         print('kombi_3_1' + '_max_positive_MW: ', positive.max())
@@ -632,8 +634,8 @@ def main(**arguments):
               + masterplan_lkos.loc['pv'][str(arguments['--year'])])  # installed pv in MW
 
         demand_ts_MW = data_load/data_load.sum() * demand * 1e3
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW)
 
         positive = residual_MW.where(residual_MW > 0, 0)
@@ -758,8 +760,8 @@ def main(**arguments):
             okt_covered_demand.sum(), nov_covered_demand.sum(),
             dez_covered_demand.sum()])
 
-        print('kombi_5' + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print('kombi_5' + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print('kombi_5' + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print('kombi_5' + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print('kombi_5' + '_positive_GWh: ', positive.sum()/1e3)
         print('kombi_5' + '_negative_GWh: ', negative.sum()/1e3)
         print('kombi_5' + '_max_positive_MW: ', positive.max())
@@ -881,8 +883,8 @@ def main(**arguments):
             * demand_stein * 1e3)
         demand_ts_lkos_MW = (data_load_lkos/data_load_lkos.sum()
             * demand_lkos * 1e3)
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = (demand_ts_stein_MW + demand_ts_lkos_MW
             - (wind_ts_MW + pv_ts_MW))
 
@@ -952,8 +954,8 @@ def main(**arguments):
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
-        print('kombi_5_1' + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print('kombi_5_1' + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print('kombi_5_1' + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print('kombi_5_1' + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print('kombi_5_1' + '_positive_GWh: ', positive.sum()/1e3)
         print('kombi_5_1' + '_negative_GWh: ', negative.sum()/1e3)
         print('kombi_5_1' + '_max_positive_MW: ', positive.max())
@@ -1003,8 +1005,8 @@ def main(**arguments):
         pv = masterplan.loc['pv'][str(arguments['--year_1'])]  # installed pv in MW
 
         demand_ts_MW = data_load/data_load.sum() * demand * 1e3
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW)
 
         positive = residual_MW.where(residual_MW > 0, 0)
@@ -1129,8 +1131,8 @@ def main(**arguments):
             okt_covered_demand.sum(), nov_covered_demand.sum(),
             dez_covered_demand.sum()])
 
-        print(str(arguments['--region_1']) + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print(str(arguments['--region_1']) + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print(str(arguments['--region_1']) + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print(str(arguments['--region_1']) + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print(str(arguments['--region_1']) + '_positive_GWh: ', positive.sum()/1e3)
         print(str(arguments['--region_1']) + '_negative_GWh: ', negative.sum()/1e3)
         print(str(arguments['--region_1']) + '_max_positive_MW: ', positive.max())
@@ -1257,14 +1259,14 @@ def main(**arguments):
         pv = masterplan.loc['pv'][str(arguments['--year_2'])]  # installed pv in MW
 
         demand_ts_MW = data_load/data_load.sum() * demand * 1e3
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW)
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
-        print(str(arguments['--region_2']) + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print(str(arguments['--region_2']) + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print(str(arguments['--region_2']) + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print(str(arguments['--region_2']) + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print(str(arguments['--region_2']) + '_positive_GWh: ', positive.sum()/1e3)
         print(str(arguments['--region_2']) + '_negative_GWh: ', negative.sum()/1e3)
         print(str(arguments['--region_2']) + '_max_positive_MW: ', positive.max())
@@ -1312,14 +1314,14 @@ def main(**arguments):
         pv = masterplan.loc['pv'][str(arguments['--year_3'])]  # installed pv in MW
 
         demand_ts_MW = data_load/data_load.sum() * demand * 1e3
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW)
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
-        print(str(arguments['--region_3']) + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print(str(arguments['--region_3']) + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print(str(arguments['--region_3']) + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print(str(arguments['--region_3']) + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print(str(arguments['--region_3']) + '_positive_GWh: ', positive.sum()/1e3)
         print(str(arguments['--region_3']) + '_negative_GWh: ', negative.sum()/1e3)
         print(str(arguments['--region_3']) + '_max_positive_MW: ', positive.max())
@@ -1367,14 +1369,14 @@ def main(**arguments):
         pv = masterplan.loc['pv'][str(arguments['--year_4'])]  # installed pv in MW
 
         demand_ts_MW = data_load/data_load.sum() * demand * 1e3
-        wind_ts_MW = data['wind']*wind
-        pv_ts_MW = data['pv']*pv
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW)
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
-        print(str(arguments['--region_4']) + '_wind_GWh: ', ((data['wind']*wind).sum())/1e3)
-        print(str(arguments['--region_4']) + '_pv_GWh: ', ((data['pv']*pv).sum())/1e3)
+        print(str(arguments['--region_4']) + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        print(str(arguments['--region_4']) + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print(str(arguments['--region_4']) + '_positive_GWh: ', positive.sum()/1e3)
         print(str(arguments['--region_4']) + '_negative_GWh: ', negative.sum()/1e3)
         print(str(arguments['--region_4']) + '_max_positive_MW: ', positive.max())
