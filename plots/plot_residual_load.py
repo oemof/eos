@@ -971,6 +971,7 @@ def main(**arguments):
     if arguments['--region_1']:
 
         if arguments['--load_1'] == 'entsoe':
+            data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
             data_load = data['demand_el']  # demand in kW
 
         if arguments['--load_1'] == 'lkos':
@@ -1224,6 +1225,7 @@ def main(**arguments):
     if arguments['--region_2']:
 
         if arguments['--load_2'] == 'entsoe':
+            data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
             data_load = data['demand_el']  # demand in kW
 
         if arguments['--load_2'] == 'lkos':
@@ -1278,6 +1280,7 @@ def main(**arguments):
     if arguments['--region_3']:
 
         if arguments['--load_3'] == 'entsoe':
+            data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
             data_load = data['demand_el']  # demand in kW
 
         if arguments['--load_3'] == 'lkos':
@@ -1332,6 +1335,7 @@ def main(**arguments):
     if arguments['--region_4']:
 
         if arguments['--load_4'] == 'entsoe':
+            data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
             data_load = data['demand_el']  # demand in kW
 
         if arguments['--load_4'] == 'lkos':
