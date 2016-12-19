@@ -48,9 +48,14 @@ Options:
 
 '''
 
+from shapely import geometry as geopy
 import pandas as pd
 import numpy as np
 import os
+
+from oemof import db
+from oemof.db import coastdat
+from feedinlib import powerplants as plants
 from demandlib import bdew as bdew
 import carpet_plot
 
@@ -64,8 +69,48 @@ def main(**arguments):
 
     results = {}
 
-    # Read weather data
-    data_weather = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+    # Read weather data from file
+    # data_weather = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+    data_weather = pd.read_csv('../data/2014_feedin_8043_52279.csv', sep=',')
+
+    # # Read weather data from coastdat
+    # data_weather = {}
+
+    # conn = db.connection()
+    # my_weather = coastdat.get_weather(
+    #     conn, geopy.Point(8.043, 52.279), 2005)
+
+    # coastDat2 = {
+    #     'dhi': 0,
+    #     'dirhi': 0,
+    #     'pressure': 0,
+    #     'temp_air': 2,
+    #     'v_wind': 100,
+    #     'Z0': 0}
+
+    # yingli210 = {
+    #     'module_name': 'Yingli_YL210__2008__E__',
+    #     'azimuth': 180,
+    #     'tilt': 30,
+    #     'albedo': 0.2}
+
+    # enerconE126 = {
+    #     'h_hub': 135,
+    #     'd_rotor': 127,
+    #     'wind_conv_type': 'ENERCON E 126 7500',
+    #     'data_height': coastDat2}
+
+    # E126_power_plant = plants.WindPowerPlant(**enerconE126)
+    # yingli_module = plants.Photovoltaic(**yingli210)
+
+    # wind_feedin = E126_power_plant.feedin(weather=my_weather, installed_capacity=1)
+    # pv_feedin = yingli_module.feedin(weather=my_weather, peak_power=1)
+
+    # print(pv_feedin.sum())
+    # print(wind_feedin.sum())
+
+    # wind_feedin.to_csv('wind_feedin.csv')
+    # pv_feedin.to_csv('pv_feedin.csv')
 
     # Get load profile data
     if arguments['--entsoe']:
