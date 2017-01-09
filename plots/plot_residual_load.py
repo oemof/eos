@@ -1139,8 +1139,8 @@ def main(**arguments):
         results['wind_ts'] = wind_ts_MW
         results['pv_ts'] = pv_ts_MW
         results['residual_kombi_5_1'] = residual_MW
-        results['residual_monthly_region_1'] = residual_monthly_MWh
-        results['demand_monthly_region_1'] = demand_monthly_MWh
+        results['residual_monthly_kombi_5_1'] = residual_monthly_MWh
+        results['demand_monthly_kombi_5_1'] = demand_monthly_MWh
 
     if arguments['--region_1']:
 
