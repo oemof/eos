@@ -170,6 +170,126 @@ def main(**arguments):
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
+
+        jan_residual = residual_MW[1:744]
+        feb_residual = residual_MW[745:1416]
+        mar_residual = residual_MW[1417:2160]
+        apr_residual = residual_MW[2161:2880]
+        mai_residual = residual_MW[2881:3624]
+        jun_residual = residual_MW[3625:4344]
+        jul_residual = residual_MW[4345:5088]
+        aug_residual = residual_MW[5089:5832]
+        sep_residual = residual_MW[5833:6552]
+        okt_residual = residual_MW[6553:7296]
+        nov_residual = residual_MW[7297:8016]
+        dez_residual = residual_MW[8017:8760]
+
+        jan_positive = positive[1:744]
+        feb_positive = positive[745:1416]
+        mar_positive = positive[1417:2160]
+        apr_positive = positive[2161:2880]
+        mai_positive = positive[2881:3624]
+        jun_positive = positive[3625:4344]
+        jul_positive = positive[4345:5088]
+        aug_positive = positive[5089:5832]
+        sep_positive = positive[5833:6552]
+        okt_positive = positive[6553:7296]
+        nov_positive = positive[7297:8016]
+        dez_positive = positive[8017:8760]
+
+        jan_negative = negative[1:744]
+        feb_negative = negative[745:1416]
+        mar_negative = negative[1417:2160]
+        apr_negative = negative[2161:2880]
+        mai_negative = negative[2881:3624]
+        jun_negative = negative[3625:4344]
+        jul_negative = negative[4345:5088]
+        aug_negative = negative[5089:5832]
+        sep_negative = negative[5833:6552]
+        okt_negative = negative[6553:7296]
+        nov_negative = negative[7297:8016]
+        dez_negative = negative[8017:8760]
+
+        jan_demand = demand_ts_MW[1:744]
+        feb_demand = demand_ts_MW[745:1416]
+        mar_demand = demand_ts_MW[1417:2160]
+        apr_demand = demand_ts_MW[2161:2880]
+        mai_demand = demand_ts_MW[2881:3624]
+        jun_demand = demand_ts_MW[3625:4344]
+        jul_demand = demand_ts_MW[4345:5088]
+        aug_demand = demand_ts_MW[5089:5832]
+        sep_demand = demand_ts_MW[5833:6552]
+        okt_demand = demand_ts_MW[6553:7296]
+        nov_demand = demand_ts_MW[7297:8016]
+        dez_demand = demand_ts_MW[8017:8760]
+
+        jan_covered_demand = demand_ts_MW[1:744] + positive[1:744] * (-1)
+        feb_covered_demand = demand_ts_MW[745:1416] + positive[745:1416] * (-1)
+        mar_covered_demand = demand_ts_MW[1417:2160] + positive[1417:2160] * (-1)
+        apr_covered_demand = demand_ts_MW[2161:2880] + positive[2161:2880] * (-1)
+        mai_covered_demand = demand_ts_MW[2881:3624] + positive[2881:3624] * (-1)
+        jun_covered_demand = demand_ts_MW[3625:4344] + positive[3625:4344] * (-1)
+        jul_covered_demand = demand_ts_MW[4345:5088] + positive[4345:5088] * (-1)
+        aug_covered_demand = demand_ts_MW[5089:5832] + positive[5089:5832] * (-1)
+        sep_covered_demand = demand_ts_MW[5833:6552] + positive[5833:6552] * (-1)
+        okt_covered_demand = demand_ts_MW[6553:7296] + positive[6553:7296] * (-1)
+        nov_covered_demand = demand_ts_MW[7297:8016] + positive[7297:8016] * (-1)
+        dez_covered_demand = demand_ts_MW[8017:8760] + positive[8017:8760] * (-1)
+
+        jan_wind = wind_ts_MW[1:744]
+        feb_wind = wind_ts_MW[745:1416]
+        mar_wind = wind_ts_MW[1417:2160]
+        apr_wind = wind_ts_MW[2161:2880]
+        mai_wind = wind_ts_MW[2881:3624]
+        jun_wind = wind_ts_MW[3625:4344]
+        jul_wind = wind_ts_MW[4345:5088]
+        aug_wind = wind_ts_MW[5089:5832]
+        sep_wind = wind_ts_MW[5833:6552]
+        okt_wind = wind_ts_MW[6553:7296]
+        nov_wind = wind_ts_MW[7297:8016]
+        dez_wind = wind_ts_MW[8017:8760]
+
+        jan_pv = pv_ts_MW[1:744]
+        feb_pv = pv_ts_MW[745:1416]
+        mar_pv = pv_ts_MW[1417:2160]
+        apr_pv = pv_ts_MW[2161:2880]
+        mai_pv = pv_ts_MW[2881:3624]
+        jun_pv = pv_ts_MW[3625:4344]
+        jul_pv = pv_ts_MW[4345:5088]
+        aug_pv = pv_ts_MW[5089:5832]
+        sep_pv = pv_ts_MW[5833:6552]
+        okt_pv = pv_ts_MW[6553:7296]
+        nov_pv = pv_ts_MW[7297:8016]
+        dez_pv = pv_ts_MW[8017:8760]
+
+        positive_monthly_MWh = np.array([jan_positive.sum(), feb_positive.sum(),
+                mar_positive.sum(), apr_positive.sum(), mai_positive.sum(),
+                jun_positive.sum(), jul_positive.sum(), aug_positive.sum(),
+                sep_positive.sum(), okt_positive.sum(), nov_positive.sum(),
+                dez_positive.sum()])
+
+        negative_monthly_MWh = np.array([jan_negative.sum(), feb_negative.sum(),
+                mar_negative.sum(), apr_negative.sum(), mai_negative.sum(),
+                jun_negative.sum(), jul_negative.sum(), aug_negative.sum(),
+                sep_negative.sum(), okt_negative.sum(), nov_negative.sum(),
+                dez_negative.sum()])
+
+        demand_monthly_MWh = np.array([jan_demand.sum(),
+            feb_demand.sum(), mar_demand.sum(),
+            apr_demand.sum(), mai_demand.sum(),
+            jun_demand.sum(), jul_demand.sum(),
+            aug_demand.sum(), sep_demand.sum(),
+            okt_demand.sum(), nov_demand.sum(),
+            dez_demand.sum()])
+
+        covered_demand_monthly_MWh = np.array([jan_covered_demand.sum(),
+            feb_covered_demand.sum(), mar_covered_demand.sum(),
+            apr_covered_demand.sum(), mai_covered_demand.sum(),
+            jun_covered_demand.sum(), jul_covered_demand.sum(),
+            aug_covered_demand.sum(), sep_covered_demand.sum(),
+            okt_covered_demand.sum(), nov_covered_demand.sum(),
+            dez_covered_demand.sum()])
+
         print('kombi_1' + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
         print('kombi_1' + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
         print('kombi_1' + '_positive_GWh: ', positive.sum()/1e3)
@@ -183,6 +303,13 @@ def main(**arguments):
         results['wind_ts'] = wind_ts_MW
         results['pv_ts'] = pv_ts_MW
         results['residual_kombi_1'] = residual_MW
+        results['positive_monthly_kombi_1'] = positive_monthly_MWh
+        results['negative_monthly_kombi_1'] = negative_monthly_MWh
+        results['demand_monthly_kombi_1'] = demand_monthly_MWh
+        results['covered_demand_monthly_kombi_1'] = covered_demand_monthly_MWh
+        results['jan_demand'] = jan_demand
+        results['jan_wind'] = jan_wind
+        results['jan_pv'] = jan_pv
 
 
     if arguments['--kombi_3']:
