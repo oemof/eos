@@ -392,10 +392,10 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
         w.writerow(y)
         f.close
 
-    pickle.dump(results_dc, open('../results/region_results_dc_' +
-        arguments['--ssr'] + '_' +
-        str(loopi) + '_' +
-        '.p', "wb"))
+        pickle.dump(results_dc, open('../results/region_results_dc_' +
+            arguments['--ssr'] + '_' +
+            str(loopi) + '_' +
+            '.p', "wb"))
     # pickle.dump(myresults, open("save_myresults.p", "wb"))
 
     return(results_dc)
