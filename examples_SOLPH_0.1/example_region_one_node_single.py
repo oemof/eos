@@ -66,7 +66,7 @@ def initialise_energysystem(year, number_timesteps):
                                     freq='H')
 
     return solph.EnergySystem(groupings=solph.GROUPINGS,
-                              time_idx=date_time_index)
+                              timeindex=date_time_index)
 
 
 def validate(**arguments):
@@ -337,7 +337,7 @@ def create_energysystem(energysystem, parameters,
 
     logging.info('Optimise the energy system')
 
-    om = solph.OperationalModel(energysystem, timeindex=energysystem.time_idx)
+    om = solph.OperationalModel(energysystem)
 
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',
