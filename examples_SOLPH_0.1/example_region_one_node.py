@@ -177,6 +177,9 @@ def create_energysystem(energysystem, parameters, loopi,
     # Create electricity bus for demand
     bel = solph.Bus(label='region_'+str(loopi)+'_bel')
 
+    # Create biogas bus for biogas
+    bbiogas = solph.Bus(label='region_'+str(loopi)+'_bbiogas')
+
     # Create storage transformer object for storage
     solph.Storage(
         label='region_'+str(loopi)+'_bat',
@@ -299,6 +302,46 @@ def create_energysystem(energysystem, parameters, loopi,
                                   actual_value=parameters['data_pv'],
                                   nominal_value=pv_nv,
                                   fixed=True)})
+
+    # Create source and transformer object for biogas
+        if arguments['--costopt']:
+            print('Cost optimization is not implemented yet')
+
+        else:
+            # if int(arguments['--multi-regions']) == 2:
+            #     biogas_nv = (float(parameters['region_parameter'].
+            #                    loc['biogas_GWh'][str(parameters
+            #                                     ['combinations']
+            #                                     [loopi][1])]) * 1e3 +
+
+            #              float(parameters['region_parameter'].
+            #                    loc['biogas_GWh'][str(parameters
+            #                                     ['combinations']
+            #                                     [loopi][2])]) * 1e3)
+
+            # else:
+            biogas_nv = float(parameters['region_parameter'].
+                            loc['biogas_GWh'][str(loopi)]) * 1e6
+
+
+            solph.Source(label='region_'+str(loopi)+'_rbiogas',
+                    outputs={bbiogas: solph.Flow(
+                        nominal_value=biogas_nv,
+                        summed_max=1)})
+
+            solph.LinearTransformer(
+                    label='region_'+str(loopi)+'_biogas',
+                    inputs={bbiogas: solph.Flow()},
+                    outputs={bel: solph.Flow(
+                        nominal_value=biogas_nv*0.38/8760)},
+                        conversion_factors={bel: 0.38})
+
+            # solph.LinearTransformer(
+            #         label='region_'+str(loopi)+'_biogas',
+            #         inputs={bbiogas: solph.Flow()},
+            #         outputs={bel: solph.Flow()})
+
+    # if arguments['--biogas_flex']:
 
     # Create simple sink objects for demands
     if int(arguments['--multi-regions']) == 2:
