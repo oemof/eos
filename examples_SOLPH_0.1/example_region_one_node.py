@@ -99,17 +99,10 @@ def read_and_calculate_parameters(**arguments):
         delimiter=',', index_col=0)
 
     data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+    data_weather = pd.read_csv('../data/2005_feedin_8043_52279.csv', sep=',')
     data_load = data['demand_el']  # demand in kW
-    data_wind = data['wind']
-    data_pv = data['pv']
-
-    # residual = data_load - (data['wind']*wind_installed*1e3
-    #                                 + data['pv']*pv_installed*1e3)
-    # positive = residual.where(residual > 0, 0)
-    # negative = residual.where(residual < 0, 0)
-    # print(positive.sum())
-    # print(negative.sum())
-    # print('len',len(negative.nonzero()[0]))
+    data_wind = data_weather['wind']
+    data_pv = data_weather['pv']
 
     # Calculate ep_costs from capex
     storage_capex = cost_parameter.loc['storage']['capex']
