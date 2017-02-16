@@ -19,8 +19,8 @@ Options:
                            weather data set. [default: 53.41] # Parchim
       --lon=LON            Sets the simulation latitude to choose the right
                            weather data set. [default: 11.84] # Parchim
-      --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
-                           2010-2014. [default: 2010]
+      --year=YEAR          Weather data year. Choose from 1998 to 2014
+                           [default: 2005]
       --num-regions=NUM    Number of regions. [default: 24]
       --multi-regions=NUM  Number of regions to combine each. [default: 1]
       --costopt            Cost optimization.
@@ -99,7 +99,7 @@ def read_and_calculate_parameters(**arguments):
         delimiter=',', index_col=0)
 
     data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
-    data_weather = pd.read_csv('../data/2005_feedin_8043_52279.csv', sep=',')
+    data_weather = pd.read_csv('../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
     data_load = data['demand_el']  # demand in kW
     data_wind = data_weather['wind']
     data_pv = data_weather['pv']
