@@ -403,7 +403,7 @@ def get_result_dict(energysystem, parameters, **arguments):
             w.writerow(y)
             f.close
 
-        pickle.dump(results_dc, open('../results/region_single_70.p', "wb"))
+        pickle.dump(results_dc, open('../results/results_single_regions_80.p', "wb"))
 
     return(results_dc)
 
