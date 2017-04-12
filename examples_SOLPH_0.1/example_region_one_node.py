@@ -24,6 +24,7 @@ Options:
       --num-regions=NUM    Number of regions. [default: 24]
       --multi-regions=NUM  Number of regions to combine each. [default: 1]
       --costopt            Cost optimization.
+      --biogas             Include biogas potential.
       --ssr=SSR            Self-sufficiency degree.
       --write-results      write results to data/scenarioname_results.csv
       --dry-run            Do nothing. Only print what would be done.
@@ -297,42 +298,42 @@ def create_energysystem(energysystem, parameters, loopi,
                                   fixed=True)})
 
     # Create source and transformer object for biogas
-        if arguments['--costopt']:
-            print('Cost optimization is not implemented yet')
+        if arguments['--biogas']:
+            if arguments['--costopt']:
+                print('Cost optimization is not implemented yet')
 
-        else:
-            # if int(arguments['--multi-regions']) == 2:
-            #     biogas_nv = (float(parameters['region_parameter'].
-            #                    loc['biogas_GWh'][str(parameters
-            #                                     ['combinations']
-            #                                     [loopi][1])]) * 1e3 +
+                # if int(arguments['--multi-regions']) == 2:
+                #     biogas_nv = (float(parameters['region_parameter'].
+                #                    loc['biogas_GWh'][str(parameters
+                #                                     ['combinations']
+                #                                     [loopi][1])]) * 1e3 +
 
-            #              float(parameters['region_parameter'].
-            #                    loc['biogas_GWh'][str(parameters
-            #                                     ['combinations']
-            #                                     [loopi][2])]) * 1e3)
+                #              float(parameters['region_parameter'].
+                #                    loc['biogas_GWh'][str(parameters
+                #                                     ['combinations']
+                #                                     [loopi][2])]) * 1e3)
 
-            # else:
-            biogas_nv = float(parameters['region_parameter'].
-                            loc['biogas_GWh'][str(loopi)]) * 1e6
+            else:
+                biogas_nv = float(parameters['region_parameter'].
+                                loc['biogas_GWh'][str(loopi)]) * 1e6
 
 
-            solph.Source(label='region_'+str(loopi)+'_rbiogas',
-                    outputs={bbiogas: solph.Flow(
-                        nominal_value=biogas_nv,
-                        summed_max=1)})
+                solph.Source(label='region_'+str(loopi)+'_rbiogas',
+                        outputs={bbiogas: solph.Flow(
+                            nominal_value=biogas_nv,
+                            summed_max=1)})
 
-            solph.LinearTransformer(
-                    label='region_'+str(loopi)+'_biogas',
-                    inputs={bbiogas: solph.Flow()},
-                    outputs={bel: solph.Flow(
-                        nominal_value=biogas_nv*0.38/8760)},
-                        conversion_factors={bel: 0.38})
+                solph.LinearTransformer(
+                        label='region_'+str(loopi)+'_biogas',
+                        inputs={bbiogas: solph.Flow()},
+                        outputs={bel: solph.Flow(
+                            nominal_value=biogas_nv*0.38/8760)},
+                            conversion_factors={bel: 0.38})
 
-            # solph.LinearTransformer(
-            #         label='region_'+str(loopi)+'_biogas',
-            #         inputs={bbiogas: solph.Flow()},
-            #         outputs={bel: solph.Flow()})
+                # solph.LinearTransformer(
+                #         label='region_'+str(loopi)+'_biogas',
+                #         inputs={bbiogas: solph.Flow()},
+                #         outputs={bel: solph.Flow()})
 
     # if arguments['--biogas_flex']:
 
