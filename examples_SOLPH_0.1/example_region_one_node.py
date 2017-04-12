@@ -102,6 +102,9 @@ def read_and_calculate_parameters(**arguments):
     data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
     data_weather = pd.read_csv('../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
     data_load = data['demand_el']  # demand in kW
+
+    # data_wind = data['wind']
+    # data_pv = data['pv']
     data_wind = data_weather['wind']
     data_pv = data_weather['pv']
 
