@@ -25,6 +25,8 @@ Options:
       --multi-regions=NUM  Number of regions to combine each. [default: 1]
       --costopt            Cost optimization.
       --biogas             Include biogas potential.
+      --lkos               LKOS load profile
+      --bdew               BDEW standard load profile h0
       --ssr=SSR            Self-sufficiency degree.
       --write-results      write results to data/scenarioname_results.csv
       --dry-run            Do nothing. Only print what would be done.
@@ -42,6 +44,7 @@ import logging
 import csv
 import pickle
 import pprint as pp
+from demandlib import bdew as bdew
 
 try:
     from docopt import docopt
@@ -101,7 +104,16 @@ def read_and_calculate_parameters(**arguments):
 
     data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
     data_weather = pd.read_csv('../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
-    data_load = data['demand_el']  # demand in kW
+    if arguments['--lkos']:
+        data_load = pd.read_csv('../data/Lastprofil_LKOS_MW_1h.csv', sep=',')
+        data_load = data_load['demand_el'] * 1e3  # demand in kW
+    elif arguments['--bdew']:
+        e_slp = bdew.ElecSlp(int(arguments['--year']))
+        h0_slp_15_min = e_slp.get_profile({'h0': 1})
+        h0_slp = h0_slp_15_min.resample('H').mean()
+        data_load = h0_slp['h0'].reset_index(drop=True)
+    else:
+        data_load = data['demand_el']  # demand in kW
 
     # data_wind = data['wind']
     # data_pv = data['pv']
