@@ -433,6 +433,8 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
         f.close
 
         pickle.dump(results_dc, open('../results/region_results_dc_' +
+            arguments['--scenario'] + '_' +
+            arguments['--year'] + '_' +
             arguments['--ssr'] + '_' +
             str(loopi) + '_' +
             '.p', "wb"))
