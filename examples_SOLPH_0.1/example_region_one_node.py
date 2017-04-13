@@ -272,7 +272,7 @@ def create_energysystem(energysystem, parameters, loopi,
                               actual_value=parameters['data_wind'],
                               fixed=True,
                               fixed_costs=parameters[
-                                  'cost_parameter'].loc['wind']['opex_var'],
+                                  'cost_parameter'].loc['wind']['opex_fix'],
                               investment=solph.Investment(
                                   ep_costs=parameters['wind_epc']))})
 
@@ -299,74 +299,75 @@ def create_energysystem(energysystem, parameters, loopi,
                               fixed=True)})
 
     # Create fixed source object for pv
-        if arguments['--costopt']:
-            solph.Source(label='region_'+str(loopi)+'_pv',
+    if arguments['--costopt']:
+        solph.Source(label='region_'+str(loopi)+'_pv',
                          outputs={bel: solph.Flow(
-                                  actual_value=parameters['data_pv'],
-                                  fixed=True,
-                                  fixed_costs=parameters['opex_pv'],
-                                  investment=solph.Investment(
-                                      ep_costs=parameters['pv_epc']))})
+                              actual_value=parameters['data_pv'],
+                              fixed=True,
+                              fixed_costs=parameters[
+                                  'cost_parameter'].loc['pv']['opex_fix'],
+                              investment=solph.Investment(
+                                  ep_costs=parameters['pv_epc']))})
+
+    else:
+        if int(arguments['--multi-regions']) == 2:
+                pv_nv = (float(parameters['region_parameter'].
+                           loc['pv_MW'][str(parameters
+                                            ['combinations']
+                                            [loopi][1])]) * 1e3 +
+
+                     float(parameters['region_parameter'].
+                           loc['pv_MW'][str(parameters
+                                            ['combinations']
+                                            [loopi][2])]) * 1e3)
 
         else:
-            if int(arguments['--multi-regions']) == 2:
-                pv_nv = (float(parameters['region_parameter'].
-                               loc['pv_MW'][str(parameters
-                                                ['combinations']
-                                                [loopi][1])]) * 1e3 +
+            pv_nv = float(parameters['region_parameter'].
+                          loc['pv_MW'][str(loopi)]) * 1e3
 
-                         float(parameters['region_parameter'].
-                               loc['pv_MW'][str(parameters
-                                                ['combinations']
-                                                [loopi][2])]) * 1e3)
-
-            else:
-                pv_nv = float(parameters['region_parameter'].
-                              loc['pv_MW'][str(loopi)]) * 1e3
-
-            solph.Source(label='region_'+str(loopi)+'_pv',
-                         outputs={bel: solph.Flow(
-                                  actual_value=parameters['data_pv'],
-                                  nominal_value=pv_nv,
-                                  fixed=True)})
+        solph.Source(label='region_'+str(loopi)+'_pv',
+                     outputs={bel: solph.Flow(
+                              actual_value=parameters['data_pv'],
+                              nominal_value=pv_nv,
+                              fixed=True)})
 
     # Create source and transformer object for biogas
-        if arguments['--biogas']:
-            if arguments['--costopt']:
+    if arguments['--biogas']:
+        if arguments['--costopt']:
                 print('Cost optimization is not implemented yet')
 
-                # if int(arguments['--multi-regions']) == 2:
-                #     biogas_nv = (float(parameters['region_parameter'].
-                #                    loc['biogas_GWh'][str(parameters
-                #                                     ['combinations']
-                #                                     [loopi][1])]) * 1e3 +
+            # if int(arguments['--multi-regions']) == 2:
+            #     biogas_nv = (float(parameters['region_parameter'].
+            #                    loc['biogas_GWh'][str(parameters
+            #                                     ['combinations']
+            #                                     [loopi][1])]) * 1e3 +
 
-                #              float(parameters['region_parameter'].
-                #                    loc['biogas_GWh'][str(parameters
-                #                                     ['combinations']
-                #                                     [loopi][2])]) * 1e3)
+            #              float(parameters['region_parameter'].
+            #                    loc['biogas_GWh'][str(parameters
+            #                                     ['combinations']
+            #                                     [loopi][2])]) * 1e3)
 
-            else:
-                biogas_nv = float(parameters['region_parameter'].
-                                loc['biogas_GWh'][str(loopi)]) * 1e6
+        else:
+            biogas_nv = float(parameters['region_parameter'].
+                            loc['biogas_GWh'][str(loopi)]) * 1e6
 
 
-                solph.Source(label='region_'+str(loopi)+'_rbiogas',
-                        outputs={bbiogas: solph.Flow(
-                            nominal_value=biogas_nv,
-                            summed_max=1)})
+            solph.Source(label='region_'+str(loopi)+'_rbiogas',
+                    outputs={bbiogas: solph.Flow(
+                        nominal_value=biogas_nv,
+                        summed_max=1)})
 
-                solph.LinearTransformer(
-                        label='region_'+str(loopi)+'_biogas',
-                        inputs={bbiogas: solph.Flow()},
-                        outputs={bel: solph.Flow(
-                            nominal_value=biogas_nv*0.38/8760)},
-                            conversion_factors={bel: 0.38})
+            solph.LinearTransformer(
+                    label='region_'+str(loopi)+'_biogas',
+                    inputs={bbiogas: solph.Flow()},
+                    outputs={bel: solph.Flow(
+                        nominal_value=biogas_nv*0.38/8760)},
+                        conversion_factors={bel: 0.38})
 
-                # solph.LinearTransformer(
-                #         label='region_'+str(loopi)+'_biogas',
-                #         inputs={bbiogas: solph.Flow()},
-                #         outputs={bel: solph.Flow()})
+            # solph.LinearTransformer(
+            #         label='region_'+str(loopi)+'_biogas',
+            #         inputs={bbiogas: solph.Flow()},
+            #         outputs={bel: solph.Flow()})
 
     # if arguments['--biogas_flex']:
 
