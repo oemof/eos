@@ -128,6 +128,18 @@ def read_and_calculate_parameters(**arguments):
                                    storage_lifetime) / ((1 + storage_wacc) **
                                                         storage_lifetime - 1)
 
+    wind_capex = cost_parameter.loc['wind']['capex']
+    wind_lifetime = cost_parameter.loc['wind']['lifetime']
+    wind_wacc = cost_parameter.loc['wind']['wacc']
+    wind_epc = wind_capex * (wind_wacc * (1 + wind_wacc) **
+                        wind_lifetime) / ((1 + wind_wacc) ** wind_lifetime - 1)
+
+    pv_capex = cost_parameter.loc['pv']['capex']
+    pv_lifetime = cost_parameter.loc['pv']['lifetime']
+    pv_wacc = cost_parameter.loc['pv']['wacc']
+    pv_epc = pv_capex * (pv_wacc * (1 + pv_wacc) **
+                         pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
+
     # Calculate grid share
     if arguments['--ssr']:
         grid_share = 1 - float(arguments['--ssr'])
@@ -157,6 +169,9 @@ def read_and_calculate_parameters(**arguments):
     parameters = {'region_parameter': region_parameter,
                   'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
+                  'storage_epc': storage_epc,
+                  'wind_epc': pv_epc,
+                  'pv_epc': pv_epc,
                   'data': data,
                   'data_load': data_load,
                   'data_wind': data_wind,
@@ -209,7 +224,14 @@ def create_energysystem(energysystem, parameters, loopi,
         investment=solph.Investment(ep_costs=parameters['storage_epc']))
 
     # Create commodity object for import electricity resource
-    if arguments['--ssr']:
+    if arguments['--costopt']:
+        solph.Source(
+                label='region_'+str(loopi)+'_gridsource',
+                outputs={bel: solph.Flow(
+                    variable_costs=parameters[
+                        'cost_parameter'].loc['grid']['opex_var'])})
+
+    elif arguments['--ssr']:
         if int(arguments['--multi-regions']) == 2:
 
             gridsource_nv = ((float(parameters
@@ -236,10 +258,7 @@ def create_energysystem(energysystem, parameters, loopi,
                 summed_max=1)})
 
     else:
-        print('Cost optimization is not implemented yet')
-        # solph.Source(label='region_'+str(region)+'_gridsource', outputs={
-        #     bel: solph.Flow(
-        #         variable_costs=parameters['price_el'])})
+        print('Something is missing')
 
     # Create excess component to allow overproduction
     solph.Sink(label='region_'+str(loopi)+'__excess',
@@ -248,14 +267,14 @@ def create_energysystem(energysystem, parameters, loopi,
     # Create fixed source object for wind
 
     if arguments['--costopt']:
-        print('Cost optimization is not implemented yet')
-        # solph.Source(label='region_'+str(region)+'_wind',
-        #              outputs={bel: solph.Flow(
-        #                       actual_value=parameters['data_wind'],
-        #                       fixed=True,
-        #                       fixed_costs=parameters['opex_wind'],
-        #                       investment=solph.Investment(
-        #                           ep_costs=parameters['wind_epc']))})
+        solph.Source(label='region_'+str(loopi)+'_wind',
+                     outputs={bel: solph.Flow(
+                              actual_value=parameters['data_wind'],
+                              fixed=True,
+                              fixed_costs=parameters[
+                                  'cost_parameter'].loc['wind']['opex_var'],
+                              investment=solph.Investment(
+                                  ep_costs=parameters['wind_epc']))})
 
     else:
         if int(arguments['--multi-regions']) == 2:
@@ -281,14 +300,13 @@ def create_energysystem(energysystem, parameters, loopi,
 
     # Create fixed source object for pv
         if arguments['--costopt']:
-            print('Cost optimization is not implemented yet')
-            # solph.Source(label='region_'+str(region)+'_pv',
-            #              outputs={bel: solph.Flow(
-            #                       actual_value=parameters['data_pv'],
-            #                       fixed=True,
-            #                       fixed_costs=parameters['opex_pv'],
-            #                       investment=solph.Investment(
-            #                           ep_costs=parameters['pv_epc']))})
+            solph.Source(label='region_'+str(loopi)+'_pv',
+                         outputs={bel: solph.Flow(
+                                  actual_value=parameters['data_pv'],
+                                  fixed=True,
+                                  fixed_costs=parameters['opex_pv'],
+                                  investment=solph.Investment(
+                                      ep_costs=parameters['pv_epc']))})
 
         else:
             if int(arguments['--multi-regions']) == 2:
