@@ -25,6 +25,7 @@ Options:
       --multi-regions=NUM  Number of regions to combine each. [default: 1]
       --costopt            Cost optimization.
       --biogas             Include biogas potential.
+      --biogas-costopt     Also cost optimize biogas bhkw.
       --lkos               LKOS load profile
       --bdew               BDEW standard load profile h0
       --ssr=SSR            Self-sufficiency degree.
@@ -140,6 +141,13 @@ def read_and_calculate_parameters(**arguments):
     pv_epc = pv_capex * (pv_wacc * (1 + pv_wacc) **
                          pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
 
+    biogas_bhkw_capex = cost_parameter.loc['biogas_bhkw']['capex']
+    biogas_bhkw_lifetime = cost_parameter.loc['biogas_bhkw']['lifetime']
+    biogas_bhkw_wacc = cost_parameter.loc['biogas_bhkw']['wacc']
+    biogas_bhkw_epc = biogas_bhkw_capex * (biogas_bhkw_wacc * (1 + biogas_bhkw_wacc) **
+                         biogas_bhkw_lifetime) / ((1 + biogas_bhkw_wacc) ** biogas_bhkw_lifetime - 1)
+
+    print(biogas_bhkw_epc)
     # Calculate grid share
     if arguments['--ssr']:
         grid_share = 1 - float(arguments['--ssr'])
@@ -172,6 +180,7 @@ def read_and_calculate_parameters(**arguments):
                   'storage_epc': storage_epc,
                   'wind_epc': wind_epc,
                   'pv_epc': pv_epc,
+                  'biogas_bhkw_epc': biogas_bhkw_epc,
                   'data': data,
                   'data_load': data_load,
                   'data_wind': data_wind,
@@ -345,8 +354,26 @@ def create_energysystem(energysystem, parameters, loopi,
 
     # Create source and transformer object for biogas
     if arguments['--biogas']:
-        if arguments['--costopt']:
-                print('Cost optimization is not implemented yet')
+        biogas_nv = float(parameters['region_parameter'].
+                            loc['biogas_GWh'][str(loopi)]) * 1e6
+
+        solph.Source(label='region_'+str(loopi)+'_rbiogas',
+                outputs={bbiogas: solph.Flow(
+                    nominal_value=biogas_nv,
+                    summed_max=1)})
+
+        if arguments['--biogas-costopt']:
+            solph.LinearTransformer(
+                    label='region_'+str(loopi)+'_biogas_bhkw',
+                    inputs={bbiogas: solph.Flow()},
+                    outputs={bel: solph.Flow(
+                                 fixed_costs=parameters[
+                                       'cost_parameter'].loc['biogas_bhkw']['opex_fix'],
+                                 variable_costs=parameters[
+                                       'cost_parameter'].loc['biogas_bhkw']['opex_var'],
+                                 investment=solph.Investment(
+                                       ep_costs=parameters['biogas_bhkw_epc']))},
+                                 conversion_factors={bel: 0.38})
 
             # if int(arguments['--multi-regions']) == 2:
             #     biogas_nv = (float(parameters['region_parameter'].
@@ -360,20 +387,12 @@ def create_energysystem(energysystem, parameters, loopi,
             #                                     [loopi][2])]) * 1e3)
 
         else:
-            biogas_nv = float(parameters['region_parameter'].
-                            loc['biogas_GWh'][str(loopi)]) * 1e6
-
-
-            solph.Source(label='region_'+str(loopi)+'_rbiogas',
-                    outputs={bbiogas: solph.Flow(
-                        nominal_value=biogas_nv,
-                        summed_max=1)})
-
             solph.LinearTransformer(
-                    label='region_'+str(loopi)+'_biogas',
+                    label='region_'+str(loopi)+'_biogas_bhkw',
                     inputs={bbiogas: solph.Flow()},
                     outputs={bel: solph.Flow(
                         nominal_value=biogas_nv*0.38/8760)},
+                        # nominal_value=biogas_nv*0.38/8760*2)},
                         conversion_factors={bel: 0.38})
 
             # solph.LinearTransformer(
