@@ -170,7 +170,7 @@ def read_and_calculate_parameters(**arguments):
                   'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
                   'storage_epc': storage_epc,
-                  'wind_epc': pv_epc,
+                  'wind_epc': wind_epc,
                   'pv_epc': pv_epc,
                   'data': data,
                   'data_load': data_load,
