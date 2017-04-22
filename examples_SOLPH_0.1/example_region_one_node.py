@@ -225,11 +225,23 @@ def create_energysystem(energysystem, parameters, loopi,
 
     # Create commodity object for import electricity resource
     if arguments['--costopt']:
-        solph.Source(
-                label='region_'+str(loopi)+'_gridsource',
-                outputs={bel: solph.Flow(
-                    variable_costs=parameters[
-                        'cost_parameter'].loc['grid']['opex_var'])})
+        if arguments['--ssr']:
+            gridsource_nv = (float(parameters
+                               ['region_parameter'].loc
+                               ['annual_demand_GWh'][str(loopi)]) *
+                               1e6 * parameters['grid_share'])
+
+            solph.Source(
+                    label='region_'+str(loopi)+'_gridsource',
+                    outputs={bel: solph.Flow(
+                        nominal_value=gridsource_nv,
+                        summed_max=1)})
+        else:
+            solph.Source(
+                    label='region_'+str(loopi)+'_gridsource',
+                    outputs={bel: solph.Flow(
+                        variable_costs=parameters[
+                            'cost_parameter'].loc['grid']['opex_var'])})
 
     elif arguments['--ssr']:
         if int(arguments['--multi-regions']) == 2:
