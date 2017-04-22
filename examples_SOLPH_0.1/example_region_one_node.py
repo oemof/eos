@@ -456,7 +456,15 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
     results_dc = {}
     myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
+    bel = energysystem.groups['region_'+str(loopi)+'_bel']
+
     storage = energysystem.groups['region_'+str(loopi)+'_bat']
+
+    wind_inst = energysystem.groups['region_'+str(loopi)+'_wind']
+
+    pv_inst = energysystem.groups['region_'+str(loopi)+'_pv']
+
+    biogas_bhkw_inst = energysystem.groups['region_'+str(loopi)+'_biogas_bhkw']
 
     demand = myresults.slice_by(obj_label='region_'+str(loopi)+'_demand',
                                 date_from=year+'-01-01 00:00:00',
@@ -470,18 +478,29 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
                             date_from=year+'-01-01 00:00:00',
                             date_to=year+'-12-31 23:00:00')
 
+    biogas_bhkw = myresults.slice_by(obj_label='region_'+str(loopi)+'_biogas_bhkw',
+                                     date_from=year+'-01-01 00:00:00',
+                                     date_to=year+'-12-31 23:00:00')
+
     grid = myresults.slice_by(obj_label='region_'+str(loopi)+'_gridsource',
-                              date_from=year+'-01-01 00:00:00',
-                              date_to=year+'-12-31 23:00:00')
+                                  date_from=year+'-01-01 00:00:00',
+                                  date_to=year+'-12-31 23:00:00')
 
     results_dc['demand_'+str(loopi)] = float(demand.sum())
+    results_dc['grid_'+str(loopi)] = grid.sum()
+    results_dc['check_ssr_'+str(loopi)] = 1 - (grid.sum() / demand.sum())
     results_dc['wind_max_'+str(loopi)] = float(wind.max())
     results_dc['pv_max_'+str(loopi)] = float(pv.max())
-    results_dc['grid'+str(loopi)] = grid.sum()
-    results_dc['check_ssr'+str(loopi)] = 1 - (grid.sum() / demand.sum())
-    results_dc['storage_cap'+str(loopi)] = energysystem.results[
+    results_dc['storage_cap_'+str(loopi)] = energysystem.results[
         storage][storage].invest
     results_dc['objective'] = energysystem.results.objective
+
+    if arguments['--costopt']:
+        results_dc['wind_inst_'+str(loopi)] = energysystem.results[wind_inst][bel].invest
+        results_dc['pv_inst_'+str(loopi)] = energysystem.results[pv_inst][bel].invest
+
+    if arguments['--biogas-costopt']:
+        results_dc['biogas_bhkw_inst_'+str(loopi)] = energysystem.results[biogas_bhkw_inst][bel].invest
 
     if arguments['--write-results']:
         x = list(results_dc.keys())
