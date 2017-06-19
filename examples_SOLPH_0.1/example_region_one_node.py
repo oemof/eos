@@ -471,7 +471,8 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
 
     pv_inst = energysystem.groups['region_'+str(loopi)+'_pv']
 
-    biogas_bhkw_inst = energysystem.groups['region_'+str(loopi)+'_biogas_bhkw']
+    if arguments['--biogas-costopt']:
+        biogas_bhkw_inst = energysystem.groups['region_'+str(loopi)+'_biogas_bhkw']
 
     demand = myresults.slice_by(obj_label='region_'+str(loopi)+'_demand',
                                 date_from=year+'-01-01 00:00:00',
@@ -485,9 +486,10 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
                             date_from=year+'-01-01 00:00:00',
                             date_to=year+'-12-31 23:00:00')
 
-    biogas_bhkw = myresults.slice_by(obj_label='region_'+str(loopi)+'_biogas_bhkw',
-                                     date_from=year+'-01-01 00:00:00',
-                                     date_to=year+'-12-31 23:00:00')
+    if (arguments['--biogas']) or (arguments['--biogas-costopt']):
+        biogas_bhkw = myresults.slice_by(obj_label='region_'+str(loopi)+'_biogas_bhkw',
+                                         date_from=year+'-01-01 00:00:00',
+                                         date_to=year+'-12-31 23:00:00')
 
     excess = myresults.slice_by(obj_label='region_'+str(loopi)+'_excess',
                                 date_from=year+'-01-01 00:00:00',
@@ -497,6 +499,9 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
                                   date_from=year+'-01-01 00:00:00',
                                   date_to=year+'-12-31 23:00:00')
 
+    if (arguments['--biogas']) or (arguments['--biogas-costopt']):
+        results_dc['biogas_bhkw_ts_'+str(loopi)] = biogas_bhkw
+
     results_dc['demand_'+str(loopi)] = float(demand.sum())
     results_dc['demand_ts_'+str(loopi)] = demand
     results_dc['grid_'+str(loopi)] = grid.sum()
@@ -505,7 +510,6 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
     results_dc['excess_ts_'+str(loopi)] = excess
     results_dc['wind_ts_'+str(loopi)] = wind
     results_dc['pv_ts_'+str(loopi)] = pv
-    results_dc['biogas_bhkw_ts_'+str(loopi)] = biogas_bhkw
     results_dc['check_ssr_'+str(loopi)] = 1 - (grid.sum() / demand.sum())
     results_dc['wind_max_'+str(loopi)] = float(wind.max())
     results_dc['pv_max_'+str(loopi)] = float(pv.max())
