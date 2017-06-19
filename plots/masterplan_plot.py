@@ -28,184 +28,325 @@ from docopt import docopt
 # pp.pprint(res)
 
 
-def read_results():
-
-    # weather_years = np.array(np.mat('1 1998; 2 1999; 3 2000; 4 2001; 5 2002;
-    #                                  6 2003; 7 2004; 8 2005; 9 2006; 10 2007;
-    #                                  11 2008; 12 2009; 13 2010; 14 2011;
-    #                                  15 2012; 16 2013; 17 2014'))
+def read_results_storage():
 
     if arguments['--scenario_year'] == 'both':
 
-        results_region_2030 = np.zeros(85).reshape(17, 5)
+        results_storage_2030 = np.zeros(85).reshape(17, 5)
 
         for i in np.arange(17):
-            results_region_2030[i][0] = pickle.load(open('../results/' +
+            results_storage_2030[i][0] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2030' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.70_1_.p', 'rb'))['storage_cap1']
+                                                    '0.70_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region_2030[i][1] = pickle.load(open('../results/' +
+            results_storage_2030[i][1] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2030' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.75_1_.p', 'rb'))['storage_cap1']
+                                                    '0.75_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region_2030[i][2] = pickle.load(open('../results/' +
+            results_storage_2030[i][2] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2030' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.80_1_.p', 'rb'))['storage_cap1']
+                                                    '0.80_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region_2030[i][3] = pickle.load(open('../results/' +
+            results_storage_2030[i][3] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2030' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.85_1_.p', 'rb'))['storage_cap1']
+                                                    '0.85_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region_2030[i][4] = pickle.load(open('../results/' +
+            results_storage_2030[i][4] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2030' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.90_1_.p', 'rb'))['storage_cap1']
+                                                    '0.90_1_.p', 'rb'))['storage_cap_1']
 
-        results_region_2050 = np.zeros(85).reshape(17, 5)
+        results_storage_2050 = np.zeros(85).reshape(17, 5)
 
         for i in np.arange(17):
-            results_region_2050[i][0] = pickle.load(open('../results/' +
+            results_storage_2050[i][0] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2050' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.70_1_.p', 'rb'))['storage_cap1']
+                                                    '0.70_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region_2050[i][1] = pickle.load(open('../results/' +
+            results_storage_2050[i][1] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2050' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.75_1_.p', 'rb'))['storage_cap1']
+                                                    '0.75_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region_2050[i][2] = pickle.load(open('../results/' +
+            results_storage_2050[i][2] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2050' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.80_1_.p', 'rb'))['storage_cap1']
+                                                    '0.80_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region_2050[i][3] = pickle.load(open('../results/' +
+            results_storage_2050[i][3] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2050' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.85_1_.p', 'rb'))['storage_cap1']
+                                                    '0.85_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region_2050[i][4] = pickle.load(open('../results/' +
+            results_storage_2050[i][4] = pickle.load(open('../results/' +
                                                     str(arguments['--scenario']) + '/' +
                                                     'region_results_dc' + '_' +
                                                     str(arguments['--region']) + '_' +
                                                     '2050' + '_' +
                                                     str(i + 1998) + '_' +
-                                                    '0.90_1_.p', 'rb'))['storage_cap1']
+                                                    '0.90_1_.p', 'rb'))['storage_cap_1']
 
-        results_region_2030_GWh = results_region_2030 / 1e6
-        results_region_2050_GWh = results_region_2050 / 1e6
+        results_storage_2030_GWh = results_storage_2030 / 1e6
+        results_storage_2050_GWh = results_storage_2050 / 1e6
 
-        results_region_GWh = {'2030': results_region_2030_GWh,
-                              '2050': results_region_2050_GWh}
+        results_storage_GWh = {'2030': results_storage_2030_GWh,
+                              '2050': results_storage_2050_GWh}
 
     else:
-        results_region = np.zeros(85).reshape(17, 5)
+        results_storage = np.zeros(85).reshape(17, 5)
         for i in np.arange(17):
-            results_region[i][0] = pickle.load(open('../results/' +
+            results_storage[i][0] = pickle.load(open('../results/' +
                                                str(arguments['--scenario']) + '/' +
                                                'region_results_dc' + '_' +
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               '0.70_1_.p', 'rb'))['storage_cap1']
+                                               '0.70_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region[i][1] = pickle.load(open('../results/' +
+            results_storage[i][1] = pickle.load(open('../results/' +
                                                str(arguments['--scenario']) + '/' +
                                                'region_results_dc' + '_' +
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               '0.75_1_.p', 'rb'))['storage_cap1']
+                                               '0.75_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region[i][2] = pickle.load(open('../results/' +
+            results_storage[i][2] = pickle.load(open('../results/' +
                                                str(arguments['--scenario']) + '/' +
                                                'region_results_dc' + '_' +
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               '0.80_1_.p', 'rb'))['storage_cap1']
+                                               '0.80_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region[i][3] = pickle.load(open('../results/' +
+            results_storage[i][3] = pickle.load(open('../results/' +
                                                str(arguments['--scenario']) + '/' +
                                                'region_results_dc' + '_' +
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               '0.85_1_.p', 'rb'))['storage_cap1']
+                                               '0.85_1_.p', 'rb'))['storage_cap_1']
 
         for i in np.arange(17):
-            results_region[i][4] = pickle.load(open('../results/' +
+            results_storage[i][4] = pickle.load(open('../results/' +
                                                str(arguments['--scenario']) + '/' +
                                                'region_results_dc' + '_' +
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               '0.90_1_.p', 'rb'))['storage_cap1']
+                                               '0.90_1_.p', 'rb'))['storage_cap_1']
 
-        results_region_GWh = results_region / 1e6
+        results_storage_GWh = results_storage / 1e6
 
-    print(results_region_GWh)
+    return results_storage_GWh
 
-    return results_region_GWh
 
-def dot_plot(results):
+def read_results_excess_grid():
+
+    if arguments['--scenario_year']:
+
+        results_excess = np.zeros(85).reshape(17, 5)
+        results_grid = np.zeros(85).reshape(17, 5)
+        results_grid_max = np.zeros(85).reshape(17, 5)
+
+        for i in np.arange(17):
+            results_excess[i][0] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.70_1_.p', 'rb'))['excess_1']
+
+            results_grid[i][0] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.70_1_.p', 'rb'))['grid_1']
+
+            results_grid_max[i][0] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.70_1_.p', 'rb'))['grid_ts_1'].max()
+
+        for i in np.arange(17):
+            results_excess[i][1] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.75_1_.p', 'rb'))['excess_1']
+
+            results_grid[i][1] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.75_1_.p', 'rb'))['grid_1']
+
+            results_grid_max[i][1] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.75_1_.p', 'rb'))['grid_ts_1'].max()
+
+        for i in np.arange(17):
+            results_excess[i][2] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.80_1_.p', 'rb'))['excess_1']
+
+            results_grid[i][2] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.80_1_.p', 'rb'))['grid_1']
+
+            results_grid_max[i][2] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.80_1_.p', 'rb'))['grid_ts_1'].max()
+
+        for i in np.arange(17):
+            results_excess[i][3] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.85_1_.p', 'rb'))['excess_1']
+
+            results_grid[i][3] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.85_1_.p', 'rb'))['grid_1']
+
+            results_grid_max[i][3] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.85_1_.p', 'rb'))['grid_ts_1'].max()
+
+        for i in np.arange(17):
+            results_excess[i][4] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.90_1_.p', 'rb'))['excess_1']
+
+            results_grid[i][4] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.90_1_.p', 'rb'))['grid_1']
+
+            results_grid_max[i][4] = pickle.load(open('../results/' +
+                                               str(arguments['--scenario']) + '/' +
+                                               'region_results_dc' + '_' +
+                                               str(arguments['--region']) + '_' +
+                                               str(arguments['--scenario_year']) + '_' +
+                                               str(i + 1998) + '_' +
+                                               '0.90_1_.p', 'rb'))['grid_ts_1'].max()
+
+        results_excess_GWh = results_excess / 1e6
+        results_grid_GWh = results_grid / 1e6
+        results_grid_max_MW = results_grid_max / 1e3
+
+    # print(results_excess_GWh)
+    # print(results_grid_GWh)
+
+    return (results_excess_GWh, results_grid_GWh, results_grid_max_MW)
+
+
+def dot_plot_storage(results_storage):
 
     if arguments['--scenario_year'] == 'both':
 
         for i in np.arange(17):
             fig = plt.figure(1)
-            plt.plot([0.70, 0.75, 0.80, 0.85, 0.90], results['2030'][i][:], 'ro')
-            plt.plot([0.70, 0.75, 0.80, 0.85, 0.90], results['2050'][i][:], 'bo')
-        plt.axis([0.68, 0.92, results['2030'].min(), results['2030'].max() + 1])
+            plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                    results_storage['2030'][i][:], 'ro')
+            plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                    results_storage['2050'][i][:], 'bo')
+        plt.axis([0.68, 0.92,
+            results_storage['2030'].min(), results_storage['2030'].max() + 1])
         plt.legend(['2030', '2050'], loc='upper left', prop={'size': 18})
 
     else:
         for i in np.arange(17):
             fig = plt.figure(1)
-            plt.plot([0.70, 0.75, 0.80, 0.85, 0.90], results[i][:], 'ro')
-        plt.axis([0.68, 0.92, results.min(), results.max() + 1])
+            plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                    results_storage[i][:], 'ro')
+        plt.axis([0.68, 0.92, results_storage.min(), results_storage.max() + 1])
 
     plt.yticks([0, 10, 20, 30, 40])
     plt.xlabel('Self-sufficiency degree', size=18)
@@ -217,13 +358,64 @@ def dot_plot(results):
 
     return fig
 
+
+def dot_plot_excess_and_grid_energy(results_excess, results_grid):
+
+    for i in np.arange(17):
+        fig = plt.figure(1)
+        plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                results_excess[i][:], 'bo')
+        plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                results_grid[i][:], 'ro')
+    # plt.axis([0.68, 0.92,
+        # results_excess.min(), results_excess.max() + 1])
+    plt.legend(['Excess', 'Import'], loc='upper left', prop={'size': 18})
+
+    plt.yticks([0, 2000, 4000, 6000, 8000, 10000])
+    plt.xlabel('Self-sufficiency degree', size=18)
+    plt.ylabel('Excess and import energy in GWh', size=18)
+    plt.rcParams.update({'font.size': 18})
+    plt.tight_layout()
+
+    plt.show()
+
+    return fig
+
+
+def dot_plot_grid_power(results_grid_max):
+
+    for i in np.arange(17):
+        fig = plt.figure(1)
+        plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                results_grid_max[i][:], 'ro')
+    # plt.axis([0.68, 0.92,
+        # results_excess.min(), results_excess.max() + 1])
+    # plt.legend(['Importleistung'], loc='upper left', prop={'size': 18})
+
+    # plt.ylim([500, 850])
+    # plt.yticks([500, 600, 700, 800])
+    plt.ylim([0, 38000])
+    plt.yticks([0, 10000, 20000, 30000])
+    plt.xlabel('Self-sufficiency degree', size=18)
+    plt.ylabel('Max. Importleistung in MW', size=18)
+    plt.rcParams.update({'font.size': 18})
+    plt.tight_layout()
+
+    plt.show()
+
+    return fig
+
+
 if __name__ == '__main__':
     arguments = docopt(__doc__)
     print(arguments)
-    results = read_results()
-    fig = dot_plot(results)
+    results_storage = read_results_storage()
+    (results_excess, results_grid, results_grid_max) = read_results_excess_grid()
+    fig_1 = dot_plot_storage(results_storage)
+    fig_2 = dot_plot_excess_and_grid_energy(results_excess, results_grid)
+    fig_3 = dot_plot_grid_power(results_grid_max)
 
     if arguments['--save']:
-        fig.savefig(os.path.join(os.path.dirname(__file__), 'saved_figures') +
+        fig_3.savefig(os.path.join(os.path.dirname(__file__), 'saved_figures') +
                 '/' + 'current_figure' +
                 '.png')
