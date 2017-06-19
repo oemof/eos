@@ -504,9 +504,9 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
 
     results_dc['demand_'+str(loopi)] = float(demand.sum())
     results_dc['demand_ts_'+str(loopi)] = demand
-    results_dc['grid_'+str(loopi)] = grid.sum()
+    results_dc['grid_'+str(loopi)] = float(grid.sum())
     results_dc['grid_ts_'+str(loopi)] = grid
-    results_dc['excess_'+str(loopi)] = excess.sum()
+    results_dc['excess_'+str(loopi)] = float(excess.sum())
     results_dc['excess_ts_'+str(loopi)] = excess
     results_dc['wind_ts_'+str(loopi)] = wind
     results_dc['pv_ts_'+str(loopi)] = pv
