@@ -358,10 +358,7 @@ def read_and_calculate_parameters(**arguments):
     #     'latitude': float(arguments['--lat']),
     #     'longitude': float(arguments['--lon'])}
 
-    pv_generation = pd.read_csv(
-              '../example/example_data/pv_generation_' + str(arguments['--year']) + '.csv', sep=",")
-
-    pv_generation = pv_generation['pv']
+    pv_generation = pd.read_csv('../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')['pv']
 
     # Calculate grid share
     if arguments['--ssr']:
