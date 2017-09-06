@@ -912,6 +912,17 @@ def main(**arguments):
     print('storage_cap: ', results['storage_cap'])
     print('objective: ', results['objective'])
     print('check_ssr_pv: ', results['check_ssr_pv'])
+    if arguments['--pv-costopt']:
+        print('pv_inst: ', (results['pv_inst_house_1'] +
+         results['pv_inst_house_2'] +
+         results['pv_inst_house_3'] +
+         results['pv_inst_house_4'] +
+         results['pv_inst_house_5'] +
+         results['pv_inst_house_6'] +
+         results['pv_inst_house_7'] +
+         results['pv_inst_house_8'] +
+         results['pv_inst_house_9'] +
+         results['pv_inst_house_10']))
     # create_plots(esys, year=arguments['--year'])
 
 
