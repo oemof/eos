@@ -7,8 +7,8 @@ Usage: example_quartier_10hh_11_to_20.py [options]
 Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario_parchim]
-  -c, --cost=COST          The cost scenario. [default: 1]
-  -t, --tech=TECH          The tech scenario. [default: 1]
+  -c, --cost=COST          The cost scenario. [default: 2]
+  -t, --tech=TECH          The tech scenario. [default: 2]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
