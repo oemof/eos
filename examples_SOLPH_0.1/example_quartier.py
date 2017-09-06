@@ -649,19 +649,19 @@ def get_result_dict(energysystem, parameters, **arguments):
                                                   ['bus_label', 'type', 'obj_label'],
                                                   drop=True)
 
-    bat_input = myresults.slice_by(obj_label='bat', type='input',
+    bat_input = myresults.slice_by(obj_label='bat',
                                    date_from=year+'-01-01 00:00:00',
                                    date_to=year+'-12-31 23:00:00').reset_index(
                                                   ['bus_label', 'type', 'obj_label'],
                                                   drop=True)
 
-    bat_output = myresults.slice_by(obj_label='bat', type='output',
+    bat_output = myresults.slice_by(obj_label='bat',
                                     date_from=year+'-01-01 00:00:00',
                                     date_to=year+'-12-31 23:00:00').reset_index(
                                                    ['bus_label', 'type', 'obj_label'],
                                                    drop=True)
 
-    bat_soc = myresults.slice_by(obj_label='bat', type='other',
+    bat_soc = myresults.slice_by(obj_label='bat',
                                  date_from=year+'-01-01 00:00:00',
                                  date_to=year+'-12-31 23:00:00').reset_index(
                                                  ['bus_label', 'type', 'obj_label'],
@@ -701,7 +701,7 @@ def get_result_dict(energysystem, parameters, **arguments):
                                             ['bus_label', 'type', 'obj_label'],
                                             drop=True)
 
-        sc = myresults.slice_by(obj_label=house+'_sc_Transformer', type='output',
+        sc = myresults.slice_by(obj_label=house+'_sc_Transformer',
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00').reset_index(
                                             ['bus_label', 'type', 'obj_label'],
