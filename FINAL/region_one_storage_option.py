@@ -182,7 +182,6 @@ def read_and_calculate_parameters(**arguments):
                   'data_load': data_load,
                   'data_wind': data_wind,
                   'data_pv': data_pv,
-                  'storage_epc': storage_epc,
                   'grid_share': grid_share,
                   'regions': regions,
                   'combinations': combinations,
