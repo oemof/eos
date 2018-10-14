@@ -19,6 +19,7 @@ Options:
                            [default: 2005]
       --num-regions=NUM    Number of regions. [default: 24]
       --multi-regions=NUM  Number of regions to combine each. [default: 1]
+      --storage-power      Take also costs for storage power unit into account.
       --costopt            Cost optimization.
       --biogas             Include biogas potential.
       --biogas-flex        Include biogas as flexible potential.
@@ -126,6 +127,17 @@ def read_and_calculate_parameters(**arguments):
                                    storage_lifetime) / ((1 + storage_wacc) **
                                                         storage_lifetime - 1)
 
+    if arguments['--storage-power']:
+        storage_power_capex = cost_parameter.loc['storage_power']['capex']
+        storage_power_lifetime = cost_parameter.loc['storage_power']['lifetime']
+        storage_power_wacc = cost_parameter.loc['storage_power']['wacc']
+        storage_power_epc = storage_power_capex * (storage_power_wacc * (1 + storage_power_wacc) **
+                                       storage_power_lifetime) / ((1 + storage_power_wacc) **
+                                                            storage_power_lifetime - 1)
+
+    else:
+        storage_power_epc = 0
+
     wind_capex = cost_parameter.loc['wind']['capex']
     wind_lifetime = cost_parameter.loc['wind']['lifetime']
     wind_wacc = cost_parameter.loc['wind']['wacc']
@@ -175,6 +187,7 @@ def read_and_calculate_parameters(**arguments):
                   'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
                   'storage_epc': storage_epc,
+                  'storage_power_epc': storage_power_epc,
                   'wind_epc': wind_epc,
                   'pv_epc': pv_epc,
                   'biogas_bhkw_epc': biogas_bhkw_epc,
@@ -209,24 +222,46 @@ def create_energysystem(energysystem, parameters, loopi,
     # Create biogas bus for biogas
     bbiogas = solph.Bus(label='region_'+str(loopi)+'_bbiogas')
 
-    # Create storage transformer object for storage
-    solph.Storage(
-        label='region_'+str(loopi)+'_bat',
-        inputs={bel: solph.Flow(variable_costs=0)},
-        outputs={bel: solph.Flow(variable_costs=0)},
-        capacity_loss=parameters[
-            'tech_parameter'].loc['storage']['cap_loss'],
-        nominal_input_capacity_ratio=parameters[
-            'tech_parameter'].loc['storage']['c_rate'],
-        nominal_output_capacity_ratio=parameters[
-            'tech_parameter'].loc['storage']['c_rate'],
-        inflow_conversion_factor=parameters[
-            'tech_parameter'].loc['storage']['eta_in'],
-        outflow_conversion_factor=parameters[
-            'tech_parameter'].loc['storage']['eta_out'],
-        fixed_costs=parameters[
-            'cost_parameter'].loc['storage']['opex_fix'],
-        investment=solph.Investment(ep_costs=parameters['storage_epc']))
+    if arguments['--storage-power']:
+        # Create storage transformer object for storage
+        solph.Storage(
+            label='region_'+str(loopi)+'_bat',
+            inputs={bel: solph.Flow(investment=solph.Investment(
+                ep_costs=parameters['storage_power_epc']), variable_costs=0)},
+            outputs={bel: solph.Flow(variable_costs=0)},
+            capacity_loss=parameters[
+                'tech_parameter'].loc['storage']['cap_loss'],
+            nominal_input_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            nominal_output_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            inflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_in'],
+            outflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_out'],
+            fixed_costs=parameters[
+                'cost_parameter'].loc['storage']['opex_fix'],
+            investment=solph.Investment(ep_costs=parameters['storage_epc']))
+
+    else:
+        # Create storage transformer object for storage
+        solph.Storage(
+            label='region_'+str(loopi)+'_bat',
+            inputs={bel: solph.Flow(variable_costs=0)},
+            outputs={bel: solph.Flow(variable_costs=0)},
+            capacity_loss=parameters[
+                'tech_parameter'].loc['storage']['cap_loss'],
+            nominal_input_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            nominal_output_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            inflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_in'],
+            outflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_out'],
+            fixed_costs=parameters[
+                'cost_parameter'].loc['storage']['opex_fix'],
+            investment=solph.Investment(ep_costs=parameters['storage_epc']))
 
     # Create commodity object for import electricity resource
     if arguments['--costopt']:
