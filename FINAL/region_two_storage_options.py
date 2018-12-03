@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ''' Example for simulating wind-pv-battery systems in regions.
+    Including two storage options (short-term and long-term storage).
 
 Usage: example_region.py [options]
 
@@ -88,22 +89,22 @@ def read_and_calculate_parameters(**arguments):
 
     # Read parameter csv files
     region_parameter = pd.read_csv(
-        'scenarios_region/' + arguments['--scenario'] +
+        'scenarios/' + arguments['--scenario'] +
         '_region_parameter.csv',
         delimiter=',', index_col=0)
 
     cost_parameter = pd.read_csv(
-        'scenarios_region/' + arguments['--scenario'] + '_cost_parameter.csv',
+        'scenarios/' + arguments['--scenario'] + '_cost_parameter.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        'scenarios_region/' + arguments['--scenario'] + '_tech_parameter.csv',
+        'scenarios/' + arguments['--scenario'] + '_tech_parameter.csv',
         delimiter=',', index_col=0)
 
-    data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
-    data_weather = pd.read_csv('../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
+    data = pd.read_csv("data/storage_invest.csv", sep=',')
+    data_weather = pd.read_csv('data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
     if arguments['--lkos']:
-        data_load = pd.read_csv('../data/Lastprofil_LKOS_MW_1h.csv', sep=',')
+        data_load = pd.read_csv('data/Lastprofil_LKOS_MW_1h.csv', sep=',')
         data_load = data_load['demand_el'] * 1e3  # demand in kW
     elif arguments['--bdew']:
         e_slp = bdew.ElecSlp(int(arguments['--year']))
@@ -119,12 +120,19 @@ def read_and_calculate_parameters(**arguments):
     data_pv = data_weather['pv']
 
     # Calculate ep_costs from capex
-    storage_capex = cost_parameter.loc['storage']['capex']
-    storage_lifetime = cost_parameter.loc['storage']['lifetime']
-    storage_wacc = cost_parameter.loc['storage']['wacc']
-    storage_epc = storage_capex * (storage_wacc * (1 + storage_wacc) **
-                                   storage_lifetime) / ((1 + storage_wacc) **
-                                                        storage_lifetime - 1)
+    storage_short_capex = cost_parameter.loc['storage_short']['capex']
+    storage_short_lifetime = cost_parameter.loc['storage_short']['lifetime']
+    storage_short_wacc = cost_parameter.loc['storage_short']['wacc']
+    storage_short_epc = storage_short_capex * (storage_short_wacc * (1 + storage_short_wacc) **
+                                   storage_short_lifetime) / ((1 + storage_short_wacc) **
+                                                        storage_short_lifetime - 1)
+
+    storage_long_capex = cost_parameter.loc['storage_long']['capex']
+    storage_long_lifetime = cost_parameter.loc['storage_long']['lifetime']
+    storage_long_wacc = cost_parameter.loc['storage_long']['wacc']
+    storage_long_epc = storage_long_capex * (storage_long_wacc * (1 + storage_long_wacc) **
+                                   storage_long_lifetime) / ((1 + storage_long_wacc) **
+                                                        storage_long_lifetime - 1)
 
     wind_capex = cost_parameter.loc['wind']['capex']
     wind_lifetime = cost_parameter.loc['wind']['lifetime']
@@ -174,7 +182,8 @@ def read_and_calculate_parameters(**arguments):
     parameters = {'region_parameter': region_parameter,
                   'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
-                  'storage_epc': storage_epc,
+                  'storage_short_epc': storage_short_epc,
+                  'storage_long_epc': storage_long_epc,
                   'wind_epc': wind_epc,
                   'pv_epc': pv_epc,
                   'biogas_bhkw_epc': biogas_bhkw_epc,
@@ -182,7 +191,6 @@ def read_and_calculate_parameters(**arguments):
                   'data_load': data_load,
                   'data_wind': data_wind,
                   'data_pv': data_pv,
-                  'storage_epc': storage_epc,
                   'grid_share': grid_share,
                   'regions': regions,
                   'combinations': combinations,
@@ -212,22 +220,36 @@ def create_energysystem(energysystem, parameters, loopi,
 
     # Create storage transformer object for storage
     solph.Storage(
-        label='region_'+str(loopi)+'_bat',
+        label='region_'+str(loopi)+'_bat_short',
         inputs={bel: solph.Flow(variable_costs=0)},
         outputs={bel: solph.Flow(variable_costs=0)},
         capacity_loss=parameters[
-            'tech_parameter'].loc['storage']['cap_loss'],
+            'tech_parameter'].loc['storage_short']['cap_loss'],
         nominal_input_capacity_ratio=parameters[
-            'tech_parameter'].loc['storage']['c_rate'],
+            'tech_parameter'].loc['storage_short']['c_rate'],
         nominal_output_capacity_ratio=parameters[
-            'tech_parameter'].loc['storage']['c_rate'],
+            'tech_parameter'].loc['storage_short']['c_rate'],
         inflow_conversion_factor=parameters[
-            'tech_parameter'].loc['storage']['eta_in'],
+            'tech_parameter'].loc['storage_short']['eta_in'],
         outflow_conversion_factor=parameters[
-            'tech_parameter'].loc['storage']['eta_out'],
+            'tech_parameter'].loc['storage_short']['eta_out'],
         fixed_costs=parameters[
-            'cost_parameter'].loc['storage']['opex_fix'],
-        investment=solph.Investment(ep_costs=parameters['storage_epc']))
+            'cost_parameter'].loc['storage_short']['opex_fix'],
+        investment=solph.Investment(ep_costs=parameters['storage_short_epc']))
+
+    solph.Storage(
+        label='region_'+str(loopi)+'_bat_long',
+        inputs={bel: solph.Flow(variable_costs=0)},
+        outputs={bel: solph.Flow(variable_costs=0)},
+        capacity_loss=parameters[
+            'tech_parameter'].loc['storage_long']['cap_loss'],
+        inflow_conversion_factor=parameters[
+            'tech_parameter'].loc['storage_long']['eta_in'],
+        outflow_conversion_factor=parameters[
+            'tech_parameter'].loc['storage_long']['eta_out'],
+        fixed_costs=parameters[
+            'cost_parameter'].loc['storage_long']['opex_fix'],
+        investment=solph.Investment(ep_costs=parameters['storage_long_epc']))
 
     # Create commodity object for import electricity resource
     if arguments['--costopt']:
@@ -474,7 +496,9 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
 
     bel = energysystem.groups['region_'+str(loopi)+'_bel']
 
-    storage = energysystem.groups['region_'+str(loopi)+'_bat']
+    storage_short = energysystem.groups['region_'+str(loopi)+'_bat_short']
+
+    storage_long = energysystem.groups['region_'+str(loopi)+'_bat_long']
 
     wind_inst = energysystem.groups['region_'+str(loopi)+'_wind']
 
@@ -522,8 +546,10 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
     results_dc['check_ssr_'+str(loopi)] = 1 - (grid.sum() / demand.sum())
     results_dc['wind_max_'+str(loopi)] = float(wind.max())
     results_dc['pv_max_'+str(loopi)] = float(pv.max())
-    results_dc['storage_cap_'+str(loopi)] = energysystem.results[
-        storage][storage].invest
+    results_dc['storage_short_cap_'+str(loopi)] = energysystem.results[
+        storage_short][storage_short].invest
+    results_dc['storage_long_cap_'+str(loopi)] = energysystem.results[
+        storage_long][storage_long].invest
     results_dc['objective'] = energysystem.results.objective
 
     if arguments['--costopt']:
