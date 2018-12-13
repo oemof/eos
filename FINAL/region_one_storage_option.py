@@ -89,16 +89,16 @@ def read_and_calculate_parameters(**arguments):
 
     # Read parameter csv files
     region_parameter = pd.read_csv(
-        'scenarios_region/' + arguments['--scenario'] +
+        'scenarios/region/' + arguments['--scenario'] +
         '_region_parameter.csv',
         delimiter=',', index_col=0)
 
     cost_parameter = pd.read_csv(
-        'scenarios_region/' + arguments['--scenario'] + '_cost_parameter.csv',
+        'scenarios/region/' + arguments['--scenario'] + '_cost_parameter.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        'scenarios_region/' + arguments['--scenario'] + '_tech_parameter.csv',
+        'scenarios/region/' + arguments['--scenario'] + '_tech_parameter.csv',
         delimiter=',', index_col=0)
 
     data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
@@ -529,6 +529,10 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
                             date_from=year+'-01-01 00:00:00',
                             date_to=year+'-12-31 23:00:00')
 
+    storage_in = myresults.slice_by(obj_label='region_'+str(loopi)+'_bat',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00')
+
     if (arguments['--biogas']) or (arguments['--biogas-costopt']):
         biogas_bhkw = myresults.slice_by(obj_label='region_'+str(loopi)+'_biogas_bhkw',
                                          date_from=year+'-01-01 00:00:00',
@@ -558,6 +562,8 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
     results_dc['pv_max_'+str(loopi)] = float(pv.max())
     results_dc['storage_cap_'+str(loopi)] = energysystem.results[
         storage][storage].invest
+    results_dc['storage_in_ts_'+str(loopi)] = storage_in
+    # results_dc['storage_out_ts_'+str(loopi)] = storage_out
     results_dc['objective'] = energysystem.results.objective
 
     if arguments['--costopt']:
