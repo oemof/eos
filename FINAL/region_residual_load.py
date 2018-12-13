@@ -61,7 +61,7 @@ import os
 # from oemof.db import coastdat
 # from feedinlib import powerplants as plants
 from demandlib import bdew as bdew
-import carpet_plot
+from helper import carpet_plot
 
 try:
     from docopt import docopt
@@ -176,6 +176,10 @@ def main(**arguments):
         bio_ts_MW = np.ones(8760)*bio
         # bio_ts_MW = np.ones(8785)*bio
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW + bio_ts_MW)
+
+        print(max(demand_ts_MW))
+        print(min(demand_ts_MW))
+        print(demand_ts_MW.mean())
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
@@ -385,6 +389,10 @@ def main(**arguments):
         bio_ts_MW = np.ones(8760)*bio
         # bio_ts_MW = np.ones(8785)*bio
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW + bio_ts_MW)
+
+        print(max(demand_ts_MW))
+        print(min(demand_ts_MW))
+        print(demand_ts_MW.mean())
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
