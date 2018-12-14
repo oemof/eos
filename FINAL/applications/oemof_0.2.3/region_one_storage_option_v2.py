@@ -88,22 +88,22 @@ def read_and_calculate_parameters(**arguments):
 
     # Read parameter csv files
     region_parameter = pd.read_csv(
-        'scenarios/region/' + arguments['--scenario'] +
+        '../../scenarios/region/' + arguments['--scenario'] +
         '_region_parameter.csv',
         delimiter=',', index_col=0)
 
     cost_parameter = pd.read_csv(
-        'scenarios/region/' + arguments['--scenario'] + '_cost_parameter.csv',
+        '../../scenarios/region/' + arguments['--scenario'] + '_cost_parameter.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        'scenarios/region/' + arguments['--scenario'] + '_tech_parameter.csv',
+        '../../scenarios/region/' + arguments['--scenario'] + '_tech_parameter.csv',
         delimiter=',', index_col=0)
 
-    data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
-    data_weather = pd.read_csv('../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
+    data = pd.read_csv("../../data/storage_invest.csv", sep=',')
+    data_weather = pd.read_csv('../../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
     if arguments['--lkos']:
-        data_load = pd.read_csv('../data/Lastprofil_LKOS_MW_1h.csv', sep=',')
+        data_load = pd.read_csv('../../data/Lastprofil_LKOS_MW_1h.csv', sep=',')
         data_load = data_load['demand_el'] * 1e3  # demand in kW
     elif arguments['--bdew']:
         e_slp = bdew.ElecSlp(int(arguments['--year']))

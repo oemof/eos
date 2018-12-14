@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 ''' Example for simulating wind-pv-battery systems in regions.
-    Including two storage options (short-term and long-term storage).
 
 Usage: example_region.py [options]
 
@@ -20,6 +19,7 @@ Options:
                            [default: 2005]
       --num-regions=NUM    Number of regions. [default: 24]
       --multi-regions=NUM  Number of regions to combine each. [default: 1]
+      --storage-power      Take also costs for storage power unit into account.
       --costopt            Cost optimization.
       --biogas             Include biogas potential.
       --biogas-flex        Include biogas as flexible potential.
@@ -89,22 +89,22 @@ def read_and_calculate_parameters(**arguments):
 
     # Read parameter csv files
     region_parameter = pd.read_csv(
-        'scenarios/region/' + arguments['--scenario'] +
+        '../../scenarios/region/' + arguments['--scenario'] +
         '_region_parameter.csv',
         delimiter=',', index_col=0)
 
     cost_parameter = pd.read_csv(
-        'scenarios/region/' + arguments['--scenario'] + '_cost_parameter.csv',
+        '../../scenarios/region/' + arguments['--scenario'] + '_cost_parameter.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        'scenarios/region/' + arguments['--scenario'] + '_tech_parameter.csv',
+        '../../scenarios/region/' + arguments['--scenario'] + '_tech_parameter.csv',
         delimiter=',', index_col=0)
 
-    data = pd.read_csv("data/storage_invest.csv", sep=',')
-    data_weather = pd.read_csv('data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
+    data = pd.read_csv("../../data/storage_invest.csv", sep=',')
+    data_weather = pd.read_csv('../../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')
     if arguments['--lkos']:
-        data_load = pd.read_csv('data/Lastprofil_LKOS_MW_1h.csv', sep=',')
+        data_load = pd.read_csv('../data/Lastprofil_LKOS_MW_1h.csv', sep=',')
         data_load = data_load['demand_el'] * 1e3  # demand in kW
     elif arguments['--bdew']:
         e_slp = bdew.ElecSlp(int(arguments['--year']))
@@ -120,19 +120,23 @@ def read_and_calculate_parameters(**arguments):
     data_pv = data_weather['pv']
 
     # Calculate ep_costs from capex
-    storage_short_capex = cost_parameter.loc['storage_short']['capex']
-    storage_short_lifetime = cost_parameter.loc['storage_short']['lifetime']
-    storage_short_wacc = cost_parameter.loc['storage_short']['wacc']
-    storage_short_epc = storage_short_capex * (storage_short_wacc * (1 + storage_short_wacc) **
-                                   storage_short_lifetime) / ((1 + storage_short_wacc) **
-                                                        storage_short_lifetime - 1)
+    storage_capex = cost_parameter.loc['storage']['capex']
+    storage_lifetime = cost_parameter.loc['storage']['lifetime']
+    storage_wacc = cost_parameter.loc['storage']['wacc']
+    storage_epc = storage_capex * (storage_wacc * (1 + storage_wacc) **
+                                   storage_lifetime) / ((1 + storage_wacc) **
+                                                        storage_lifetime - 1)
 
-    storage_long_capex = cost_parameter.loc['storage_long']['capex']
-    storage_long_lifetime = cost_parameter.loc['storage_long']['lifetime']
-    storage_long_wacc = cost_parameter.loc['storage_long']['wacc']
-    storage_long_epc = storage_long_capex * (storage_long_wacc * (1 + storage_long_wacc) **
-                                   storage_long_lifetime) / ((1 + storage_long_wacc) **
-                                                        storage_long_lifetime - 1)
+    if arguments['--storage-power']:
+        storage_power_capex = cost_parameter.loc['storage_power']['capex']
+        storage_power_lifetime = cost_parameter.loc['storage_power']['lifetime']
+        storage_power_wacc = cost_parameter.loc['storage_power']['wacc']
+        storage_power_epc = storage_power_capex * (storage_power_wacc * (1 + storage_power_wacc) **
+                                       storage_power_lifetime) / ((1 + storage_power_wacc) **
+                                                            storage_power_lifetime - 1)
+
+    else:
+        storage_power_epc = 0
 
     wind_capex = cost_parameter.loc['wind']['capex']
     wind_lifetime = cost_parameter.loc['wind']['lifetime']
@@ -182,8 +186,8 @@ def read_and_calculate_parameters(**arguments):
     parameters = {'region_parameter': region_parameter,
                   'cost_parameter': cost_parameter,
                   'tech_parameter': tech_parameter,
-                  'storage_short_epc': storage_short_epc,
-                  'storage_long_epc': storage_long_epc,
+                  'storage_epc': storage_epc,
+                  'storage_power_epc': storage_power_epc,
                   'wind_epc': wind_epc,
                   'pv_epc': pv_epc,
                   'biogas_bhkw_epc': biogas_bhkw_epc,
@@ -218,37 +222,50 @@ def create_energysystem(energysystem, parameters, loopi,
     # Create biogas bus for biogas
     bbiogas = solph.Bus(label='region_'+str(loopi)+'_bbiogas')
 
-    # adding the buses to the energy system
-    energysystem.add(bel, bbiogas)
+    if arguments['--storage-power']:
+        # Create storage transformer object for storage
+        solph.Storage(
+            label='region_'+str(loopi)+'_bat',
+            inputs={bel: solph.Flow(investment=solph.Investment(
+                ep_costs=parameters['storage_power_epc']), variable_costs=0)},
+            outputs={bel: solph.Flow(variable_costs=0)},
+            capacity_loss=parameters[
+                'tech_parameter'].loc['storage']['cap_loss'],
+            nominal_input_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            nominal_output_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            inflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_in'],
+            outflow_conversion_factor=parameters[
+               'tech_parameter'].loc['storage']['eta_out'],
+            fixed_costs=parameters[
+                'cost_parameter'].loc['storage']['opex_fix'],
+            investment=solph.Investment(ep_costs=parameters['storage_epc']))
 
-    # Create storage transformer object for storage
-    energysystem.add(solph.components.GenericStorage(
-        label='region_'+str(loopi)+'_bat_short',
-        inputs={bel: solph.Flow(variable_costs=0)},
-        outputs={bel: solph.Flow(variable_costs=0)},
-        capacity_loss=parameters[
-            'tech_parameter'].loc['storage_short']['cap_loss'],
-        nominal_input_capacity_ratio=parameters[
-            'tech_parameter'].loc['storage_short']['c_rate'],
-        nominal_output_capacity_ratio=parameters[
-            'tech_parameter'].loc['storage_short']['c_rate'],
-        inflow_conversion_factor=parameters[
-            'tech_parameter'].loc['storage_short']['eta_in'],
-        outflow_conversion_factor=parameters[
-            'tech_parameter'].loc['storage_short']['eta_out'],
-        investment=solph.Investment(ep_costs=parameters['storage_short_epc']+parameters['cost_parameter'].loc['storage_short']['opex_fix'])))
-
-    energysystem.add(solph.components.GenericStorage(
-        label='region_'+str(loopi)+'_bat_long',
-        inputs={bel: solph.Flow(variable_costs=0)},
-        outputs={bel: solph.Flow(variable_costs=0)},
-        capacity_loss=parameters[
-            'tech_parameter'].loc['storage_long']['cap_loss'],
-        inflow_conversion_factor=parameters[
-            'tech_parameter'].loc['storage_long']['eta_in'],
-        outflow_conversion_factor=parameters[
-            'tech_parameter'].loc['storage_long']['eta_out'],
-        investment=solph.Investment(ep_costs=parameters['storage_long_epc']+parameters['cost_parameter'].loc['storage_long']['opex_fix'])))
+    else:
+        # Create storage transformer object for storage
+        solph.Storage(
+            label='region_'+str(loopi)+'_bat',
+            inputs={bel: solph.Flow(variable_costs=0)},
+            outputs={bel: solph.Flow(variable_costs=0)},
+            capacity_loss=parameters[
+                'tech_parameter'].loc['storage']['cap_loss'],
+            nominal_input_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            nominal_output_capacity_ratio=parameters[
+                'tech_parameter'].loc['storage']['c_rate'],
+            inflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_in'],
+            outflow_conversion_factor=parameters[
+                'tech_parameter'].loc['storage']['eta_out'],
+            capacity_min=parameters[
+               'tech_parameter'].loc['storage']['capacity_min'],
+            capacity_max=parameters[
+               'tech_parameter'].loc['storage']['capacity_max'],
+            fixed_costs=parameters[
+                'cost_parameter'].loc['storage']['opex_fix'],
+            investment=solph.Investment(ep_costs=parameters['storage_epc']))
 
     # Create commodity object for import electricity resource
     if arguments['--costopt']:
@@ -258,19 +275,19 @@ def create_energysystem(energysystem, parameters, loopi,
                                ['annual_demand_GWh'][str(loopi)]) *
                                1e6 * parameters['grid_share'])
 
-            energysystem.add(solph.Source(
+            solph.Source(
                     label='region_'+str(loopi)+'_gridsource',
                     outputs={bel: solph.Flow(
                         nominal_value=gridsource_nv,
-                        summed_max=1)}))
+                        summed_max=1)})
                         # summed_max=1,
                         # min=0.0)})
         else:
-            energysystem.add(solph.Source(
+            solph.Source(
                     label='region_'+str(loopi)+'_gridsource',
                     outputs={bel: solph.Flow(
                         variable_costs=parameters[
-                            'cost_parameter'].loc['grid']['opex_var'])}))
+                            'cost_parameter'].loc['grid']['opex_var'])})
                             # 'cost_parameter'].loc['grid']['opex_var'],
                             # min=0.0)})
 
@@ -294,11 +311,11 @@ def create_energysystem(energysystem, parameters, loopi,
                                ['annual_demand_GWh'][str(loopi)]) *
                                1e6 * parameters['grid_share'])
 
-        energysystem.add(solph.Source(
+        solph.Source(
             label='region_'+str(loopi)+'_gridsource',
             outputs={bel: solph.Flow(
                 nominal_value=gridsource_nv,
-                summed_max=1)}))
+                summed_max=1)})
                 # summed_min=1,
                 # max=0.0001)})
 
@@ -306,19 +323,20 @@ def create_energysystem(energysystem, parameters, loopi,
         print('Something is missing')
 
     # Create excess component to allow overproduction
-    energysystem.add(solph.Sink(label='region_'+str(loopi)+'_excess',
-               inputs={bel: solph.Flow()}))
+    solph.Sink(label='region_'+str(loopi)+'_excess',
+               inputs={bel: solph.Flow()})
 
     # Create fixed source object for wind
 
     if arguments['--costopt']:
-        energysystem.add(solph.Source(label='region_'+str(loopi)+'_wind',
+        solph.Source(label='region_'+str(loopi)+'_wind',
                      outputs={bel: solph.Flow(
                               actual_value=parameters['data_wind'],
                               fixed=True,
-
+                              fixed_costs=parameters[
+                                  'cost_parameter'].loc['wind']['opex_fix'],
                               investment=solph.Investment(
-                                  ep_costs=parameters['wind_epc']+parameters['cost_parameter'].loc['wind']['opex_fix']))}))
+                                  ep_costs=parameters['wind_epc']))})
 
     else:
         if int(arguments['--multi-regions']) == 2:
@@ -336,20 +354,22 @@ def create_energysystem(energysystem, parameters, loopi,
             wind_nv = float(parameters['region_parameter'].
                             loc['wind_MW'][str(loopi)]) * 1e3
 
-        energysystem.add(solph.Source(label='region_'+str(loopi)+'_wind',
+        solph.Source(label='region_'+str(loopi)+'_wind',
                      outputs={bel: solph.Flow(
                               actual_value=parameters['data_wind'],
                               nominal_value=wind_nv,
-                              fixed=True)}))
+                              fixed=True)})
 
     # Create fixed source object for pv
     if arguments['--costopt']:
-        energysystem.add(solph.Source(label='region_'+str(loopi)+'_pv',
+        solph.Source(label='region_'+str(loopi)+'_pv',
                          outputs={bel: solph.Flow(
                               actual_value=parameters['data_pv'],
                               fixed=True,
+                              fixed_costs=parameters[
+                                  'cost_parameter'].loc['pv']['opex_fix'],
                               investment=solph.Investment(
-                                  ep_costs=parameters['pv_epc']+parameters['cost_parameter'].loc['pv']['opex_fix']))}))
+                                  ep_costs=parameters['pv_epc']))})
 
     else:
         if int(arguments['--multi-regions']) == 2:
@@ -367,11 +387,11 @@ def create_energysystem(energysystem, parameters, loopi,
             pv_nv = float(parameters['region_parameter'].
                           loc['pv_MW'][str(loopi)]) * 1e3
 
-        energysystem.add(solph.Source(label='region_'+str(loopi)+'_pv',
+        solph.Source(label='region_'+str(loopi)+'_pv',
                      outputs={bel: solph.Flow(
                               actual_value=parameters['data_pv'],
                               nominal_value=pv_nv,
-                              fixed=True)}))
+                              fixed=True)})
 
     # Create source and transformer object for biogas
     if arguments['--biogas']:
@@ -379,50 +399,51 @@ def create_energysystem(energysystem, parameters, loopi,
         biogas_nv = float(parameters['region_parameter'].
                             loc['biogas_GWh'][str(loopi)]) * 1e6
 
-        energysystem.add(solph.Source(label='region_'+str(loopi)+'_rbiogas',
+        solph.Source(label='region_'+str(loopi)+'_rbiogas',
                 outputs={bbiogas: solph.Flow(
                     nominal_value=biogas_nv,
-                    summed_max=1)}))
+                    summed_max=1)})
 
         if arguments['--biogas-flex']:
 
-            energysystem.add(solph.Transformer(
+            solph.LinearTransformer(
                     label='region_'+str(loopi)+'_biogas_bhkw',
                     inputs={bbiogas: solph.Flow()},
                     outputs={bel: solph.Flow(
                         nominal_value=biogas_nv*0.38/8760*2)},
                         # nominal_value=biogas_nv*0.38/8760*2)},
-                        conversion_factors={bel: 0.38}))
+                        conversion_factors={bel: 0.38})
 
         else:
-            energysystem.add(solph.Transformer(
+            solph.LinearTransformer(
                     label='region_'+str(loopi)+'_biogas_bhkw',
                     inputs={bbiogas: solph.Flow()},
                     outputs={bel: solph.Flow(
                         nominal_value=biogas_nv*0.38/8760)},
                         # nominal_value=biogas_nv*0.38/8760*2)},
-                        conversion_factors={bel: 0.38}))
+                        conversion_factors={bel: 0.38})
 
     if arguments['--biogas-costopt']:
 
         biogas_nv = float(parameters['region_parameter'].
                             loc['biogas_GWh'][str(loopi)]) * 1e6
 
-        energysystem.add(solph.Source(label='region_'+str(loopi)+'_rbiogas',
+        solph.Source(label='region_'+str(loopi)+'_rbiogas',
                 outputs={bbiogas: solph.Flow(
                     nominal_value=biogas_nv,
-                    summed_max=1)}))
+                    summed_max=1)})
 
-        energysystem.add(solph.Transformer(
+        solph.LinearTransformer(
                 label='region_'+str(loopi)+'_biogas_bhkw',
                 inputs={bbiogas: solph.Flow()},
                 outputs={bel: solph.Flow(
-
+                             fixed_costs=parameters[
+                                   'cost_parameter'].loc['biogas_bhkw']['opex_fix'],
                              variable_costs=parameters[
                                    'cost_parameter'].loc['biogas_bhkw']['opex_var'],
                              investment=solph.Investment(
-                                   ep_costs=parameters['biogas_bhkw_epc']+parameters['cost_parameter'].loc['biogas_bhkw']['opex_fix']))},
-                             conversion_factors={bel: 0.38}))
+                                   ep_costs=parameters['biogas_bhkw_epc']))},
+                             conversion_factors={bel: 0.38})
 
         # if int(arguments['--multi-regions']) == 2:
         #     biogas_nv = (float(parameters['region_parameter'].
@@ -469,7 +490,7 @@ def create_energysystem(energysystem, parameters, loopi,
 
     logging.info('Optimise the energy system')
 
-    om = solph.Model(energysystem)
+    om = solph.OperationalModel(energysystem)
 
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',
@@ -491,9 +512,7 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
 
     bel = energysystem.groups['region_'+str(loopi)+'_bel']
 
-    storage_short = energysystem.groups['region_'+str(loopi)+'_bat_short']
-
-    storage_long = energysystem.groups['region_'+str(loopi)+'_bat_long']
+    storage = energysystem.groups['region_'+str(loopi)+'_bat']
 
     wind_inst = energysystem.groups['region_'+str(loopi)+'_wind']
 
@@ -511,6 +530,10 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
                               date_to=year+'-12-31 23:00:00')
 
     pv = myresults.slice_by(obj_label='region_'+str(loopi)+'_pv',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00')
+
+    storage_in = myresults.slice_by(obj_label='region_'+str(loopi)+'_bat',
                             date_from=year+'-01-01 00:00:00',
                             date_to=year+'-12-31 23:00:00')
 
@@ -541,10 +564,10 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
     results_dc['check_ssr_'+str(loopi)] = 1 - (grid.sum() / demand.sum())
     results_dc['wind_max_'+str(loopi)] = float(wind.max())
     results_dc['pv_max_'+str(loopi)] = float(pv.max())
-    results_dc['storage_short_cap_'+str(loopi)] = energysystem.results[
-        storage_short][storage_short].invest
-    results_dc['storage_long_cap_'+str(loopi)] = energysystem.results[
-        storage_long][storage_long].invest
+    results_dc['storage_cap_'+str(loopi)] = energysystem.results[
+        storage][storage].invest
+    results_dc['storage_in_ts_'+str(loopi)] = storage_in
+    # results_dc['storage_out_ts_'+str(loopi)] = storage_out
     results_dc['objective'] = energysystem.results.objective
 
     if arguments['--costopt']:
