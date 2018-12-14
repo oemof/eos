@@ -238,7 +238,7 @@ def create_energysystem(energysystem, parameters, loopi,
             inflow_conversion_factor=parameters[
                 'tech_parameter'].loc['storage']['eta_in'],
             outflow_conversion_factor=parameters[
-                'tech_parameter'].loc['storage']['eta_out'],
+               'tech_parameter'].loc['storage']['eta_out'],
             fixed_costs=parameters[
                 'cost_parameter'].loc['storage']['opex_fix'],
             investment=solph.Investment(ep_costs=parameters['storage_epc']))
@@ -259,6 +259,10 @@ def create_energysystem(energysystem, parameters, loopi,
                 'tech_parameter'].loc['storage']['eta_in'],
             outflow_conversion_factor=parameters[
                 'tech_parameter'].loc['storage']['eta_out'],
+            capacity_min=parameters[
+               'tech_parameter'].loc['storage']['capacity_min'],
+            capacity_max=parameters[
+               'tech_parameter'].loc['storage']['capacity_max'],
             fixed_costs=parameters[
                 'cost_parameter'].loc['storage']['opex_fix'],
             investment=solph.Investment(ep_costs=parameters['storage_epc']))
