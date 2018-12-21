@@ -500,123 +500,119 @@ def get_result_dict(energysystem, om, parameters, loopi, **arguments):
     logging.info('Check the results')
 
     year = arguments['--year']
+    results_dc = {}
 
     energysystem.results['main'] = outputlib.processing.results(om)
     energysystem.results['meta'] = outputlib.processing.meta_results(om)
 
     # Convert keys to string and print all keys
-    string_results = outputlib.views.convert_keys_to_strings(energysystem.results['main'])
-    print(string_results.keys())
-
     # Collect all the flows into and out of the busses
-    node_results_bel = outputlib.views.node(energysystem.results['main'], 'bel')
-    node_results_bbiogas = outputlib.views.node(energysystem.results['main'], 'bbiogas')
+    # string_results = outputlib.views.convert_keys_to_strings(energysystem.results['main'])
+    # print(string_results.keys())
 
-    df = node_results_bel['sequences']
+    # print(energysystem.results['meta'])
 
-    # results = energysystem.results['main']
+    results = energysystem.results['main']
+    bel = energysystem.groups['region_'+str(loopi)+'_bel']
+    demand = energysystem.groups['region_'+str(loopi)+'_demand']
+    wind = energysystem.groups['region_'+str(loopi)+'_wind']
+    pv = energysystem.groups['region_'+str(loopi)+'_pv']
+    gridsource = energysystem.groups['region_'+str(loopi)+'_gridsource']
+    excess = energysystem.groups['region_'+str(loopi)+'_excess']
+    storage = energysystem.groups['region_'+str(loopi)+'_bat']
 
-    # storage = energysystem.groups['region_'+str(loopi)+'_bat']
-    # results[(storage, None)]['scalars']['invest']
+    if (arguments['--biogas']) or (arguments['--biogas-costopt']):
+        biogas_bhkw = energysystem.groups['region_'+str(loopi)+'_biogas_bhkw']
 
-    # if arguments['--storage-power']:
-    #     results[(storage, None)]['scalars']['invest']
-    #     results[(bel, storage)]['scalars']['invest']
-    #     results[(storage, bel)]['scalars']['invest']
+    # ['region_'+str(loopi)+'_biogas_bhkw']
+    # print(results[(storage, None)]['sequences'][year+'-01-01 00:00:00':year+'-12-31 23:00:00'])
+    # custom_storage = outputlib.views.node(results, 'storage')
 
-    # # results_dc = {}
-    # # myresults = outputlib.DataFramePlot(energy_system=energysystem)
+    # Installed capacities
+    # --------------------------------------------------------------------------------
+    storage_inst_cap = results[(storage, None)]['scalars']['invest']
 
-    # bel = energysystem.groups['region_'+str(loopi)+'_bel']
+    if arguments['--costopt']:
+         wind_inst = (results[wind, bel])['scalars']['invest']
+         pv_inst = (results[pv, bel])['scalars']['invest']
 
-    # wind_inst = energysystem.groups['region_'+str(loopi)+'_wind']
+    if arguments['--storage-power']:
+         storage_inst_in = results[(bel, storage)]['scalars']['invest']
+         storage_inst_out = results[(storage, bel)]['scalars']['invest']
 
-    # pv_inst = energysystem.groups['region_'+str(loopi)+'_pv']
+    if arguments['--biogas-costopt']:
+        biogas_bhkw_inst = results[(biogas_bhkw, bel)]['scalars']['invest']
 
-    # if arguments['--biogas-costopt']:
-    #     biogas_bhkw_inst = energysystem.groups['region_'+str(loopi)+'_biogas_bhkw']
+    # --------------------------------------------------------------------------------
 
-    # demand = myresults.slice_by(obj_label='region_'+str(loopi)+'_demand',
-    #                             date_from=year+'-01-01 00:00:00',
-    #                             date_to=year+'-12-31 23:00:00')
+    # Sequences
+    # --------------------------------------------------------------------------------
+    demand = results[(bel, demand)]['sequences']
+    wind = results[(wind, bel)]['sequences']
+    pv = results[(pv, bel)]['sequences']
+    gridsource = results[(gridsource, bel)]['sequences']
+    excess = results[(bel, excess)]['sequences']
+    storage_in = results[(bel, storage)]['sequences']
+    storage_out = results[(storage, bel)]['sequences']
 
-    # wind = myresults.slice_by(obj_label='region_'+str(loopi)+'_wind',
-    #                           date_from=year+'-01-01 00:00:00',
-    #                           date_to=year+'-12-31 23:00:00')
+    if (arguments['--biogas']) or (arguments['--biogas-costopt']):
+        biogas_bhkw = results[(biogas_bhkw, bel)]['sequences']
 
-    # pv = myresults.slice_by(obj_label='region_'+str(loopi)+'_pv',
-    #                         date_from=year+'-01-01 00:00:00',
-    #                         date_to=year+'-12-31 23:00:00')
+    # --------------------------------------------------------------------------------
 
-    # storage_in = myresults.slice_by(obj_label='region_'+str(loopi)+'_bat',
-    #                         date_from=year+'-01-01 00:00:00',
-    #                         date_to=year+'-12-31 23:00:00')
+    # Write to dictionary - Sequences and postprocessings from sequences
+    # --------------------------------------------------------------------------------
+    results_dc['demand_'+str(loopi)] = float(demand.sum())
+    results_dc['demand_ts_'+str(loopi)] = demand
+    results_dc['wind_ts_'+str(loopi)] = wind
+    results_dc['pv_ts_'+str(loopi)] = pv
+    results_dc['wind_max_'+str(loopi)] = float(wind.max())
+    results_dc['pv_max_'+str(loopi)] = float(pv.max())
+    results_dc['grid_ts_'+str(loopi)] = gridsource
+    results_dc['grid_'+str(loopi)] = float(gridsource.sum())
+    results_dc['check_ssr_'+str(loopi)] = 1 - (gridsource.sum() / demand.sum())
+    results_dc['excess_ts_'+str(loopi)] = excess
+    results_dc['excess_'+str(loopi)] = float(excess.sum())
+    results_dc['storage_in_ts_'+str(loopi)] = storage_in
+    results_dc['storage_out_ts_'+str(loopi)] = storage_out
+    results_dc['storage_in_max_'+str(loopi)] = float(storage_in.max())
+    results_dc['storage_out_max_'+str(loopi)] = float(storage_out.max())
 
-    # if (arguments['--biogas']) or (arguments['--biogas-costopt']):
-    #     biogas_bhkw = myresults.slice_by(obj_label='region_'+str(loopi)+'_biogas_bhkw',
-    #                                      date_from=year+'-01-01 00:00:00',
-    #                                      date_to=year+'-12-31 23:00:00')
+    # Write to dictionary - Scalars
+    # --------------------------------------------------------------------------------
+    results_dc['storage_cap_'+str(loopi)] = storage_inst_cap
+    results_dc['objective'] = energysystem.results['meta']['objective']
 
-    # excess = myresults.slice_by(obj_label='region_'+str(loopi)+'_excess',
-    #                             date_from=year+'-01-01 00:00:00',
-    #                             date_to=year+'-12-31 23:00:00')
+    if arguments['--costopt']:
+        results_dc['wind_inst_'+str(loopi)] = wind_inst
+        results_dc['pv_inst_'+str(loopi)] = pv_inst
 
-    # grid = myresults.slice_by(obj_label='region_'+str(loopi)+'_gridsource',
-    #                               date_from=year+'-01-01 00:00:00',
-    #                               date_to=year+'-12-31 23:00:00')
+    if arguments['--storage-power']:
+        results_dc['storage_inst_in_'+str(loopi)] = storage_inst_in
+        results_dc['storage_inst_out_'+str(loopi)] = storage_inst_out
 
-    # if (arguments['--biogas']) or (arguments['--biogas-costopt']):
-    #     results_dc['biogas_bhkw_ts_'+str(loopi)] = biogas_bhkw
+    if arguments['--biogas-costopt']:
+        results_dc['biogas_bhkw_inst_'+str(loopi)] = energysystem.results[biogas_bhkw_inst][bel].invest
 
-    # results_dc['demand_'+str(loopi)] = float(demand.sum())
-    # results_dc['demand_ts_'+str(loopi)] = demand
-    # results_dc['grid_'+str(loopi)] = float(grid.sum())
-    # results_dc['grid_ts_'+str(loopi)] = grid
-    # results_dc['excess_'+str(loopi)] = float(excess.sum())
-    # results_dc['excess_ts_'+str(loopi)] = excess
-    # results_dc['wind_ts_'+str(loopi)] = wind
-    # results_dc['pv_ts_'+str(loopi)] = pv
-    # results_dc['check_ssr_'+str(loopi)] = 1 - (grid.sum() / demand.sum())
-    # results_dc['wind_max_'+str(loopi)] = float(wind.max())
-    # results_dc['pv_max_'+str(loopi)] = float(pv.max())
-    # results_dc['storage_cap_'+str(loopi)] = energysystem.results[
-    #     storage][storage].invest
-    # results_dc['storage_in_ts_'+str(loopi)] = storage_in
-    # # results_dc['storage_out_ts_'+str(loopi)] = storage_out
-    # results_dc['objective'] = energysystem.results.objective
+    if (arguments['--biogas']) or (arguments['--biogas-costopt']):
+        results_dc['biogas_bhkw_ts_'+str(loopi)] = biogas_bhkw
 
-    # if arguments['--costopt']:
-    #     results_dc['wind_inst_'+str(loopi)] = energysystem.results[wind_inst][bel].invest
-    #     results_dc['pv_inst_'+str(loopi)] = energysystem.results[pv_inst][bel].invest
+    # --------------------------------------------------------------------------------
 
-    # if arguments['--biogas-costopt']:
-    #     results_dc['biogas_bhkw_inst_'+str(loopi)] = energysystem.results[biogas_bhkw_inst][bel].invest
-
-    # if arguments['--write-results']:
-    #     x = list(results_dc.keys())
-    #     y = list(results_dc.values())
-    #     f = open(
-    #         'data/'+arguments['--scenario']+'_results.csv',
-    #         'w', newline='')
-    #     w = csv.writer(f, delimiter=';')
-    #     w.writerow(x)
-    #     w.writerow(y)
-    #     f.close
-
-    #     if arguments['--ssr']:
-    #         pickle.dump(results_dc, open('../results/region_results_dc_' +
-    #             arguments['--scenario'] + '_' +
-    #             arguments['--year'] + '_' +
-    #             arguments['--ssr'] + '_' +
-    #             str(loopi) + '_' +
-    #             '.p', "wb"))
-    #     else:
-    #         pickle.dump(results_dc, open('../results/region_results_dc_' +
-    #             arguments['--scenario'] + '_' +
-    #             arguments['--year'] + '_' +
-    #             str(loopi) + '_' +
-    #             '.p', "wb"))
-    # # pickle.dump(myresults, open("save_myresults.p", "wb"))
+    if arguments['--write-results']:
+        if arguments['--ssr']:
+            pickle.dump(results_dc, open('../../results/region_results_dc_' +
+                arguments['--scenario'] + '_' +
+                arguments['--year'] + '_' +
+                arguments['--ssr'] + '_' +
+                str(loopi) + '_' +
+                '.p', "wb"))
+        else:
+            pickle.dump(results_dc, open('../../results/region_results_dc_' +
+                arguments['--scenario'] + '_' +
+                arguments['--year'] + '_' +
+                str(loopi) + '_' +
+                '.p', "wb"))
 
     return(results_dc)
 
