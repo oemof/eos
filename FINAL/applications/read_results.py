@@ -46,8 +46,8 @@ class System:
         #                             str(arguments['--ssr']) + '_1_' +
         #                            '.p')
 
-        results = pd.read_pickle('../results/results/' +
-                                   'region_results_dc_landkreis_osnabrueck_2050_' + str(arguments['--year']) + '_' +
+        results = pd.read_pickle('../results/' +
+                                   'region_results_dc_total_region_2050_' + str(arguments['--year']) + '_' +
                                     str(arguments['--ssr']) + '_1_' +
                                    '.p')
 
@@ -72,23 +72,25 @@ if __name__ == '__main__':
     sys = System
     results = sys.get_results(arguments)
     number=1
-    print('check_ssr: ', results['check_ssr_'+str(number)])
+    print('pv_max: ', results['pv_max_'+str(number)])
+    # print('pv_inst: ', results['pv_inst_1'])
+    print('wind_max: ', results['wind_max_'+str(number)])
+    # print('wind_inst: ', results['wind_inst_1'])
     print('demand: ', results['demand_'+str(number)])
+    print('check_ssr: ', results['check_ssr_'+str(number)])
     print('storage_cap: ', results['storage_cap_'+str(number)])
+    print('storage_in_max: ', results['storage_in_max_'+str(number)])
+    print('storage_out_max: ', results['storage_out_max_'+str(number)])
     # print('storage_short_cap: ', results['storage_short_cap_1'])
     # print('storage_long_cap: ', results['storage_long_cap_1'])
-    # print('wind_inst: ', results['wind_inst_1'])
-    print('wind_max: ', results['wind_max_'+str(number)])
-    # print('pv_inst: ', results['pv_inst_1'])
-    print('pv_max: ', results['pv_max_'+str(number)])
     # print('biogas_bhkw: ', results['biogas_bhkw_inst_1'])
     # print('biogas_bhkw_ts: ', results['biogas_bhkw_ts_1'])
     # print('biogas_bhkw_inst: ', results['biogas_bhkw_inst_1'])
-    print('excess: ', results['excess_'+str(number)])
     print('grid: ', results['grid_'+str(number)])
     print('grid_max: ', results['grid_ts_'+str(number)].max())
     # print('hours_deficit: ', results['grid_ts_1'].count())
     print('hours_deficit: ', 8760-(results['grid_ts_'+str(number)]==0).sum())
+    print('excess: ', results['excess_'+str(number)])
     print('objective: ', results['objective'])
     # print('check_ssr_pv: ', results['check_ssr_pv1'])
     # print(results['hh'])
