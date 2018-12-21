@@ -594,7 +594,7 @@ def get_result_dict(energysystem, om, parameters, loopi, **arguments):
         results_dc['storage_inst_out_'+str(loopi)] = storage_inst_out
 
     if arguments['--biogas-costopt']:
-        results_dc['biogas_bhkw_inst_'+str(loopi)] = energysystem.results[biogas_bhkw_inst][bel].invest
+        results_dc['biogas_bhkw_inst_'+str(loopi)] = biogas_bhkw_inst
 
     if (arguments['--biogas']) or (arguments['--biogas-costopt']):
         results_dc['biogas_bhkw_ts_'+str(loopi)] = biogas_bhkw
