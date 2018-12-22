@@ -396,6 +396,8 @@ def create_energysystem(energysystem, parameters, loopi,
         solph.Source(label='region_'+str(loopi)+'_rbiogas',
                 outputs={bbiogas: solph.Flow(
                     nominal_value=biogas_nv,
+                    variable_costs=parameters[
+                        'cost_parameter'].loc['biogas_th']['opex_var'],
                     summed_max=1)})
 
         solph.LinearTransformer(
