@@ -34,129 +34,382 @@ def read_results_storage():
 
     results_storage_2030 = np.zeros(5).reshape(1, 5)
 
-    results_storage_2030[0][0] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.70_1_.p', 'rb'))['storage_cap_1']
+    if arguments['--region'] == 'krst_plus_lkos_addiert':
 
-    results_storage_2030[0][1] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.75_1_.p', 'rb'))['storage_cap_1']
+        results_storage_2030[0][0] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1'] +
 
-    results_storage_2030[0][2] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.80_1_.p', 'rb'))['storage_cap_1']
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1'])
 
-    results_storage_2030[0][3] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.85_1_.p', 'rb'))['storage_cap_1']
+        results_storage_2030[0][1] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1'] +
 
-    results_storage_2030[0][4] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.90_1_.p', 'rb'))['storage_cap_1']
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_2030[0][2] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1'] +
+
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_2030[0][3] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1'] +
+
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_2030[0][4] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1'] +
+
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1'])
+
+    else:
+
+        results_storage_2030[0][0] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_2030[0][1] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_2030[0][2] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_2030[0][3] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_2030[0][4] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1']
+
 
     results_storage_2050 = np.zeros(5).reshape(1, 5)
 
-    results_storage_2050[0][0] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2050' + '_' +
-                                        str(2005) + '_' +
-                                        '0.70_1_.p', 'rb'))['storage_cap_1']
+    if arguments['--region'] == 'krst_plus_lkos_addiert':
 
-    results_storage_2050[0][1] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2050' + '_' +
-                                        str(2005) + '_' +
-                                        '0.75_1_.p', 'rb'))['storage_cap_1']
+        results_storage_2050[0][0] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1'] +
 
-    results_storage_2050[0][2] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2050' + '_' +
-                                        str(2005) + '_' +
-                                        '0.80_1_.p', 'rb'))['storage_cap_1']
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1'])
 
-    results_storage_2050[0][3] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2050' + '_' +
-                                        str(2005) + '_' +
-                                        '0.85_1_.p', 'rb'))['storage_cap_1']
+        results_storage_2050[0][1] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1'] +
 
-    results_storage_2050[0][4] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        str(arguments['--scenario']) + '/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2050' + '_' +
-                                        str(2005) + '_' +
-                                        '0.90_1_.p', 'rb'))['storage_cap_1']
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_2050[0][2] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1'] +
+
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_2050[0][3] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1'] +
+
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_2050[0][4] = (pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1'] +
+
+                                     pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1'])
+
+    else:
+
+        results_storage_2050[0][0] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_2050[0][1] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_2050[0][2] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_2050[0][3] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_2050[0][4] = pd.read_pickle(open('../results' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2050' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1']
 
     results_storage_costopt = np.zeros(5).reshape(1, 5)
 
-    results_storage_costopt[0][0] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.70_1_.p', 'rb'))['storage_cap_1']
+    if arguments['--region'] == 'krst_plus_lkos_addiert':
 
-    results_storage_costopt[0][1] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.75_1_.p', 'rb'))['storage_cap_1']
+        results_storage_costopt[0][0] = (pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1'] +
 
-    results_storage_costopt[0][2] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.80_1_.p', 'rb'))['storage_cap_1']
+                                        pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1'])
 
-    results_storage_costopt[0][3] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.85_1_.p', 'rb'))['storage_cap_1']
+        results_storage_costopt[0][1] = (pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1'] +
 
-    results_storage_costopt[0][4] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt/' +
-                                        'region_results_dc' + '_' +
-                                        str(arguments['--region']) + '_' +
-                                        '2030' + '_' +
-                                        str(2005) + '_' +
-                                        '0.90_1_.p', 'rb'))['storage_cap_1']
+                                        pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_costopt[0][2] = (pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1'] +
+
+                                        pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_costopt[0][3] = (pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1'] +
+
+                                        pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1'])
+
+        results_storage_costopt[0][4] = (pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'kreis_steinfurt' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1'] +
+
+                                        pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            'landkreis_osnabrueck' + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1'])
+
+    else:
+
+        results_storage_costopt[0][0] = pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.70_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_costopt[0][1] = pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.75_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_costopt[0][2] = pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_costopt[0][3] = pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1']
+
+        results_storage_costopt[0][4] = pd.read_pickle(open('../results' +
+                                            '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1']
 
     results_storage_2030_GWh = results_storage_2030 / 1e6
     results_storage_2050_GWh = results_storage_2050 / 1e6
@@ -823,7 +1076,7 @@ def dot_plot_storage(results_storage):
 
     leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
     leg._legend_box.align = 'left'
-    leg.set_title('Kreis Steinfurt', prop={'size': 28})
+    leg.set_title('Kreis Steinfurt und Landkreis Osnabrück addiert', prop={'size': 28})
     for color,text in zip(colors,leg.get_texts()):
         # for text in leg.get_texts():
             text.set_color(color)
@@ -1129,7 +1382,7 @@ if __name__ == '__main__':
     arguments = docopt(__doc__)
     print(arguments)
     results_storage = read_results_storage()
-    ig = dot_plot_storage(results_storage)
+    fig = dot_plot_storage(results_storage)
     # results_capacities = read_results_capacities()
     # fig = bar_plot_capacities(results_capacities)
     # (results_deficit, results_excess, results_demand) = read_results_deficit_excess()
@@ -1139,6 +1392,6 @@ if __name__ == '__main__':
     # fig = dot_plot_storage_biogas_options(results_storage, results_storage_biogas_options)
 
     if arguments['--save']:
-        fig.savefig(os.path.join(os.path.dirname(__file__), 'saved_figures') +
-                '/' + 'current_figure' +
+        fig.savefig(os.path.join(os.path.dirname(__file__)) +
+                'current_figure' +
                 '.png')
