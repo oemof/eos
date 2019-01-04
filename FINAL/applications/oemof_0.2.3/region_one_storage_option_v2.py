@@ -112,6 +112,7 @@ def read_and_calculate_parameters(**arguments):
         data_load = h0_slp['h0'].reset_index(drop=True)
     else:
         data_load = data['demand_el']  # demand in kW
+        print(data_load.sum())
 
     # data_wind = data['wind']
     # data_pv = data['pv']
@@ -331,7 +332,6 @@ def create_energysystem(energysystem, parameters, loopi,
                      outputs={bel: solph.Flow(
                               actual_value=parameters['data_wind'],
                               fixed=True,
-
                               investment=solph.Investment(
                                   ep_costs=parameters['wind_epc']+parameters['cost_parameter'].loc['wind']['opex_fix']))}))
 
@@ -363,7 +363,6 @@ def create_energysystem(energysystem, parameters, loopi,
                          outputs={bel: solph.Flow(
                               actual_value=parameters['data_pv'],
                               fixed=True,
-
                               investment=solph.Investment(
                                   ep_costs=parameters['pv_epc']+parameters['cost_parameter'].loc['pv']['opex_fix']))}))
 
@@ -526,9 +525,6 @@ def get_result_dict(energysystem, om, parameters, loopi, **arguments):
     if (arguments['--biogas']) or (arguments['--biogas-costopt']):
         biogas_bhkw = energysystem.groups['region_'+str(loopi)+'_biogas_bhkw']
 
-    # ['region_'+str(loopi)+'_biogas_bhkw']
-    # print(results[(storage, None)]['sequences'][year+'-01-01 00:00:00':year+'-12-31 23:00:00'])
-    # custom_storage = outputlib.views.node(results, 'storage')
 
     # Installed capacities
     # --------------------------------------------------------------------------------
