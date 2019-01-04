@@ -545,25 +545,25 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
         results_dc['biogas_bhkw_inst_'+str(loopi)] = energysystem.results[biogas_bhkw_inst][bel].invest
 
     if arguments['--write-results']:
-        x = list(results_dc.keys())
-        y = list(results_dc.values())
-        f = open(
-            'data/'+arguments['--scenario']+'_results.csv',
-            'w', newline='')
-        w = csv.writer(f, delimiter=';')
-        w.writerow(x)
-        w.writerow(y)
-        f.close
+        # x = list(results_dc.keys())
+        # y = list(results_dc.values())
+        # f = open(
+        #     'data/'+arguments['--scenario']+'_results.csv',
+        #     'w', newline='')
+        # w = csv.writer(f, delimiter=';')
+        # w.writerow(x)
+        # w.writerow(y)
+        # f.close
 
         if arguments['--ssr']:
-            pickle.dump(results_dc, open('../results/region_results_dc_' +
+            pickle.dump(results_dc, open('../../results/region_results_dc_' +
                 arguments['--scenario'] + '_' +
                 arguments['--year'] + '_' +
                 arguments['--ssr'] + '_' +
                 str(loopi) + '_' +
                 '.p', "wb"))
         else:
-            pickle.dump(results_dc, open('../results/region_results_dc_' +
+            pickle.dump(results_dc, open('../../results/region_results_dc_' +
                 arguments['--scenario'] + '_' +
                 arguments['--year'] + '_' +
                 str(loopi) + '_' +
