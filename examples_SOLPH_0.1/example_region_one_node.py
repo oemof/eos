@@ -15,16 +15,13 @@ Options:
                            [default: ERROR]
   -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
   -h, --help               Display this help.
-      --lat=LAT            Sets the simulation longitude to choose the right
-                           weather data set. [default: 53.41] # Parchim
-      --lon=LON            Sets the simulation latitude to choose the right
-                           weather data set. [default: 11.84] # Parchim
       --year=YEAR          Weather data year. Choose from 1998 to 2014
                            [default: 2005]
       --num-regions=NUM    Number of regions. [default: 24]
       --multi-regions=NUM  Number of regions to combine each. [default: 1]
       --costopt            Cost optimization.
       --biogas             Include biogas potential.
+      --biogas-flex        Include biogas as flexible potential.
       --biogas-costopt     Also cost optimize biogas bhkw.
       --lkos               LKOS load profile
       --bdew               BDEW standard load profile h0
@@ -245,12 +242,16 @@ def create_energysystem(energysystem, parameters, loopi,
                     outputs={bel: solph.Flow(
                         nominal_value=gridsource_nv,
                         summed_max=1)})
+                        # summed_max=1,
+                        # min=0.0)})
         else:
             solph.Source(
                     label='region_'+str(loopi)+'_gridsource',
                     outputs={bel: solph.Flow(
                         variable_costs=parameters[
                             'cost_parameter'].loc['grid']['opex_var'])})
+                            # 'cost_parameter'].loc['grid']['opex_var'],
+                            # min=0.0)})
 
     elif arguments['--ssr']:
         if int(arguments['--multi-regions']) == 2:
@@ -277,6 +278,8 @@ def create_energysystem(energysystem, parameters, loopi,
             outputs={bel: solph.Flow(
                 nominal_value=gridsource_nv,
                 summed_max=1)})
+                # summed_min=1,
+                # max=0.0001)})
 
     else:
         print('Something is missing')
@@ -354,6 +357,7 @@ def create_energysystem(energysystem, parameters, loopi,
 
     # Create source and transformer object for biogas
     if arguments['--biogas']:
+
         biogas_nv = float(parameters['region_parameter'].
                             loc['biogas_GWh'][str(loopi)]) * 1e6
 
@@ -362,20 +366,27 @@ def create_energysystem(energysystem, parameters, loopi,
                     nominal_value=biogas_nv,
                     summed_max=1)})
 
-        solph.LinearTransformer(
-                label='region_'+str(loopi)+'_biogas_bhkw',
-                inputs={bbiogas: solph.Flow()},
-                outputs={bel: solph.Flow(
-                    nominal_value=biogas_nv*0.38/8760)},
-                    # nominal_value=biogas_nv*0.38/8760*2)},
-                    conversion_factors={bel: 0.38})
+        if arguments['--biogas-flex']:
 
-        # solph.LinearTransformer(
-        #         label='region_'+str(loopi)+'_biogas',
-        #         inputs={bbiogas: solph.Flow()},
-        #         outputs={bel: solph.Flow()})
+            solph.LinearTransformer(
+                    label='region_'+str(loopi)+'_biogas_bhkw',
+                    inputs={bbiogas: solph.Flow()},
+                    outputs={bel: solph.Flow(
+                        nominal_value=biogas_nv*0.38/8760*2)},
+                        # nominal_value=biogas_nv*0.38/8760*2)},
+                        conversion_factors={bel: 0.38})
+
+        else:
+            solph.LinearTransformer(
+                    label='region_'+str(loopi)+'_biogas_bhkw',
+                    inputs={bbiogas: solph.Flow()},
+                    outputs={bel: solph.Flow(
+                        nominal_value=biogas_nv*0.38/8760)},
+                        # nominal_value=biogas_nv*0.38/8760*2)},
+                        conversion_factors={bel: 0.38})
 
     if arguments['--biogas-costopt']:
+
         biogas_nv = float(parameters['region_parameter'].
                             loc['biogas_GWh'][str(loopi)]) * 1e6
 
@@ -406,8 +417,6 @@ def create_energysystem(energysystem, parameters, loopi,
         #                    loc['biogas_GWh'][str(parameters
         #                                     ['combinations']
         #                                     [loopi][2])]) * 1e3)
-
-    # if arguments['--biogas_flex']:
 
     # Create simple sink objects for demands
     if int(arguments['--multi-regions']) == 2:
@@ -456,6 +465,7 @@ def create_energysystem(energysystem, parameters, loopi,
 
 
 def get_result_dict(energysystem, parameters, loopi, **arguments):
+    print('HALLOOOO')
     logging.info('Check the results')
 
     year = arguments['--year']
@@ -525,17 +535,19 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
         results_dc['biogas_bhkw_inst_'+str(loopi)] = energysystem.results[biogas_bhkw_inst][bel].invest
 
     if arguments['--write-results']:
-        x = list(results_dc.keys())
-        y = list(results_dc.values())
-        f = open(
-            'data/'+arguments['--scenario']+'_results.csv',
-            'w', newline='')
-        w = csv.writer(f, delimiter=';')
-        w.writerow(x)
-        w.writerow(y)
-        f.close
-
+#         x = list(results_dc.keys())
+#         y = list(results_dc.values())
+#         f = open(
+#             'data/'+arguments['--scenario']+'_results.csv',
+#             'w', newline='')
+#         w = csv.writer(f, delimiter=';')
+#         w.writerow(x)
+#         w.writerow(y)
+#         f.close
+#
+        print('HI')
         if arguments['--ssr']:
+            print('HALLO')
             pickle.dump(results_dc, open('../results/region_results_dc_' +
                 arguments['--scenario'] + '_' +
                 arguments['--year'] + '_' +
@@ -580,7 +592,7 @@ def main(**arguments):
                                    **arguments)
         esys.dump()
         # esys.restore()
-        pp.pprint(get_result_dict(esys, parameters, loopi, **arguments))
+        get_result_dict(esys, parameters, loopi, **arguments)
         # create_plots(esys, year=arguments['--year'])
 
 

@@ -65,10 +65,12 @@ def initialise_energysystem(year, number_timesteps):
     logging.info('Initialize the energy system')
     date_time_index = pd.date_range('1/1/' + year,
                                     periods=number_timesteps,
-                                    freq='15Min')
+                                    # periods=35040,
+                                    freq='H')
+                                    # freq='15Min')
 
     return solph.EnergySystem(groupings=solph.GROUPINGS,
-                              time_idx=date_time_index)
+                              timeindex=date_time_index)
 
 
 def validate(**arguments):
@@ -116,34 +118,39 @@ def read_and_calculate_parameters(**arguments):
     pv_epc = pv_capex * (pv_wacc * (1 + pv_wacc) **
                          pv_lifetime) / ((1 + pv_wacc) ** pv_lifetime - 1)
 
-    # Read load data in kW
-    data_load = \
-        pd.read_csv(
-                 "../example/example_data/load_2015_15min.csv",
-                 sep=",")
+    data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+    data_load = data['demand_el']  # demand in kW
+    data_wind = data['wind']
+    data_pv = data['pv']
 
-    data_load = data_load['load']
+    # # Read load data in kW
+    # data_load = \
+    #     pd.read_csv(
+    #              "../example/example_data/load_2015_15min.csv",
+    #              sep=",")
 
-    # Read standardized feed-in from pv
-    # loc = {
-    #     'tz': 'Europe/Berlin',
-    #     'latitude': float(arguments['--lat']),
-    #     'longitude': float(arguments['--lon'])}
+    # data_load = data_load['load']
 
-    # data_pv = hlp.get_pv_generation(
-    #                 year=int(arguments['--year']),
-    #                 azimuth=180,
-    #                 tilt=30,
-    #                 albedo=0.2,
-    #                 loc=loc)
+    # # Read standardized feed-in from pv
+    # # loc = {
+    # #     'tz': 'Europe/Berlin',
+    # #     'latitude': float(arguments['--lat']),
+    # #     'longitude': float(arguments['--lon'])}
 
-    # Or read pv data from file
-    data_pv = \
-        pd.read_csv(
-                 "../example/example_data/osna_pv_15min.csv",
-                 sep=",")
+    # # data_pv = hlp.get_pv_generation(
+    # #                 year=int(arguments['--year']),
+    # #                 azimuth=180,
+    # #                 tilt=30,
+    # #                 albedo=0.2,
+    # #                 loc=loc)
 
-    data_pv = data_pv['pv']
+    # # Or read pv data from file
+    # data_pv = \
+    #     pd.read_csv(
+    #              "../example/example_data/osna_pv_15min.csv",
+    #              sep=",")
+
+    # data_pv = data_pv['pv']
 
     # Calculate grid share
     if arguments['--ssr']:
@@ -260,10 +267,10 @@ def create_energysystem(energysystem, parameters,
     ##########################################################################
 
     logging.info('Optimise the energy system')
-    print(energysystem.time_idx)
+    print(energysystem.timeindex)
 
-    om = solph.OperationalModel(energysystem, timeindex=energysystem.time_idx,
-                                timeincrement=float(arguments['--tau']))
+    om = solph.OperationalModel(energysystem)
+                                # timeincrement=np.ones(35040) * 0.25)
 
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',

@@ -366,7 +366,7 @@ def get_result_dict(energysystem, parameters, **arguments):
 
     results_dc['check_ssr_pv'] = covered_by_pv.sum() / demand_total
 
-    results_dc['mwh_to_kwp'] = results_dc['demand'] /1e3 / float(arguments['--pv_installed'])
+    # results_dc['mwh_to_kwp'] = results_dc['demand'] /1e3 / float(arguments['--pv_installed'])
 
     results_dc['ts_demand_all'] = ts_demand_all
     results_dc['ts_pv_all'] = ts_pv_all
@@ -467,7 +467,7 @@ def main(**arguments):
     print('check_ssr: ', results['check_ssr'])
     print('storage_cap: ', results['storage_cap'])
     print('objective: ', results['objective'])
-    print('mwh_to_kwp: ', results['mwh_to_kwp'])
+    # print('mwh_to_kwp: ', results['mwh_to_kwp'])
     print('check_ssr_pv: ', results['check_ssr_pv'])
     # create_plots(esys, year=arguments['--year'])
 

@@ -7,14 +7,16 @@ Usage: example_housholds.py [options]
 Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario_parchim]
+  -c, --cost=COST          The cost scenario. [default: 2]
+  -t, --tech=TECH          The tech scenario. [default: 2]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
   -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
                            WARNING, ERROR or CRITICAL.
                            [default: ERROR]
-  -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
   -h, --help               Display this help.
+  -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
       --lat=LAT            Sets the simulation longitude to choose the right
                            weather data set. [default: 53.41] # Parchim
       --lon=LON            Sets the simulation latitude to choose the right
@@ -26,6 +28,16 @@ Options:
       --num-hh=NUM         Number of households to choose. [default: 2]
       --random-hh          Set if you want to run simulation with random
                            choice of households.
+      --profile=PROFILE    Choose between summer, winter, day and night.
+      --load-hh            Set if you want to load your former choice of
+                           random households.
+      --scale-dem          Set if you want to scale profiles from given
+                           demand data.
+      --only-slp-h0        Use only the H0 standard load profile for all
+                           households.
+      --only-slp           Use all standard load profiles (H0, G0, L0).
+      --include-g0-l0      Include the standard load profiles G0 and L0. The
+                           loads for household buildings are chosen randomly.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
                            2010-2014. [default: 2010]
       --pv-costopt         Cost optimization for pv plants.
@@ -33,6 +45,7 @@ Options:
                            scenario_pv.csv) and max feedin
       --write-results      Write results to data/scenarioname_results.csv
       --ssr=SSR            Self-sufficiency degree.
+      --save               Save results.
       --dry-run            Do nothing. Only print what would be done.
 
 '''
@@ -76,7 +89,7 @@ def initialise_energysystem(year, number_timesteps):
                                     freq='H')
 
     return solph.EnergySystem(groupings=solph.GROUPINGS,
-                              time_idx=date_time_index)
+                              timeindex=date_time_index)
 
 
 def validate(**arguments):
@@ -321,7 +334,7 @@ def create_energysystem(energysystem, parameters, house, house_pv,
 
     logging.info('Optimise the energy system')
 
-    om = solph.OperationalModel(energysystem, timeindex=energysystem.time_idx)
+    om = solph.OperationalModel(energysystem)
 
     logging.info('Store lp-file')
     om.write('optimization_problem.lp',
@@ -414,11 +427,11 @@ def get_result_dict(energysystem, parameters, house, results_dc, **arguments):
     results_dc['cost_fit_'+house] = fit_cost
     results_dc['objective'] = energysystem.results.objective
 
-    if arguments['--pv-costopt']:
-        pickle.dump(results_dc, open('../results/households_results_dc_' +
-                    arguments['--ssr'] + '_' +
-                    str(house) + '_' +
-                    'costopt_' + '.p', 'wb'))
+    # if arguments['--pv-costopt']:
+        # pickle.dump(results_dc, open('../results/households_results_dc_' +
+                    # arguments['--ssr'] + '_' +
+                    # str(house) + '_' +
+                    # 'costopt_' + '.p', 'wb'))
 #    else:
 #        pickle.dump(results_dc, open('../results/households_results_dc_' +
 #                    arguments['--ssr'] + '_' +

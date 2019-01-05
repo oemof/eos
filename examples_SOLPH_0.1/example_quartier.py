@@ -2,13 +2,14 @@
 
 ''' Example for simulating pv-battery systems in quarters
 
-Usage: example_quartier_10hh_11_to_20.py [options]
+Usage: example_quartier.py [options]
 
 Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario_parchim]
   -c, --cost=COST          The cost scenario. [default: 2]
   -t, --tech=TECH          The tech scenario. [default: 2]
+  -n, --number=NUM         Number of run. [default: 1]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
@@ -39,7 +40,7 @@ Options:
       --include-g0-l0      Include the standard load profiles G0 and L0. The
                            loads for household buildings are chosen randomly.
       --year=YEAR          Weather data year. Choose from 1998, 2003, 2007,
-                           2010-2014. [default: 2010]
+                           2010-2014. [default: 2005]
       --pv-costopt         Cost optimization for pv plants.
       --feedin             Option with different pv plants (will need
                            scenario_pv.csv) and max feedin
@@ -159,7 +160,7 @@ def read_and_calculate_parameters(**arguments):
                 hh = pickle.load(open('hh_' + arguments['--scenario'] + '_random_part_446.p', "wb"))
 
         else:
-            hh = pickle.load(open('hh_' + arguments['--scenario'] + '.p', 'rb'))
+            hh = pickle.load(open('hh_' + arguments['--scenario'] + '_' + str(arguments['--number']) + '.p', "rb"))
 
     elif arguments['--random-hh']:
         hh_list = range(1, 75, 1)
@@ -168,7 +169,8 @@ def read_and_calculate_parameters(**arguments):
         hh = OrderedDict()
         for i in np.arange(int(arguments['--num-hh'])):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
-        pickle.dump(hh, open('hh_' + arguments['--scenario'] + '.p', "wb"))
+        pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + str(arguments['--number']) + '.p', "wb"))
+
 
     elif arguments['--profile']:
         hh_list = range(1, 4, 1)
@@ -177,7 +179,7 @@ def read_and_calculate_parameters(**arguments):
         hh = OrderedDict()
         for i in np.arange(int(arguments['--num-hh'])):
             hh['house_' + str(i+1)] = 'hh_' + str(hh_to_choose[i])
-        pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + str(arguments['--profile']) + '.p', "wb"))
+        # pickle.dump(hh, open('hh_' + arguments['--scenario'] + '_' + str(arguments['--profile']) + '.p', "wb"))
 
     else:
         hh_start = int(arguments['--start-hh'])
@@ -204,7 +206,7 @@ def read_and_calculate_parameters(**arguments):
             hh_random = OrderedDict()
             for i in np.arange(int(household_dict.size)):
                 hh_random['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
-            pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_84.p', "wb"))
+            # pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_84.p', "wb"))
 
             # This is only a dummy dictionary for a proper object creation
             # (with the right number of households)
@@ -240,7 +242,7 @@ def read_and_calculate_parameters(**arguments):
             hh_random = OrderedDict()
             for i in np.arange(int(household_dict.size)):
                 hh_random['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
-            pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_375.p', "wb"))
+            # pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_375.p', "wb"))
 
             # This is only a dummy dictionary for a proper object creation
             # (with the right number of households)
@@ -274,7 +276,7 @@ def read_and_calculate_parameters(**arguments):
             hh_random = OrderedDict()
             for i in np.arange(int(household_dict.size)):
                 hh_random['house_' + str(household_dict[i])] = 'hh_' + str(hh_to_choose[i])
-            pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_446.p', "wb"))
+            # pickle.dump(hh_random, open('hh_' + arguments['--scenario'] + '_random_part_446.p', "wb"))
 
             # This is only a dummy dictionary for a proper object creation
             # (with the right number of households)
@@ -359,6 +361,7 @@ def read_and_calculate_parameters(**arguments):
     #     'longitude': float(arguments['--lon'])}
 
     pv_generation = pd.read_csv('../data/' + arguments['--year'] + '_feedin_8043_52279.csv', sep=',')['pv']
+    # pv_generation = pd.read_csv('../data/storage_invest.csv', sep=',')['pv']
 
     # Calculate grid share
     if arguments['--ssr']:
@@ -814,6 +817,16 @@ def get_result_dict(energysystem, parameters, **arguments):
                         str(arguments['--year']) + '_' +
                         str(arguments['--ssr']) + '_' +
                         'incl_g0_l0' + '.p', 'wb'))
+
+        elif arguments['--number']:
+            pickle.dump(results_dc, open('../results/quartier_results_' +
+                        str(arguments['--num-hh']) + '_' +
+                        str(arguments['--cost']) + '_' +
+                        str(arguments['--tech']) + '_' +
+                        str(arguments['--year']) + '_' +
+                        str(arguments['--ssr']) + '_' +
+                        str(arguments['--number']) + '_' +
+                        'random' + '.p', 'wb'))
 
         else:
             pickle.dump(results_dc, open('../results/quartier_results_' +

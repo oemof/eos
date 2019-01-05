@@ -237,7 +237,7 @@ def create_energysystem(energysystem, parameters,
             #         variable_costs=parameters['price_el'])})
 
         # Create excess component to allow overproduction
-        solph.Sink(label='region_'+str(loopi)+'__excess',
+        solph.Sink(label='region_'+str(loopi)+'_excess',
                    inputs={bel: solph.Flow()})
 
         # Create fixed source object for wind
@@ -356,6 +356,8 @@ def create_energysystem(energysystem, parameters,
 def get_result_dict(energysystem, parameters, **arguments):
     logging.info('Check the results')
 
+    year = arguments['--year']
+
     results_dc = {}
 
     for loopi in parameters['loop']:
@@ -364,7 +366,13 @@ def get_result_dict(energysystem, parameters, **arguments):
 
         myresults = outputlib.DataFramePlot(energy_system=energysystem)
 
+        bel = energysystem.groups['region_'+str(loopi)+'_bel']
+
         storage = energysystem.groups['region_'+str(loopi)+'_bat']
+
+        wind_inst = energysystem.groups['region_'+str(loopi)+'_wind']
+
+        pv_inst = energysystem.groups['region_'+str(loopi)+'_pv']
 
         demand = myresults.slice_by(obj_label='region_'+str(loopi)+'_demand',
                                     date_from=year+'-01-01 00:00:00',
@@ -378,19 +386,34 @@ def get_result_dict(energysystem, parameters, **arguments):
                                 date_from=year+'-01-01 00:00:00',
                                 date_to=year+'-12-31 23:00:00')
 
+        excess = myresults.slice_by(obj_label='region_'+str(loopi)+'_excess',
+                                date_from=year+'-01-01 00:00:00',
+                                date_to=year+'-12-31 23:00:00')
+
         grid = myresults.slice_by(obj_label='region_'+str(loopi)+'_gridsource',
                                   date_from=year+'-01-01 00:00:00',
                                   date_to=year+'-12-31 23:00:00')
 
         results_dc['demand_'+str(loopi)] = float(demand.sum())
+        results_dc['demand_ts_'+str(loopi)] = demand
+        results_dc['grid_'+str(loopi)] = float(grid.sum())
+        results_dc['grid_ts_'+str(loopi)] = grid
+        results_dc['excess_'+str(loopi)] = float(excess.sum())
+        results_dc['excess_ts_'+str(loopi)] = excess
+        results_dc['wind_ts_'+str(loopi)] = wind
+        results_dc['pv_ts_'+str(loopi)] = pv
+        results_dc['check_ssr'+str(loopi)] = 1 - (grid.sum() / demand.sum())
         results_dc['wind_max_'+str(loopi)] = float(wind.max())
         results_dc['pv_max_'+str(loopi)] = float(pv.max())
         results_dc['grid'+str(loopi)] = grid.sum()
-        results_dc['check_ssr'+str(loopi)] = 1 - (grid.sum() / demand.sum())
-        results_dc['storage_cap'+str(loopi)] = energysystem.results[
+        results_dc['storage_cap_'+str(loopi)] = energysystem.results[
             storage][storage].invest
         results_dc['objective'] = energysystem.results.objective
-        print(results_dc)
+       #  print(results_dc)
+
+       #  if arguments['--costopt']:
+       #      results_dc['wind_inst_'+str(loopi)] = energysystem.results[wind_inst][bel].invest
+       #  results_dc['pv_inst_'+str(loopi)] = energysystem.results[pv_inst][bel].invest
 
         if arguments['--write-results']:
             x = list(results_dc.keys())
@@ -403,7 +426,7 @@ def get_result_dict(energysystem, parameters, **arguments):
             w.writerow(y)
             f.close
 
-        pickle.dump(results_dc, open('../results/results_single_regions_80.p', "wb"))
+            pickle.dump(results_dc, open('../results/results_single_regions_' + str(arguments['--ssr']) + '.p', "wb"))
 
     return(results_dc)
 
