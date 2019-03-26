@@ -4,4 +4,6 @@ pv_field_MW,9.3
 pv_roof_MW,64
 pv_MW,73.4
 wind_MW,341
-annual_demand_GWh,117.57
+biogas_GWh,46.3
+annual_demand_GWh_orig,117.57
+annual_demand_GWh,87.865
