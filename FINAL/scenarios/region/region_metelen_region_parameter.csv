@@ -1,0 +1,7 @@
+param,1
+region_name,Metelen
+pv_field_MW,3.6
+pv_roof_MW,15.8
+pv_MW,19.3
+wind_MW,34
+annual_demand_GWh,23.936
