@@ -134,29 +134,29 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_2030[0][2] = pd.read_pickle(open('../results' +
-                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
-                                            'region_results_dc' + '_' +
-                                            str(arguments['--region']) + '_' +
-                                            '2030' + '_' +
-                                            str(2005) + '_' +
-                                            '0.80_1_.p', 'rb'))['storage_cap_1']
+        # results_storage_2030[0][2] = pd.read_pickle(open('../results' +
+        #                                     '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+        #                                     'region_results_dc' + '_' +
+        #                                     str(arguments['--region']) + '_' +
+        #                                     '2030' + '_' +
+        #                                     str(2005) + '_' +
+        #                                     '0.80_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_2030[0][3] = pd.read_pickle(open('../results' +
-                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
-                                            'region_results_dc' + '_' +
-                                            str(arguments['--region']) + '_' +
-                                            '2030' + '_' +
-                                            str(2005) + '_' +
-                                            '0.85_1_.p', 'rb'))['storage_cap_1']
+        # results_storage_2030[0][3] = pd.read_pickle(open('../results' +
+        #                                     '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+        #                                     'region_results_dc' + '_' +
+        #                                     str(arguments['--region']) + '_' +
+        #                                     '2030' + '_' +
+        #                                     str(2005) + '_' +
+        #                                     '0.85_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_2030[0][4] = pd.read_pickle(open('../results' +
-                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
-                                            'region_results_dc' + '_' +
-                                            str(arguments['--region']) + '_' +
-                                            '2030' + '_' +
-                                            str(2005) + '_' +
-                                            '0.90_1_.p', 'rb'))['storage_cap_1']
+        # results_storage_2030[0][4] = pd.read_pickle(open('../results' +
+        #                                     '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+        #                                     'region_results_dc' + '_' +
+        #                                     str(arguments['--region']) + '_' +
+        #                                     '2030' + '_' +
+        #                                     str(2005) + '_' +
+        #                                     '0.90_1_.p', 'rb'))['storage_cap_1']
 
 
     results_storage_2050 = np.zeros(5).reshape(1, 5)
@@ -422,6 +422,66 @@ def read_results_storage():
     return results_storage_GWh
 
 
+def read_results_storage_quartier():
+
+    results_storage_quartier = np.zeros(3).reshape(1, 3)
+    # results_storage_quartier = np.zeros(5).reshape(1, 5)
+
+    results_storage_quartier[0][0] = pd.read_pickle('../results/quartier/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.5' +
+                                        '_' +
+                                        '.p')['storage_cap']
+
+    results_storage_quartier[0][1] = pd.read_pickle('../results/quartier/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.6' +
+                                        '_' +
+                                        '.p')['storage_cap']
+
+    results_storage_quartier[0][2] = pd.read_pickle('../results/quartier/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.7' +
+                                        '_' +
+                                        '.p')['storage_cap']
+
+    # results_storage_quartier[0][3] = pd.read_pickle('../results/quartier/' +
+    #                                     'quartier_results_' +
+    #                                     '74' +
+    #                                     '_1_1_' +
+    #                                     '2005' +
+    #                                     '_' +
+    #                                     '0.8' +
+    #                                     '_' +
+    #                                     '.p')['storage_cap']
+
+    # results_storage_quartier[0][4] = pd.read_pickle('../results/quartier/' +
+    #                                     'quartier_results_' +
+    #                                     '74' +
+    #                                     '_1_1_' +
+    #                                     '2005' +
+    #                                     '_' +
+    #                                     '0.9' +
+    #                                     '_' +
+    #                                     '.p')['storage_cap']
+
+    results_storage_kWh = {'quartier': results_storage_quartier}
+
+    return results_storage_kWh
+
+
 def read_results_storage_biogas_options():
 
     results_storage_biogas_flex_2030 = np.zeros(5).reshape(1, 5)
@@ -568,40 +628,40 @@ def read_results_deficit_excess():
 
     # Read deficit 2030
 
-    results_deficit_2030[0][0] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2030[0][0] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['grid_1']
 
-    results_deficit_2030[0][1] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2030[0][1] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['grid_1']
 
-    results_deficit_2030[0][2] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2030[0][2] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['grid_1']
 
-    results_deficit_2030[0][3] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2030[0][3] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['grid_1']
 
-    results_deficit_2030[0][4] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2030[0][4] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -610,40 +670,40 @@ def read_results_deficit_excess():
 
     # Read excess 2030
 
-    results_excess_2030[0][0] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2030[0][0] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['excess_1']
 
-    results_excess_2030[0][1] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2030[0][1] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['excess_1']
 
-    results_excess_2030[0][2] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2030[0][2] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['excess_1']
 
-    results_excess_2030[0][3] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2030[0][3] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['excess_1']
 
-    results_excess_2030[0][4] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2030[0][4] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -655,40 +715,40 @@ def read_results_deficit_excess():
 
     # Read deficit 2050
 
-    results_deficit_2050[0][0] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2050[0][0] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['grid_1']
 
-    results_deficit_2050[0][1] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2050[0][1] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['grid_1']
 
-    results_deficit_2050[0][2] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2050[0][2] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['grid_1']
 
-    results_deficit_2050[0][3] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2050[0][3] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['grid_1']
 
-    results_deficit_2050[0][4] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_deficit_2050[0][4] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
@@ -697,40 +757,40 @@ def read_results_deficit_excess():
 
     # Read excess 2050
 
-    results_excess_2050[0][0] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2050[0][0] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['excess_1']
 
-    results_excess_2050[0][1] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2050[0][1] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['excess_1']
 
-    results_excess_2050[0][2] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2050[0][2] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['excess_1']
 
-    results_excess_2050[0][3] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2050[0][3] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['excess_1']
 
-    results_excess_2050[0][4] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_excess_2050[0][4] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
@@ -742,40 +802,40 @@ def read_results_deficit_excess():
 
     # Read deficit costopt
 
-    results_deficit_costopt[0][0] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_deficit_costopt[0][0] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['grid_1']
 
-    results_deficit_costopt[0][1] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_deficit_costopt[0][1] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['grid_1']
 
-    results_deficit_costopt[0][2] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_deficit_costopt[0][2] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['grid_1']
 
-    results_deficit_costopt[0][3] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_deficit_costopt[0][3] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['grid_1']
 
-    results_deficit_costopt[0][4] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_deficit_costopt[0][4] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -784,40 +844,40 @@ def read_results_deficit_excess():
 
     # Read excess costopt
 
-    results_excess_costopt[0][0] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_excess_costopt[0][0] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['grid_1']
 
-    results_excess_costopt[0][1] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_excess_costopt[0][1] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['grid_1']
 
-    results_excess_costopt[0][2] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_excess_costopt[0][2] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['grid_1']
 
-    results_excess_costopt[0][3] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_excess_costopt[0][3] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['grid_1']
 
-    results_excess_costopt[0][4] = pickle.load(open('../results/' +
-                                        'costopt/' +
+    results_excess_costopt[0][4] = pd.read_pickle(open('../results/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -827,40 +887,40 @@ def read_results_deficit_excess():
     # Read demand
     results_demand = np.zeros(5).reshape(1, 5)
 
-    results_demand[0][0] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_demand[0][0] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['demand_1']
 
-    results_demand[0][1] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_demand[0][1] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['demand_1']
 
-    results_demand[0][2] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_demand[0][2] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['demand_1']
 
-    results_demand[0][3] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_demand[0][3] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['demand_1']
 
-    results_demand[0][4] = pickle.load(open('../results/' +
-                                        str(arguments['--scenario']) + '/' +
+    results_demand[0][4] = pd.read_pickle(open('../results/' +
+                                        '2_szenario_mit_biogas_unflex_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -890,15 +950,15 @@ def read_results_deficit_excess():
 
 def read_results_capacities():
 
-    masterplan_stein = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+    masterplan_stein = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                   'stein' + '.csv', sep=',',
                                   index_col=0)
 
-    masterplan_lkos = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+    masterplan_lkos = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                   'lkos' + '.csv', sep=',',
                                   index_col=0)
 
-    masterplan_osna = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+    masterplan_osna = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                               'osna' + '.csv', sep=',',
                               index_col=0)
 
@@ -921,7 +981,7 @@ def read_results_capacities():
     results_wind_costopt = np.zeros(5).reshape(1, 5)
 
     results_wind_costopt[0][0] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -929,7 +989,7 @@ def read_results_capacities():
                                         '0.70_1_.p', 'rb'))['wind_inst_1']
 
     results_wind_costopt[0][1] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -937,7 +997,7 @@ def read_results_capacities():
                                         '0.75_1_.p', 'rb'))['wind_inst_1']
 
     results_wind_costopt[0][2] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -945,7 +1005,7 @@ def read_results_capacities():
                                         '0.80_1_.p', 'rb'))['wind_inst_1']
 
     results_wind_costopt[0][3] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -953,7 +1013,7 @@ def read_results_capacities():
                                         '0.85_1_.p', 'rb'))['wind_inst_1']
 
     results_wind_costopt[0][4] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -963,7 +1023,7 @@ def read_results_capacities():
     results_pv_costopt = np.zeros(5).reshape(1, 5)
 
     results_pv_costopt[0][0] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -971,7 +1031,7 @@ def read_results_capacities():
                                         '0.70_1_.p', 'rb'))['pv_inst_1']
 
     results_pv_costopt[0][1] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -979,7 +1039,7 @@ def read_results_capacities():
                                         '0.75_1_.p', 'rb'))['pv_inst_1']
 
     results_pv_costopt[0][2] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -987,7 +1047,7 @@ def read_results_capacities():
                                         '0.80_1_.p', 'rb'))['pv_inst_1']
 
     results_pv_costopt[0][3] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -995,7 +1055,7 @@ def read_results_capacities():
                                         '0.85_1_.p', 'rb'))['pv_inst_1']
 
     results_pv_costopt[0][4] = pickle.load(open('../results/' +
-                                        'costopt/' +
+                                        '6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -1067,16 +1127,18 @@ def dot_plot_storage(results_storage):
         # results_storage['2030'].min(), results_storage['2030'].max() + 1])
 
     plt.xlim([0.68, 0.92])
-    plt.ylim([0, 11])
+    # plt.ylim([0, 11])
+    plt.ylim([0, 21])
 
     plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90], fontsize=28, color=diagram_color)
-    plt.yticks([0, 5, 10], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 5, 10], fontsize=28, color=diagram_color)
+    plt.yticks([0, 5, 10, 15, 20], fontsize=28, color=diagram_color)
     plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
     plt.ylabel('Speicherkapazität in GWh', fontsize=28, color=diagram_color)
 
     leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
     leg._legend_box.align = 'left'
-    leg.set_title('Kreis Steinfurt und Landkreis Osnabrück addiert', prop={'size': 28})
+    leg.set_title('Stadt und Landkreis Osnabrück vernetzt', prop={'size': 28})
     for color,text in zip(colors,leg.get_texts()):
         # for text in leg.get_texts():
             text.set_color(color)
@@ -1091,6 +1153,72 @@ def dot_plot_storage(results_storage):
 
     return fig
 
+
+def dot_plot_storage_quartier(results_storage_quartier):
+
+    print(results_storage_quartier['quartier'][0][:])
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = plt.subplot()
+
+    lw = 3
+    diagram_color = 'black'
+    main_color = '#7f7f7f'
+    colors = []
+
+    # line, = ax.plot([0.50, 0.60, 0.70, 0.80, 0.90],
+    line, = ax.plot([0.50, 0.60, 0.70],
+                     results_storage_quartier['quartier'][0][:],
+                     linestyle='',
+                     marker='o',
+                     markersize=16,
+                     markeredgecolor='orange',
+                     markeredgewidth=3,
+                     markerfacecolor='None',
+                     label='CES')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    # line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+    line, = ax.plot([0.50, 0.60, 0.70],
+                     [133, 424, 1695],
+                     linestyle='',
+                     marker='o',
+                     markersize=16,
+                     markeredgecolor='b',
+                     markeredgewidth=3,
+                     markerfacecolor='None',
+                     label='Summe RES')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    # plt.axis([0.68, 0.92,
+        # results_storage['2030'].min(), results_storage['2030'].max() + 1])
+
+    plt.xlim([0.48, 0.72])
+    # plt.ylim([0, 19])
+    # plt.ylim([0, 21])
+
+    plt.xticks([0.50, 0.60, 0.70], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 5, 10], fontsize=28, color=diagram_color)
+    plt.yticks([400, 800, 1200, 1600], fontsize=28, color=diagram_color)
+    plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    plt.ylabel('Speicherkapazität in kWh', fontsize=28, color=diagram_color)
+
+    leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
+    leg._legend_box.align = 'left'
+    # leg.set_title('Stadt und Landkreis Osnabrück vernetzt', prop={'size': 28})
+    for color,text in zip(colors,leg.get_texts()):
+        # for text in leg.get_texts():
+            text.set_color(color)
+
+    plt.tight_layout()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color(main_color)
+    ax.spines['bottom'].set_color(main_color)
+
+    plt.show()
+
+    return fig
 
 def dot_plot_storage_biogas_options(results_storage,
         results_storage_biogas_options):
@@ -1180,54 +1308,54 @@ def bar_plot_capacities(results_capacities):
 
     X = np.arange(5)
 
+    ax.bar(X, results_capacities['pv'][0][:],
+           bar_width,
+           facecolor=main_color,
+           edgecolor='white',
+           label='kostenoptimiert')
+    line = ax.axhline(results_capacities['pv_2030'],
+            linewidth=2,
+            color='gold',
+            label='2030')
+    colors.append(plt.getp(line,'markeredgecolor'))
+    line = ax.axhline(results_capacities['pv_2050'],
+            linewidth=2,
+            color='goldenrod',
+            label='2050')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
     # ax.bar(X, results_capacities['wind'][0][:],
     #        bar_width,
-    #        facecolor=main_color,
+    #        facecolor='slateblue',
     #        edgecolor='white',
-    #        label='kostenoptimiert')
-    # line = ax.axhline(results_capacities['wind_2030'],
-    #         linewidth=2,
-    #         color='slateblue',
-    #         label='2030')
-    # # colors.append(plt.getp(line,'markeredgecolor'))
-    # line = ax.axhline(results_capacities['wind_2050'],
-    #         linewidth=2,
-    #         color='midnightblue',
-    #         label='2050')
-    # # colors.append(plt.getp(line,'markeredgecolor'))
-
-    ax.bar(X, results_capacities['wind'][0][:],
-           bar_width,
-           facecolor='slateblue',
-           edgecolor='white',
-           label='Windenergie')
-    ax.bar(X+bar_width, results_capacities['pv'][0][:],
-           bar_width,
-           facecolor='gold',
-           edgecolor='white',
-           label='PV')
+    #        label='Windenergie')
+    # ax.bar(X+bar_width, results_capacities['pv'][0][:],
+    #        bar_width,
+    #        facecolor='gold',
+    #        edgecolor='white',
+    #        label='PV')
 
     plt.ylim([0, 3600])
-    # plt.xticks(X, ('0.70', '0.75', '0.80', '0.85', '0.90'), fontsize=28, color=diagram_color)
-    plt.xticks(X + bar_width / 2, ('0.70', '0.75', '0.80', '0.85', '0.90'), fontsize=28, color=diagram_color)
+    plt.xticks(X, ('0.70', '0.75', '0.80', '0.85', '0.90'), fontsize=28, color=diagram_color)
+    # plt.xticks(X + bar_width / 2, ('0.70', '0.75', '0.80', '0.85', '0.90'), fontsize=28, color=diagram_color)
     plt.yticks([1000, 2000, 3000], fontsize=28, color=diagram_color)
     plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
     plt.ylabel('Installierte Leistung in MW', fontsize=28, color=diagram_color)
 
-    leg = ax.legend(loc='upper left', frameon=False, prop={'size': 28})
-    # leg = ax.legend(loc=(0.03, 0.42), frameon=False, prop={'size': 28}) # für PV-Grafik
+    # leg = ax.legend(loc='upper left', frameon=False, prop={'size': 28})
+    leg = ax.legend(loc=(0.03, 0.42), frameon=False, prop={'size': 28}) # für PV-Grafik
     leg.set_title('Masterplanregion', prop={'size': 28})
     leg._legend_box.align = 'left'
 
-    for bar,text in zip(leg.get_patches(), leg.get_texts()):
-        text.set_color(bar.get_facecolor())
+    # for bar,text in zip(leg.get_patches(), leg.get_texts()):
+    #     text.set_color(bar.get_facecolor())
     # for color,text in zip(['slateblue', 'midnightblue', main_color], leg.get_texts()):
-        # text.set_color(color)
-    # for color,text in zip(['gold', 'goldenrod', main_color], leg.get_texts()):
     #     text.set_color(color)
-    # for color,text in zip(colors,leg.get_texts()):
-    # # for text in l.get_texts():
-    #     text.set_color(color)
+    for color,text in zip(['gold', 'goldenrod', main_color], leg.get_texts()):
+        text.set_color(color)
+    for color,text in zip(colors,leg.get_texts()):
+    # for text in l.get_texts():
+        text.set_color(color)
 
     plt.tight_layout()
     ax.spines['top'].set_visible(False)
@@ -1381,8 +1509,10 @@ def bar_plot_excess(results_excess):
 if __name__ == '__main__':
     arguments = docopt(__doc__)
     print(arguments)
-    results_storage = read_results_storage()
-    fig = dot_plot_storage(results_storage)
+    # results_storage = read_results_storage()
+    # fig = dot_plot_storage(results_storage)
+    results_storage_quartier = read_results_storage_quartier()
+    fig = dot_plot_storage_quartier(results_storage_quartier)
     # results_capacities = read_results_capacities()
     # fig = bar_plot_capacities(results_capacities)
     # (results_deficit, results_excess, results_demand) = read_results_deficit_excess()
