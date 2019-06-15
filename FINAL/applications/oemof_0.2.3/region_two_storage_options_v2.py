@@ -8,13 +8,16 @@ Usage: example_region.py [options]
 Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario]
+  -c, --cost=COST          The cost scenario. [default: 1]
+  -t, --tech=TECH          The tech scenario. [default: 1]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
+
                            or "gurobi".
                            [default: cbc]
   -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
                            WARNING, ERROR or CRITICAL.
                            [default: ERROR]
-  -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
+      --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
   -h, --help               Display this help.
       --year=YEAR          Weather data year. Choose from 1998 to 2014
                            [default: 2005]
@@ -93,11 +96,13 @@ def read_and_calculate_parameters(**arguments):
         delimiter=',', index_col=0)
 
     cost_parameter = pd.read_csv(
-        '../../scenarios/region/' + arguments['--scenario'] + '_cost_parameter.csv',
+        '../../scenarios/region/' + arguments['--scenario'] +
+            '_cost_parameter_' + str(arguments['--cost']) + '.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        '../../scenarios/region/' + arguments['--scenario'] + '_tech_parameter.csv',
+        '../../scenarios/region/' + arguments['--scenario'] +
+            '_tech_parameter_' + str(arguments['--tech']) + '.csv',
         delimiter=',', index_col=0)
 
     data = pd.read_csv("../../data/storage_invest.csv", sep=',')
@@ -132,6 +137,13 @@ def read_and_calculate_parameters(**arguments):
     storage_long_epc = storage_long_capex * (storage_long_wacc * (1 + storage_long_wacc) **
                                    storage_long_lifetime) / ((1 + storage_long_wacc) **
                                                         storage_long_lifetime - 1)
+
+    storage_power_long_capex = cost_parameter.loc['storage_power_long']['capex']
+    storage_power_long_lifetime = cost_parameter.loc['storage_power_long']['lifetime']
+    storage_power_long_wacc = cost_parameter.loc['storage_power_long']['wacc']
+    storage_power_long_epc = storage_power_long_capex * (storage_power_long_wacc * (1 + storage_power_long_wacc) **
+                                   storage_power_long_lifetime) / ((1 + storage_power_long_wacc) **
+                                                        storage_power_long_lifetime - 1)
 
     wind_capex = cost_parameter.loc['wind']['capex']
     wind_lifetime = cost_parameter.loc['wind']['lifetime']
@@ -183,6 +195,7 @@ def read_and_calculate_parameters(**arguments):
                   'tech_parameter': tech_parameter,
                   'storage_short_epc': storage_short_epc,
                   'storage_long_epc': storage_long_epc,
+                  'storage_power_long_epc': storage_power_long_epc,
                   'wind_epc': wind_epc,
                   'pv_epc': pv_epc,
                   'biogas_bhkw_epc': biogas_bhkw_epc,
@@ -220,16 +233,16 @@ def create_energysystem(energysystem, parameters, loopi,
     # adding the buses to the energy system
     energysystem.add(bel, bbiogas)
 
-    # Create storage transformer object for storage
+    # Create storage transformer object for short term storage
     energysystem.add(solph.components.GenericStorage(
         label='region_'+str(loopi)+'_bat_short',
         inputs={bel: solph.Flow(variable_costs=0)},
         outputs={bel: solph.Flow(variable_costs=0)},
         capacity_loss=parameters[
             'tech_parameter'].loc['storage_short']['cap_loss'],
-        nominal_input_capacity_ratio=parameters[
+        invest_relation_input_capacity=parameters[
             'tech_parameter'].loc['storage_short']['c_rate'],
-        nominal_output_capacity_ratio=parameters[
+        invest_relation_output_capacity=parameters[
             'tech_parameter'].loc['storage_short']['c_rate'],
         inflow_conversion_factor=parameters[
             'tech_parameter'].loc['storage_short']['eta_in'],
@@ -237,10 +250,12 @@ def create_energysystem(energysystem, parameters, loopi,
             'tech_parameter'].loc['storage_short']['eta_out'],
         investment=solph.Investment(ep_costs=parameters['storage_short_epc']+parameters['cost_parameter'].loc['storage_short']['opex_fix'])))
 
+    # Create storage transformer object for long term storage
     energysystem.add(solph.components.GenericStorage(
         label='region_'+str(loopi)+'_bat_long',
-        inputs={bel: solph.Flow(variable_costs=0)},
-        outputs={bel: solph.Flow(variable_costs=0)},
+        inputs={bel: solph.Flow(variable_costs=0, investment=solph.Investment(ep_costs=parameters['storage_power_long_epc']))},
+        outputs={bel: solph.Flow(variable_costs=0, investment=solph.Investment(ep_costs=0))},
+        invest_relation_input_output=1,
         capacity_loss=parameters[
             'tech_parameter'].loc['storage_long']['cap_loss'],
         inflow_conversion_factor=parameters[
