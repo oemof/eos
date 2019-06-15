@@ -12,6 +12,7 @@ Options:
       --scenario=SCEN      scenario or path to results
                            [default: masterplan_results_mit_biogas_unflex]
       --scenario_year=SY   2030, 2050 or both. [default: both]
+      --storage=S          1 or 2. [default: 1]
       --save               Save figure.
 '''
 
@@ -420,6 +421,1015 @@ def read_results_storage():
                            'costopt': results_storage_costopt_GWh}
 
     return results_storage_GWh
+
+
+def read_results_storage_two():
+
+    results_storage_two_2030_short = np.zeros(5).reshape(1, 5)
+    results_storage_two_2030_short_in = np.zeros(5).reshape(1, 5)
+    results_storage_two_2030_short_out = np.zeros(5).reshape(1, 5)
+    results_storage_two_2030_long = np.zeros(5).reshape(1, 5)
+    results_storage_two_2030_long_in = np.zeros(5).reshape(1, 5)
+    results_storage_two_2030_long_out = np.zeros(5).reshape(1, 5)
+
+    results_storage_two_2030_short[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_2030_short[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_2030_short[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_2030_short[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_2030_short[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2030_short_in[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_2030_short_in[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_2030_short_in[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_2030_short_in[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_2030_short_in[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2030_short_out[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_2030_short_out[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_2030_short_out[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_2030_short_out[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_2030_short_out[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2030_long[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_2030_long[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_2030_long[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_2030_long[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_2030_long[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2030_long_in[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_2030_long_in[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_2030_long_in[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_2030_long_in[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_2030_long_in[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2030_long_out[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2030_long_out[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2030_long_out[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2030_long_out[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2030_long_out[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2050_short = np.zeros(5).reshape(1, 5)
+    results_storage_two_2050_short_in = np.zeros(5).reshape(1, 5)
+    results_storage_two_2050_short_out = np.zeros(5).reshape(1, 5)
+    results_storage_two_2050_long = np.zeros(5).reshape(1, 5)
+    results_storage_two_2050_long_in = np.zeros(5).reshape(1, 5)
+    results_storage_two_2050_long_out = np.zeros(5).reshape(1, 5)
+
+    results_storage_two_2050_short[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_2050_short[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_2050_short[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_2050_short[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_2050_short[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2050_short_in[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_2050_short_in[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_2050_short_in[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_2050_short_in[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_2050_short_in[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2050_short_out[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_2050_short_out[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_2050_short_out[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_2050_short_out[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_2050_short_out[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2050_long[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_2050_long[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_2050_long[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_2050_long[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_2050_long[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2050_long_in[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_2050_long_in[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_2050_long_in[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_2050_long_in[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_2050_long_in[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_2050_long_out[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2050_long_out[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2050_long_out[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2050_long_out[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2050_long_out[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/2_v2_szenario_mit_biogas_unflex_zwei_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_costopt_short = np.zeros(5).reshape(1, 5)
+    results_storage_two_costopt_short_in = np.zeros(5).reshape(1, 5)
+    results_storage_two_costopt_short_out = np.zeros(5).reshape(1, 5)
+    results_storage_two_costopt_long = np.zeros(5).reshape(1, 5)
+    results_storage_two_costopt_long_in = np.zeros(5).reshape(1, 5)
+    results_storage_two_costopt_long_out = np.zeros(5).reshape(1, 5)
+
+    results_storage_two_costopt_short[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_costopt_short[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_costopt_short[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_costopt_short[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+    results_storage_two_costopt_short[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_cap_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_costopt_short_in[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_costopt_short_in[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_costopt_short_in[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_costopt_short_in[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+    results_storage_two_costopt_short_in[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_in_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_costopt_short_out[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_costopt_short_out[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_costopt_short_out[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_costopt_short_out[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+    results_storage_two_costopt_short_out[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_short_out_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_costopt_long[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_costopt_long[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_costopt_long[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_costopt_long[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+    results_storage_two_costopt_long[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_cap_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_costopt_long_in[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_costopt_long_in[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_costopt_long_in[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_costopt_long_in[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+    results_storage_two_costopt_long_in[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_in_max_1']
+
+# --------------------------------------------------------------------------------------------------
+
+    results_storage_two_costopt_long_out[0][0] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_costopt_long_out[0][1] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_costopt_long_out[0][2] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_costopt_long_out[0][3] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_costopt_long_out[0][4] = pd.read_pickle(open('../results/2_ZWEI_SPEICHER' +
+                                        '/6_v2_costopt_mit_biogas_costopt_zwei_speicher/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90' + '_' +
+                                        str(arguments['--storage']) +
+                                        '_.p', 'rb'))['storage_long_out_max_1']
+
+    results_storage_two_2030_short_GWh = results_storage_two_2030_short / 1e6
+    results_storage_two_2030_short_in_GW = results_storage_two_2030_short_in / 1e6
+    results_storage_two_2030_short_out_GW = results_storage_two_2030_short_out / 1e6
+
+    results_storage_two_2050_short_GWh = results_storage_two_2050_short / 1e6
+    results_storage_two_2050_short_in_GW = results_storage_two_2050_short_in / 1e6
+    results_storage_two_2050_short_out_GW = results_storage_two_2050_short_out / 1e6
+
+    results_storage_two_costopt_short_GWh = results_storage_two_costopt_short / 1e6
+    results_storage_two_costopt_short_in_GW = results_storage_two_costopt_short_in / 1e6
+    results_storage_two_costopt_short_out_GW = results_storage_two_costopt_short_out / 1e6
+
+    results_storage_two_2030_long_GWh = results_storage_two_2030_long / 1e6
+    results_storage_two_2030_long_in_GW = results_storage_two_2030_long_in / 1e6
+    results_storage_two_2030_long_out_GW = results_storage_two_2030_long_out / 1e6
+
+    results_storage_two_2050_long_GWh = results_storage_two_2050_long / 1e6
+    results_storage_two_2050_long_in_GW = results_storage_two_2050_long_in / 1e6
+    results_storage_two_2050_long_out_GW = results_storage_two_2050_long_out / 1e6
+
+    results_storage_two_costopt_long_GWh = results_storage_two_costopt_long / 1e6
+    results_storage_two_costopt_long_in_GW = results_storage_two_costopt_long_in / 1e6
+    results_storage_two_costopt_long_out_GW = results_storage_two_costopt_long_out / 1e6
+
+    results_storage_two_short_GWh = {'2030': results_storage_two_2030_short_GWh,
+                           '2050': results_storage_two_2050_short_GWh,
+                           'costopt': results_storage_two_costopt_short_GWh}
+
+    results_storage_two_short_in_GW = {'2030': results_storage_two_2030_short_in_GW,
+                           '2050': results_storage_two_2050_short_in_GW,
+                           'costopt': results_storage_two_costopt_short_in_GW}
+
+    results_storage_two_short_out_GW = {'2030': results_storage_two_2030_short_out_GW,
+                           '2050': results_storage_two_2050_short_out_GW,
+                           'costopt': results_storage_two_costopt_short_out_GW}
+
+    results_storage_two_long_GWh = {'2030': results_storage_two_2030_long_GWh,
+                           '2050': results_storage_two_2050_long_GWh,
+                           'costopt': results_storage_two_costopt_long_GWh}
+
+    results_storage_two_long_in_GW = {'2030': results_storage_two_2030_long_in_GW,
+                           '2050': results_storage_two_2050_long_in_GW,
+                           'costopt': results_storage_two_costopt_long_in_GW}
+
+    results_storage_two_long_out_GW = {'2030': results_storage_two_2030_long_out_GW,
+                           '2050': results_storage_two_2050_long_out_GW,
+                           'costopt': results_storage_two_costopt_long_out_GW}
+
+    return (results_storage_two_short_GWh,
+            results_storage_two_short_in_GW,
+            results_storage_two_short_out_GW,
+            results_storage_two_long_GWh,
+            results_storage_two_long_in_GW,
+            results_storage_two_long_out_GW)
 
 
 def read_results_storage_quartier():
@@ -1154,6 +2164,87 @@ def dot_plot_storage(results_storage):
     return fig
 
 
+def dot_plot_storage_two(results_storage_two_short,
+        results_storage_two_short_in,
+        results_storage_two_short_out,
+        results_storage_two_long,
+        results_storage_two_long_in,
+        results_storage_two_long_out):
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = plt.subplot()
+
+    lw = 3
+    diagram_color = 'black'
+    main_color = '#7f7f7f'
+    colors = []
+
+    line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                     results_storage_two_short_out['2030'][0][:],
+                     linestyle='',
+                     marker='o',
+                     markersize=16,
+                     markeredgecolor='orange',
+                     markeredgewidth=3,
+                     markerfacecolor='None',
+                     label='2030')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                     results_storage_two_short_out['2050'][0][:],
+                     linestyle='',
+                     marker='o',
+                     markersize=16,
+                     markeredgecolor='b',
+                     markeredgewidth=3,
+                     markerfacecolor='None',
+                     label='2050')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                     results_storage_two_short_out['costopt'][0][:],
+                     linestyle='',
+                     marker='o',
+                     markersize=16,
+                     markeredgecolor=main_color,
+                     markeredgewidth=3,
+                     markerfacecolor='None',
+                     label='kostenoptimiert')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    # plt.axis([0.68, 0.92,
+        # results_storage['2030'].min(), results_storage['2030'].max() + 1])
+
+    plt.xlim([0.68, 0.92])
+    # plt.ylim([0, 11])
+    # plt.ylim([0, 21])
+
+    plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 5, 10], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 5, 10, 15, 20], fontsize=28, color=diagram_color)
+    plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    # plt.ylabel('Speicherkapazität in GWh', fontsize=28, color=diagram_color)
+    # plt.ylabel('Max. Einspeicherleistung in GW', fontsize=28, color=diagram_color)
+    plt.ylabel('Max. Ausspeicherleistung in GW', fontsize=28, color=diagram_color)
+
+    leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
+    leg._legend_box.align = 'left'
+    # leg.set_title('Stadt und Landkreis Osnabrück vernetzt', prop={'size': 28})
+    for color,text in zip(colors,leg.get_texts()):
+        # for text in leg.get_texts():
+            text.set_color(color)
+
+    plt.tight_layout()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color(main_color)
+    ax.spines['bottom'].set_color(main_color)
+
+    plt.show()
+
+    return fig
+
+
 def dot_plot_storage_quartier(results_storage_quartier):
 
     print(results_storage_quartier['quartier'][0][:])
@@ -1509,10 +2600,23 @@ def bar_plot_excess(results_excess):
 if __name__ == '__main__':
     arguments = docopt(__doc__)
     print(arguments)
+
     # results_storage = read_results_storage()
     # fig = dot_plot_storage(results_storage)
-    results_storage_quartier = read_results_storage_quartier()
-    fig = dot_plot_storage_quartier(results_storage_quartier)
+    # results_storage_quartier = read_results_storage_quartier()
+    # fig = dot_plot_storage_quartier(results_storage_quartier)
+    (results_storage_two_short,
+            results_storage_two_short_in,
+            results_storage_two_short_out,
+            results_storage_two_long,
+            results_storage_two_long_in,
+            results_storage_two_long_out) = read_results_storage_two()
+    fig = dot_plot_storage_two(results_storage_two_short,
+            results_storage_two_short_in,
+            results_storage_two_short_out,
+            results_storage_two_long,
+            results_storage_two_long_in,
+            results_storage_two_long_out)
     # results_capacities = read_results_capacities()
     # fig = bar_plot_capacities(results_capacities)
     # (results_deficit, results_excess, results_demand) = read_results_deficit_excess()
