@@ -253,7 +253,7 @@ def create_energysystem(energysystem, parameters, loopi,
     # Create storage transformer object for long term storage
     energysystem.add(solph.components.GenericStorage(
         label='region_'+str(loopi)+'_bat_long',
-        inputs={bel: solph.Flow(variable_costs=0, investment=solph.Investment(ep_costs=parameters['storage_power_long_epc']))},
+        inputs={bel: solph.Flow(variable_costs=0, investment=solph.Investment(ep_costs=parameters['storage_power_long_epc']+parameters['cost_parameter'].loc['storage_power']['opex_fix']))},
         outputs={bel: solph.Flow(variable_costs=0, investment=solph.Investment(ep_costs=0))},
         invest_relation_input_output=1,
         capacity_loss=parameters[
