@@ -7,13 +7,15 @@ Usage: example_region.py [options]
 Options:
 
   -s, --scenario=SCENARIO  The scenario name. [default: scenario]
+  -c, --cost=COST          The cost scenario. [default: 0]
+  -t, --tech=TECH          The tech scenario. [default: 0]
   -o, --solver=SOLVER      The solver to use. Should be one of "glpk", "cbc"
                            or "gurobi".
                            [default: cbc]
   -l, --loglevel=LOGLEVEL  Set the loglevel. Should be one of DEBUG, INFO,
                            WARNING, ERROR or CRITICAL.
                            [default: ERROR]
-  -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
+      --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
   -h, --help               Display this help.
       --year=YEAR          Weather data year. Choose from 1998 to 2014
                            [default: 2005]
@@ -93,11 +95,13 @@ def read_and_calculate_parameters(**arguments):
         delimiter=',', index_col=0)
 
     cost_parameter = pd.read_csv(
-        '../../scenarios/region/' + arguments['--scenario'] + '_cost_parameter.csv',
+        '../../scenarios/region/' + arguments['--scenario'] +
+            '_cost_parameter_' + str(arguments['--cost']) + '.csv',
         delimiter=',', index_col=0)
 
     tech_parameter = pd.read_csv(
-        '../../scenarios/region/' + arguments['--scenario'] + '_tech_parameter.csv',
+        '../../scenarios/region/' + arguments['--scenario'] +
+            '_tech_parameter_' + str(arguments['--tech']) + '.csv',
         delimiter=',', index_col=0)
 
     data = pd.read_csv("../../data/storage_invest.csv", sep=',')
