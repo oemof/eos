@@ -234,7 +234,7 @@ def create_energysystem(energysystem, parameters, loopi,
         energysystem.add(solph.components.GenericStorage(
             label='region_'+str(loopi)+'_bat',
             inputs={bel: solph.Flow(investment=solph.Investment(
-                ep_costs=parameters['storage_power_epc']), variable_costs=0)},
+                ep_costs=parameters['storage_power_epc']+parameters['cost_parameter'].loc['storage_power']['opex_fix']), variable_costs=0)},
             outputs={bel: solph.Flow(variable_costs=0)},
             capacity_loss=parameters[
                 'tech_parameter'].loc['storage']['cap_loss'],
