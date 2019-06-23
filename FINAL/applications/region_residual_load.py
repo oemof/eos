@@ -119,7 +119,7 @@ def main(**arguments):
 
     # Get load profile data
     if arguments['--entsoe']:
-        data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+        data = pd.read_csv("../../example/example_data/storage_invest.csv", sep=',')
         data_load = data['demand_el']  # demand in kW
 
     if arguments['--entsoe_1']:
@@ -150,11 +150,11 @@ def main(**arguments):
 
     if arguments['--kombi_1']:
 
-        masterplan_lkos = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+        masterplan_lkos = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                       'lkos' + '.csv', sep=',',
                                       index_col=0)
 
-        masterplan_osna = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+        masterplan_osna = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                   'osna' + '.csv', sep=',',
                                   index_col=0)
 
@@ -353,15 +353,15 @@ def main(**arguments):
 
     if arguments['--kombi_3']:
 
-        masterplan_stein = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+        masterplan_stein = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                       'stein' + '.csv', sep=',',
                                       index_col=0)
 
-        masterplan_lkos = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+        masterplan_lkos = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                       'lkos' + '.csv', sep=',',
                                       index_col=0)
 
-        masterplan_osna = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+        masterplan_osna = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                       'osna' + '.csv', sep=',',
                                       index_col=0)
 
@@ -1373,7 +1373,7 @@ def main(**arguments):
     if arguments['--region_1']:
 
         if arguments['--load_1'] == 'entsoe':
-            data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+            data = pd.read_csv("../data/storage_invest.csv", sep=',')
             data_load = data['demand_el']  # demand in kW
 
         if arguments['--load_1'] == 'lkos':
@@ -1399,7 +1399,7 @@ def main(**arguments):
         h0_slp = h0_slp_15_min.resample('H').mean()
         data_load_2 = h0_slp['h0'].reset_index(drop=True)
 
-        masterplan = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+        masterplan = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                  str(arguments['--region_1']) + '.csv', sep=',',
                                  index_col=0)
 
@@ -1677,7 +1677,7 @@ def main(**arguments):
             residual_MW = results['grid_ts_1']/1000
 
         if arguments['--load_2'] == 'entsoe':
-            data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+            data = pd.read_csv("../data/storage_invest.csv", sep=',')
             data_load = data['demand_el']  # demand in kW
 
         if arguments['--load_2'] == 'lkos':
@@ -1698,22 +1698,22 @@ def main(**arguments):
             h0_slp = h0_slp_15_min.resample('H').mean()
             data_load = h0_slp['h0'].reset_index(drop=True)
 
-        # masterplan = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
-                                 # str(arguments['--region_2']) + '.csv', sep=',',
-                                 # index_col=0)
+        masterplan = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
+                               str(arguments['--region_2']) + '.csv', sep=',',
+                               index_col=0)
 
-        # print(masterplan)
+        print(masterplan)
 
-        # demand = masterplan.loc['demand'][str(arguments['--year_2'])]  # demand in GWh
-        # wind = masterplan.loc['wind'][str(arguments['--year_2'])]  # installed wind in MW
-        # pv = masterplan.loc['pv'][str(arguments['--year_2'])]  # installed pv in MW
-        # bio = masterplan.loc['bio_MW'][str(arguments['--year_2'])]  # installed pv in MW
+        demand = masterplan.loc['demand'][str(arguments['--year_2'])]  # demand in GWh
+        wind = masterplan.loc['wind'][str(arguments['--year_2'])]  # installed wind in MW
+        pv = masterplan.loc['pv'][str(arguments['--year_2'])]  # installed pv in MW
+        bio = masterplan.loc['bio_MW'][str(arguments['--year_2'])]  # installed pv in MW
 
-        # demand_ts_MW = data_load/data_load.sum() * demand * 1e3
-        # wind_ts_MW = data_weather['wind']*wind
-        # pv_ts_MW = data_weather['pv']*pv
-        # bio_ts_MW = np.ones(8760)*bio
-        # residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW + bio_ts_MW)
+        demand_ts_MW = data_load/data_load.sum() * demand * 1e3
+        wind_ts_MW = data_weather['wind']*wind
+        pv_ts_MW = data_weather['pv']*pv
+        bio_ts_MW = np.ones(8760)*bio
+        residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW + bio_ts_MW)
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
@@ -1857,7 +1857,7 @@ def main(**arguments):
     if arguments['--region_3']:
 
         if arguments['--load_3'] == 'entsoe':
-            data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+            data = pd.read_csv("../data/storage_invest.csv", sep=',')
             data_load = data['demand_el']  # demand in kW
 
         if arguments['--load_3'] == 'lkos':
@@ -1878,7 +1878,7 @@ def main(**arguments):
             h0_slp = h0_slp_15_min.resample('H').mean()
             data_load = h0_slp['h0'].reset_index(drop=True)
 
-        masterplan = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+        masterplan = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                  str(arguments['--region_3']) + '.csv', sep=',',
                                  index_col=0)
 
@@ -2038,7 +2038,7 @@ def main(**arguments):
     if arguments['--region_4']:
 
         if arguments['--load_4'] == 'entsoe':
-            data = pd.read_csv("../example/example_data/storage_invest.csv", sep=',')
+            data = pd.read_csv("../../example/example_data/storage_invest.csv", sep=',')
             data_load = data['demand_el']  # demand in kW
 
         if arguments['--load_4'] == 'lkos':
@@ -2059,7 +2059,7 @@ def main(**arguments):
             h0_slp = h0_slp_15_min.resample('H').mean()
             data_load = h0_slp['h0'].reset_index(drop=True)
 
-        masterplan = pd.read_csv('../examples_SOLPH_0.1/scenarios/masterplan_' +
+        masterplan = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
                                  str(arguments['--region_4']) + '.csv', sep=',',
                                  index_col=0)
 
@@ -2135,7 +2135,7 @@ if __name__ == "__main__":
                              wind=(results['woche_pv'] +
                                    results['woche_wind'] +
                                    results['woche_bio']),
-                             res_name=('Power in MW'),
+                             res_name=('Power [MW]'),
                              show=True)
 
         # fig = line.line_plot(pv=results['demand_ts'],
@@ -2145,28 +2145,28 @@ if __name__ == "__main__":
     if arguments['--jdl']:
         line = carpet_plot.Line
         if arguments['--kombi_1']:
-            results['residual_kombi_1'].sort(ascending=False)
+            results['residual_kombi_1'].sort_values(ascending=False,inplace=True)
         if arguments['--kombi_3']:
-            results['residual_kombi_3'].sort(ascending=False)
+            results['residual_kombi_3'].sort_values(ascending=False,inplace=True)
         if arguments['--kombi_3_1']:
-            results['residual_kombi_3_1'].sort(ascending=False)
+            results['residual_kombi_3_1'].sort_values(ascending=False,inplace=True)
         if arguments['--kombi_5']:
-            results['residual_kombi_5'].sort(ascending=False)
+            results['residual_kombi_5'].sort_values(ascending=False,inplace=True)
         if arguments['--kombi_5_1']:
-            results['residual_kombi_5_1'].sort(ascending=False)
+            results['residual_kombi_5_1'].sort_values(ascending=False,inplace=True)
         if arguments['--kombi_6']:
-            results['residual_kombi_6'].sort(ascending=False)
+            results['residual_kombi_6'].sort_values(ascending=False,inplace=True)
         if arguments['--region_1']:
-            results['residual_region_1'].sort(ascending=False)
+            results['residual_region_1'].sort_values(ascending=False, inplace=True)
             xxx = results['residual_region_1']
         if arguments['--region_2']:
-            results['residual_region_2'].sort_values(by=['val'], ascending=False)
+            results['residual_region_2'].sort_values(ascending=False, inplace=True)
             yyy = results['residual_region_2']
         if arguments['--region_3']:
-            results['residual_region_3'].sort(ascending=False)
+            results['residual_region_3'].sort_values(ascending=False, inplace=True)
             zzz = results['residual_region_3']
         if arguments['--region_4']:
-            results['residual_region_4'].sort(ascending=False)
+            results['residual_region_4'].sort_values(ascending=False,inplace=True)
 
         # xxx = xxx.to_frame().reset_index()
         # yyy = yyy.to_frame().reset_index()
@@ -2194,12 +2194,14 @@ if __name__ == "__main__":
         #                      # res_name=('Residual demand ' +
         #                      # str(arguments['--year']) + ' in MW'),
         #                      show=True)
-        print(results['residual_region_2'])
-        fig = line.line_plot(residual_2=results['residual_region_2'],
-                             # residual_3=results['residual_region_3'],
+
+        fig = line.line_plot(residual_1=results['residual_region_1'],
+                             #residual_2=results['residual_region_2'],
+                             #residual_3=results['residual_region_3'],
                              # residual_4=results['residual_region_4'],
-                             # residual_3=results['residual_kombi_3'],
-                             res_name='Residual load in MW',
+                             residual_2=results['residual_kombi_1'],
+                             residual_3=results['residual_kombi_3'],
+                             res_name='Residual load [MW]',
                              # res_name=('Residual demand ' +
                              # str(arguments['--year']) + ' in MW'),
                              show=True)
@@ -2224,7 +2226,7 @@ if __name__ == "__main__":
         fig = bar.bar_plot(Y1=results['covered_demand_monthly_region_1'],
                            Y2=results['negative_monthly_region_1'],
                            Y3=results['demand_monthly_region_1'],
-                           res_name='Demand in GWh',
+                           res_name='Demand [GWh]',
                            show=True)
 
         # fig = bar.bar_plot(Y1=(results['covered_demand_monthly_region_1'] +
@@ -2237,7 +2239,7 @@ if __name__ == "__main__":
         #                    show=True)
 
     if arguments['--save']:
-        fig.savefig(os.path.join(os.path.dirname(__file__), 'saved_figures/bar') +
+        fig.savefig(os.path.join(os.path.dirname(__file__), 'saved_figures') +
                 '/' + 'bar_' +
                 'region_1_' + str(arguments['--region_1']) + '_' +
                 'region_2_' + str(arguments['--region_2']) + '_' +
