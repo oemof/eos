@@ -292,6 +292,7 @@ def read_and_calculate_parameters(**arguments):
     data_load = \
         pd.read_csv(
              "../../data/quartier/example_data_load_hourly_mean_74_profiles.csv",
+             # "../../data/quartier/example_data_load_hourly_mean_73_profiles.csv",
                  sep=",") / 1000
     if arguments['--profile'] == 'summer':
         data_load = \
@@ -302,7 +303,7 @@ def read_and_calculate_parameters(**arguments):
     if arguments['--profile'] == 'winter':
         data_load = \
             pd.read_csv(
-                     "../../data/quartier/example_data_load_hourly_mean_WINTER.csv",
+                     "../../data/quartier/example_data_load_hourly_mean_WINTER_2.csv",
                      sep=",") / 1000
 
     if arguments['--profile'] == 'day':
@@ -625,10 +626,10 @@ def optimize_energysystem(energysystem):
 
     om = solph.OperationalModel(energysystem)
 
-#     logging.info('Store lp-file')
-#     om.write('optimization_problem.lp',
-#              io_options={'symbolic_solver_labels': True})
-#
+    logging.info('Store lp-file')
+    om.write('optimization_problem.lp',
+             io_options={'symbolic_solver_labels': True})
+
     logging.info('Solve the optimization problem')
     om.solve(solver=arguments['--solver'], solve_kwargs={'tee': True})
 
