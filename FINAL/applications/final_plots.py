@@ -37,7 +37,7 @@ def read_results_storage():
 
     if arguments['--region'] == 'krst_plus_lkos_addiert':
 
-        results_storage_2030[0][0] = (pd.read_pickle(open('../results' +
+        results_storage_2030[0][0] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -45,7 +45,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -53,7 +53,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_2030[0][1] = (pd.read_pickle(open('../results' +
+        results_storage_2030[0][1] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -61,7 +61,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -69,7 +69,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_2030[0][2] = (pd.read_pickle(open('../results' +
+        results_storage_2030[0][2] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -77,7 +77,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.80_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -85,7 +85,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.80_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_2030[0][3] = (pd.read_pickle(open('../results' +
+        results_storage_2030[0][3] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -93,7 +93,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.85_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -101,7 +101,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.85_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_2030[0][4] = (pd.read_pickle(open('../results' +
+        results_storage_2030[0][4] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -109,7 +109,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.90_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -119,7 +119,7 @@ def read_results_storage():
 
     else:
 
-        results_storage_2030[0][0] = pd.read_pickle(open('../results' +
+        results_storage_2030[0][0] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -127,7 +127,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_2030[0][1] = pd.read_pickle(open('../results' +
+        results_storage_2030[0][1] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -135,36 +135,36 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1']
 
-        # results_storage_2030[0][2] = pd.read_pickle(open('../results' +
-        #                                     '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
-        #                                     'region_results_dc' + '_' +
-        #                                     str(arguments['--region']) + '_' +
-        #                                     '2030' + '_' +
-        #                                     str(2005) + '_' +
-        #                                     '0.80_1_.p', 'rb'))['storage_cap_1']
+        results_storage_2030[0][2] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.80_1_.p', 'rb'))['storage_cap_1']
 
-        # results_storage_2030[0][3] = pd.read_pickle(open('../results' +
-        #                                     '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
-        #                                     'region_results_dc' + '_' +
-        #                                     str(arguments['--region']) + '_' +
-        #                                     '2030' + '_' +
-        #                                     str(2005) + '_' +
-        #                                     '0.85_1_.p', 'rb'))['storage_cap_1']
+        results_storage_2030[0][3] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.85_1_.p', 'rb'))['storage_cap_1']
 
-        # results_storage_2030[0][4] = pd.read_pickle(open('../results' +
-        #                                     '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
-        #                                     'region_results_dc' + '_' +
-        #                                     str(arguments['--region']) + '_' +
-        #                                     '2030' + '_' +
-        #                                     str(2005) + '_' +
-        #                                     '0.90_1_.p', 'rb'))['storage_cap_1']
+        results_storage_2030[0][4] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                            '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
+                                            'region_results_dc' + '_' +
+                                            str(arguments['--region']) + '_' +
+                                            '2030' + '_' +
+                                            str(2005) + '_' +
+                                            '0.90_1_.p', 'rb'))['storage_cap_1']
 
 
     results_storage_2050 = np.zeros(5).reshape(1, 5)
 
     if arguments['--region'] == 'krst_plus_lkos_addiert':
 
-        results_storage_2050[0][0] = (pd.read_pickle(open('../results' +
+        results_storage_2050[0][0] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -172,7 +172,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -180,7 +180,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_2050[0][1] = (pd.read_pickle(open('../results' +
+        results_storage_2050[0][1] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -188,7 +188,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -196,7 +196,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_2050[0][2] = (pd.read_pickle(open('../results' +
+        results_storage_2050[0][2] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -204,7 +204,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.80_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -212,7 +212,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.80_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_2050[0][3] = (pd.read_pickle(open('../results' +
+        results_storage_2050[0][3] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -220,7 +220,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.85_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -228,7 +228,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.85_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_2050[0][4] = (pd.read_pickle(open('../results' +
+        results_storage_2050[0][4] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -236,7 +236,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.90_1_.p', 'rb'))['storage_cap_1'] +
 
-                                     pd.read_pickle(open('../results' +
+                                     pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -246,7 +246,7 @@ def read_results_storage():
 
     else:
 
-        results_storage_2050[0][0] = pd.read_pickle(open('../results' +
+        results_storage_2050[0][0] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -254,7 +254,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_2050[0][1] = pd.read_pickle(open('../results' +
+        results_storage_2050[0][1] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -262,7 +262,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_2050[0][2] = pd.read_pickle(open('../results' +
+        results_storage_2050[0][2] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -270,7 +270,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.80_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_2050[0][3] = pd.read_pickle(open('../results' +
+        results_storage_2050[0][3] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -278,7 +278,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.85_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_2050[0][4] = pd.read_pickle(open('../results' +
+        results_storage_2050[0][4] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/2_szenario_mit_biogas_unflex_ein_speicher' + '/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -290,7 +290,7 @@ def read_results_storage():
 
     if arguments['--region'] == 'krst_plus_lkos_addiert':
 
-        results_storage_costopt[0][0] = (pd.read_pickle(open('../results' +
+        results_storage_costopt[0][0] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -298,7 +298,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1'] +
 
-                                        pd.read_pickle(open('../results' +
+                                        pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -306,7 +306,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_costopt[0][1] = (pd.read_pickle(open('../results' +
+        results_storage_costopt[0][1] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -314,7 +314,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1'] +
 
-                                        pd.read_pickle(open('../results' +
+                                        pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -322,7 +322,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_costopt[0][2] = (pd.read_pickle(open('../results' +
+        results_storage_costopt[0][2] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -330,7 +330,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.80_1_.p', 'rb'))['storage_cap_1'] +
 
-                                        pd.read_pickle(open('../results' +
+                                        pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -338,7 +338,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.80_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_costopt[0][3] = (pd.read_pickle(open('../results' +
+        results_storage_costopt[0][3] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -346,7 +346,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.85_1_.p', 'rb'))['storage_cap_1'] +
 
-                                        pd.read_pickle(open('../results' +
+                                        pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -354,7 +354,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.85_1_.p', 'rb'))['storage_cap_1'])
 
-        results_storage_costopt[0][4] = (pd.read_pickle(open('../results' +
+        results_storage_costopt[0][4] = (pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'kreis_steinfurt' + '_' +
@@ -362,7 +362,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.90_1_.p', 'rb'))['storage_cap_1'] +
 
-                                        pd.read_pickle(open('../results' +
+                                        pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             'landkreis_osnabrueck' + '_' +
@@ -372,7 +372,7 @@ def read_results_storage():
 
     else:
 
-        results_storage_costopt[0][0] = pd.read_pickle(open('../results' +
+        results_storage_costopt[0][0] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -380,7 +380,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.70_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_costopt[0][1] = pd.read_pickle(open('../results' +
+        results_storage_costopt[0][1] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -388,7 +388,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.75_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_costopt[0][2] = pd.read_pickle(open('../results' +
+        results_storage_costopt[0][2] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -396,7 +396,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.80_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_costopt[0][3] = pd.read_pickle(open('../results' +
+        results_storage_costopt[0][3] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -404,7 +404,7 @@ def read_results_storage():
                                             str(2005) + '_' +
                                             '0.85_1_.p', 'rb'))['storage_cap_1']
 
-        results_storage_costopt[0][4] = pd.read_pickle(open('../results' +
+        results_storage_costopt[0][4] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
                                             '/6_v2_costopt_mit_biogas_costopt_ein_speicher/' +
                                             'region_results_dc' + '_' +
                                             str(arguments['--region']) + '_' +
@@ -1435,9 +1435,12 @@ def read_results_storage_two():
 def read_results_storage_quartier():
 
     results_storage_quartier = np.zeros(3).reshape(1, 3)
+    results_storage_quartier_costopt = np.zeros(3).reshape(1, 3)
     # results_storage_quartier = np.zeros(5).reshape(1, 5)
+    # results_storage_quartier_costopt = np.zeros(5).reshape(1, 5)
 
-    results_storage_quartier[0][0] = pd.read_pickle('../results/quartier/' +
+################################################################
+    results_storage_quartier[0][0] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
                                         'quartier_results_' +
                                         '74' +
                                         '_1_1_' +
@@ -1447,7 +1450,7 @@ def read_results_storage_quartier():
                                         '_' +
                                         '.p')['storage_cap']
 
-    results_storage_quartier[0][1] = pd.read_pickle('../results/quartier/' +
+    results_storage_quartier[0][1] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
                                         'quartier_results_' +
                                         '74' +
                                         '_1_1_' +
@@ -1457,7 +1460,7 @@ def read_results_storage_quartier():
                                         '_' +
                                         '.p')['storage_cap']
 
-    results_storage_quartier[0][2] = pd.read_pickle('../results/quartier/' +
+    results_storage_quartier[0][2] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
                                         'quartier_results_' +
                                         '74' +
                                         '_1_1_' +
@@ -1467,7 +1470,7 @@ def read_results_storage_quartier():
                                         '_' +
                                         '.p')['storage_cap']
 
-    # results_storage_quartier[0][3] = pd.read_pickle('../results/quartier/' +
+    # results_storage_quartier[0][3] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
     #                                     'quartier_results_' +
     #                                     '74' +
     #                                     '_1_1_' +
@@ -1477,7 +1480,7 @@ def read_results_storage_quartier():
     #                                     '_' +
     #                                     '.p')['storage_cap']
 
-    # results_storage_quartier[0][4] = pd.read_pickle('../results/quartier/' +
+    # results_storage_quartier[0][4] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
     #                                     'quartier_results_' +
     #                                     '74' +
     #                                     '_1_1_' +
@@ -1487,9 +1490,166 @@ def read_results_storage_quartier():
     #                                     '_' +
     #                                     '.p')['storage_cap']
 
-    results_storage_kWh = {'quartier': results_storage_quartier}
+################################################################
+# COSTOPT
+    results_storage_quartier_costopt[0][0] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.5' +
+                                        '_costopt' +
+                                        '.p')['storage_cap']
+
+    results_storage_quartier_costopt[0][1] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.6' +
+                                        '_costopt' +
+                                        '.p')['storage_cap']
+
+    results_storage_quartier_costopt[0][2] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.7' +
+                                        '_costopt' +
+                                        '.p')['storage_cap']
+
+    # results_storage_quartier_costopt[0][3] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+    #                                     'quartier_results_' +
+    #                                     '74' +
+    #                                     '_1_1_' +
+    #                                     '2005' +
+    #                                     '_' +
+    #                                     '0.8' +
+    #                                     '_costopt' +
+    #                                     '.p')['storage_cap']
+
+    # results_storage_quartier_costopt[0][4] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+    #                                     'quartier_results_' +
+    #                                     '74' +
+    #                                     '_1_1_' +
+    #                                     '2005' +
+    #                                     '_' +
+    #                                     '0.9' +
+    #                                     '_costopt' +
+    #                                     '.p')['storage_cap']
+
+    results_storage_kWh = {'quartier': results_storage_quartier,
+            'quartier_costopt': results_storage_quartier_costopt}
 
     return results_storage_kWh
+
+
+def read_results_storage_pv_quartier_costopt():
+
+    results_pv_quartier_costopt = np.zeros(3).reshape(1, 3)
+    # results_storage_quartier_costopt = np.zeros(5).reshape(1, 5)
+
+################################################################
+# COSTOPT
+    results_pv_quartier_costopt[0][0] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.5' +
+                                        '_costopt' +
+                                        '.p')['pv_inst']
+
+    results_pv_quartier_costopt[0][1] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.6' +
+                                        '_costopt' +
+                                        '.p')['pv_inst']
+
+    results_pv_quartier_costopt[0][2] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+                                        'quartier_results_' +
+                                        '74' +
+                                        '_1_1_' +
+                                        '2005' +
+                                        '_' +
+                                        '0.7' +
+                                        '_costopt' +
+                                        '.p')['pv_inst']
+
+    # results_pv_quartier_costopt[0][3] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+    #                                     'quartier_results_' +
+    #                                     '74' +
+    #                                     '_1_1_' +
+    #                                     '2005' +
+    #                                     '_' +
+    #                                     '0.8' +
+    #                                     '_costopt' +
+    #                                     '.p')['pv_inst']
+
+    # results_pv_quartier_costopt[0][4] = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
+    #                                     'quartier_results_' +
+    #                                     '74' +
+    #                                     '_1_1_' +
+    #                                     '2005' +
+    #                                     '_' +
+    #                                     '0.9' +
+    #                                     '_costopt' +
+    #                                     '.p')['pv_inst']
+
+    results_pv_kW = {'quartier_pv_costopt': results_pv_quartier_costopt}
+
+    return results_pv_kW
+
+
+def read_results_storage_quartier_random():
+
+    df_storage = pd.DataFrame(columns=['storage_random'])
+    df_storage_costopt = pd.DataFrame(columns=['storage_costopt_random'])
+
+    for n in np.arange(100):
+        storage = pd.read_pickle('../results/QUARTIER_RANDOM/' +
+                                            'quartier_results_' +
+                                            '73' +
+                                            '_1_1_' +
+                                            '2005' +
+                                            '_' +
+                                            '0.7_' +
+                                            str(n+1) +
+                                            '_random' +
+                                            '.p')['storage_cap']
+
+        df_storage = df_storage.append({'storage_random': storage},
+                                    ignore_index=True)
+
+    for n in np.arange(100):
+        storage_costopt = pd.read_pickle('../results/QUARTIER_RANDOM/' +
+                                                    'quartier_results_' +
+                                                    '73' +
+                                                    '_1_1_' +
+                                                    '2005' +
+                                                    '_' +
+                                                    '0.7_costopt_' +
+                                                    str(n+1) +
+                                                    '_random' +
+                                                    '.p')['storage_cap']
+
+        df_storage_costopt = df_storage_costopt.append({'storage_costopt_random': storage_costopt},
+                                    ignore_index=True)
+
+    df_random = pd.concat([df_storage, df_storage_costopt], axis=1)
+
+    print(df_random)
+
+    return df_random
 
 
 def read_results_storage_biogas_options():
@@ -2105,7 +2265,8 @@ def dot_plot_storage(results_storage):
                      linestyle='',
                      marker='o',
                      markersize=16,
-                     markeredgecolor='orange',
+                     # markeredgecolor='orange',
+                     markeredgecolor='goldenrod',
                      markeredgewidth=3,
                      markerfacecolor='None',
                      label='2030')
@@ -2116,7 +2277,8 @@ def dot_plot_storage(results_storage):
                      linestyle='',
                      marker='o',
                      markersize=16,
-                     markeredgecolor='b',
+                     # markeredgecolor='b',
+                     markeredgecolor='darkblue',
                      markeredgewidth=3,
                      markerfacecolor='None',
                      label='2050')
@@ -2130,17 +2292,18 @@ def dot_plot_storage(results_storage):
                      markeredgecolor=main_color,
                      markeredgewidth=3,
                      markerfacecolor='None',
-                     label='kostenoptimiert')
+                     label='Kostenoptimum')
     colors.append(plt.getp(line,'markeredgecolor'))
 
     # plt.axis([0.68, 0.92,
         # results_storage['2030'].min(), results_storage['2030'].max() + 1])
 
     plt.xlim([0.68, 0.92])
-    # plt.ylim([0, 11])
-    plt.ylim([0, 21])
+    # plt.ylim([0, 11.5])
+    plt.ylim([0, 21.5])
 
-    plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90], fontsize=28, color=diagram_color)
+    plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90])
+    ax.set_xticklabels(['0,70', '0,75', '0,80', '0,85', '0,90'], fontsize=28, color=diagram_color)
     # plt.yticks([0, 5, 10], fontsize=28, color=diagram_color)
     plt.yticks([0, 5, 10, 15, 20], fontsize=28, color=diagram_color)
     plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
@@ -2148,7 +2311,7 @@ def dot_plot_storage(results_storage):
 
     leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
     leg._legend_box.align = 'left'
-    leg.set_title('Stadt und Landkreis Osnabrück vernetzt', prop={'size': 28})
+    # leg.set_title('Stadt und Landkreis Osnabrück vernetzt', prop={'size': 28})
     for color,text in zip(colors,leg.get_texts()):
         # for text in leg.get_texts():
             text.set_color(color)
@@ -2180,7 +2343,7 @@ def dot_plot_storage_two(results_storage_two_short,
     colors = []
 
     line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-                     results_storage_two_short_out['2030'][0][:],
+                     results_storage_two_short['2030'][0][:],
                      linestyle='',
                      marker='o',
                      markersize=16,
@@ -2191,7 +2354,7 @@ def dot_plot_storage_two(results_storage_two_short,
     colors.append(plt.getp(line,'markeredgecolor'))
 
     line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-                     results_storage_two_short_out['2050'][0][:],
+                     results_storage_two_short['2050'][0][:],
                      linestyle='',
                      marker='o',
                      markersize=16,
@@ -2202,7 +2365,7 @@ def dot_plot_storage_two(results_storage_two_short,
     colors.append(plt.getp(line,'markeredgecolor'))
 
     line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-                     results_storage_two_short_out['costopt'][0][:],
+                     results_storage_two_short['costopt'][0][:],
                      linestyle='',
                      marker='o',
                      markersize=16,
@@ -2221,11 +2384,12 @@ def dot_plot_storage_two(results_storage_two_short,
 
     plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90], fontsize=28, color=diagram_color)
     # plt.yticks([0, 5, 10], fontsize=28, color=diagram_color)
-    # plt.yticks([0, 5, 10, 15, 20], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 50, 100, 150, 200], fontsize=28, color=diagram_color)
+    plt.yticks([0, 5, 10, 15, 20], fontsize=28, color=diagram_color)
     plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
-    # plt.ylabel('Speicherkapazität in GWh', fontsize=28, color=diagram_color)
+    plt.ylabel('Speicherkapazität in GWh', fontsize=28, color=diagram_color)
     # plt.ylabel('Max. Einspeicherleistung in GW', fontsize=28, color=diagram_color)
-    plt.ylabel('Max. Ausspeicherleistung in GW', fontsize=28, color=diagram_color)
+    # plt.ylabel('Max. Ausspeicherleistung in GW', fontsize=28, color=diagram_color)
 
     leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
     leg._legend_box.align = 'left'
@@ -2247,7 +2411,8 @@ def dot_plot_storage_two(results_storage_two_short,
 
 def dot_plot_storage_quartier(results_storage_quartier):
 
-    print(results_storage_quartier['quartier'][0][:])
+    # print(results_storage_quartier['quartier'][0][:])
+    # print(results_storage_quartier['quartier_costopt'][0][:])
 
     fig = plt.figure(figsize=(12, 8))
     ax = plt.subplot()
@@ -2257,29 +2422,49 @@ def dot_plot_storage_quartier(results_storage_quartier):
     main_color = '#7f7f7f'
     colors = []
 
-    # line, = ax.plot([0.50, 0.60, 0.70, 0.80, 0.90],
     line, = ax.plot([0.50, 0.60, 0.70],
                      results_storage_quartier['quartier'][0][:],
                      linestyle='',
                      marker='o',
                      markersize=16,
-                     markeredgecolor='orange',
+                     markeredgecolor='#00AFAF',
                      markeredgewidth=3,
                      markerfacecolor='None',
                      label='CES')
     colors.append(plt.getp(line,'markeredgecolor'))
 
-    # line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+    # line, = ax.plot([0.50, 0.60, 0.70],
+    #                  results_storage_quartier['quartier_costopt'][0][:],
+    #                  linestyle='',
+    #                  marker='o',
+    #                  markersize=16,
+    #                  markeredgecolor='#00AFAF',
+    #                  markeredgewidth=3,
+    #                  markerfacecolor='None',
+    #                  label='CES und PV kostenoptimiert')
+    # colors.append(plt.getp(line,'markeredgecolor'))
+
     line, = ax.plot([0.50, 0.60, 0.70],
-                     [133, 424, 1695],
+                     [126, 269, 461],
                      linestyle='',
                      marker='o',
                      markersize=16,
-                     markeredgecolor='b',
+                     markeredgecolor='#FF5050',
                      markeredgewidth=3,
                      markerfacecolor='None',
                      label='Summe RES')
     colors.append(plt.getp(line,'markeredgecolor'))
+
+    # line, = ax.plot([0.50, 0.60, 0.70],
+    #                  [273, 412, 575],
+    #                  linestyle='',
+    #                  marker='o',
+    #                  markersize=16,
+    #                  markeredgecolor='#FF5050',
+    #                  markeredgewidth=3,
+    #                  markerfacecolor='None',
+    #                  label='Summe RES und PV kostenoptimiert')
+    # colors.append(plt.getp(line,'markeredgecolor'))
 
     # plt.axis([0.68, 0.92,
         # results_storage['2030'].min(), results_storage['2030'].max() + 1])
@@ -2287,10 +2472,13 @@ def dot_plot_storage_quartier(results_storage_quartier):
     plt.xlim([0.48, 0.72])
     # plt.ylim([0, 19])
     # plt.ylim([0, 21])
+    plt.ylim([0, 700])
 
     plt.xticks([0.50, 0.60, 0.70], fontsize=28, color=diagram_color)
+    ax.set_xticklabels(['0,50', '0,60', '0,70'], fontsize=28, color=diagram_color)
     # plt.yticks([0, 5, 10], fontsize=28, color=diagram_color)
-    plt.yticks([400, 800, 1200, 1600], fontsize=28, color=diagram_color)
+    # plt.yticks([400, 800, 1200, 1600], fontsize=28, color=diagram_color)
+    plt.yticks([0, 200, 400, 600], fontsize=28, color=diagram_color)
     plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
     plt.ylabel('Speicherkapazität in kWh', fontsize=28, color=diagram_color)
 
@@ -2310,6 +2498,74 @@ def dot_plot_storage_quartier(results_storage_quartier):
     plt.show()
 
     return fig
+
+
+def boxplot_storage_quartier_random(dataframe):
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = plt.subplot()
+
+    lw = 3
+    diagram_color = 'black'
+    main_color = '#7f7f7f'
+    colors = []
+
+    # color = dict(boxes='black', whiskers='black', medians='#2ca25f')
+    color = dict(boxes='black', whiskers='black', medians='#00AFAF')
+    # color = dict(boxes='black', whiskers='black', medians='#FF5050')
+    # color = dict(boxes='black', whiskers='black', medians='#ffc000')
+
+    dataframe.plot.box(ax=ax,
+            color=color,
+            boxprops=dict(linewidth=2),
+            whiskerprops=dict(linewidth=2),
+            medianprops=dict(linewidth=2.5, linestyle='--'),
+            capprops=dict(linewidth=2),
+            flierprops=dict(markersize=10),
+            grid=False,
+            fontsize=28)
+
+    # Add jitter
+    # ax = sns.swarmplot(data=dataframe, color=main_color)
+
+    # ax.set_xticklabels(['0,50', '0,60', '0,70'])
+    # ax.set_xticklabels(['aus SYS-Sicht', 'aus BW-Sicht'])
+    # ax.set_ylim([-1, 20])
+    # ax.set_ylim([-0.05, 0.8])
+    # ax.set_yticks([0, 500, 1000])
+    # ax.set_yticks([0, 5, 10, 15, 20])
+    # ax.set_yticks([0, 0.20, 0.40, 0.60, 0.80])
+    # ax.set_yticklabels(['0', '0,20', '0,40', '0,60', '0,80'], fontsize=28, color=diagram_color)
+
+    # plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    # plt.xlabel('Kostenoptimum', fontsize=28, color=diagram_color)
+
+    plt.ylabel('Speicherkapazität in kWh', fontsize=28, color=diagram_color)
+    # plt.ylabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    # plt.ylabel('Installierte PV-Leistung in kW', fontsize=28, color=diagram_color)
+
+    plt.tight_layout()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color(main_color)
+    ax.spines['bottom'].set_color(main_color)
+
+    # plt.xlim([0.68, 0.92])
+    # plt.ylim([0, 11])
+    # plt.ylim([0, 21])
+
+    print('mean', dataframe.mean(0))
+    print('std', dataframe.std(0))
+    print('min', dataframe.min(0))
+    print('quantile_25', dataframe.quantile(0.25))
+    print('median', dataframe.median(0))
+    print('quantile_75', dataframe.quantile(0.75))
+    print('max', dataframe.max(0))
+
+    plt.show()
+
+    return fig
+
 
 def dot_plot_storage_biogas_options(results_storage,
         results_storage_biogas_options):
@@ -2603,20 +2859,23 @@ if __name__ == '__main__':
 
     # results_storage = read_results_storage()
     # fig = dot_plot_storage(results_storage)
-    # results_storage_quartier = read_results_storage_quartier()
-    # fig = dot_plot_storage_quartier(results_storage_quartier)
-    (results_storage_two_short,
-            results_storage_two_short_in,
-            results_storage_two_short_out,
-            results_storage_two_long,
-            results_storage_two_long_in,
-            results_storage_two_long_out) = read_results_storage_two()
-    fig = dot_plot_storage_two(results_storage_two_short,
-            results_storage_two_short_in,
-            results_storage_two_short_out,
-            results_storage_two_long,
-            results_storage_two_long_in,
-            results_storage_two_long_out)
+    # results_quartier = read_results_storage_quartier()
+    # results_quartier = read_results_storage_pv_quartier_costopt()
+    dataframe = read_results_storage_quartier_random()
+    fig = boxplot_storage_quartier_random(dataframe)
+    # fig = dot_plot_storage_quartier(results_quartier)
+    # (results_storage_two_short,
+    #         results_storage_two_short_in,
+    #         results_storage_two_short_out,
+    #         results_storage_two_long,
+    #         results_storage_two_long_in,
+    #         results_storage_two_long_out) = read_results_storage_two()
+    # fig = dot_plot_storage_two(results_storage_two_short,
+    #         results_storage_two_short_in,
+    #         results_storage_two_short_out,
+    #         results_storage_two_long,
+    #         results_storage_two_long_in,
+    #         results_storage_two_long_out)
     # results_capacities = read_results_capacities()
     # fig = bar_plot_capacities(results_capacities)
     # (results_deficit, results_excess, results_demand) = read_results_deficit_excess()
@@ -2628,4 +2887,4 @@ if __name__ == '__main__':
     if arguments['--save']:
         fig.savefig(os.path.join(os.path.dirname(__file__)) +
                 'current_figure' +
-                '.png')
+                '.pdf')
