@@ -110,8 +110,9 @@ def read_results_capacities():
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               str(arguments['--ssr']) +
-                                               '_1_.p', 'rb'))['wind_inst_1']
+                                               # str(arguments['--ssr']) +
+                                               # '_1_.p', 'rb'))['wind_inst_1']
+                                               '1_.p', 'rb'))['wind_inst_1']
         for i in np.arange(17):
             results_capacities[1][i] = pickle.load(open('../results/' +
                                                str(arguments['--scenario']) + '/' +
@@ -119,8 +120,9 @@ def read_results_capacities():
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               str(arguments['--ssr']) +
-                                               '_1_.p', 'rb'))['pv_inst_1']
+                                               # str(arguments['--ssr']) +
+                                               # '_1_.p', 'rb'))['pv_inst_1']
+                                               '1_.p', 'rb'))['pv_inst_1']
         for i in np.arange(17):
             results_capacities[2][i] = pickle.load(open('../results/' +
                                                str(arguments['--scenario']) + '/' +
@@ -128,8 +130,9 @@ def read_results_capacities():
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               str(arguments['--ssr']) +
-                                               '_1_.p', 'rb'))['biogas_bhkw_inst_1']
+                                               #str(arguments['--ssr']) +
+                                               #'_1_.p', 'rb'))['biogas_bhkw_inst_1']
+                                               '1_.p', 'rb'))['biogas_bhkw_inst_1']
 
         results_capacities_MW = results_capacities / 1e3
 
@@ -144,8 +147,9 @@ def read_results_capacities():
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               str(arguments['--ssr']) +
-                                               '_1_.p', 'rb'))['wind_inst_1']
+                                               # str(arguments['--ssr']) +
+                                               # '_1_.p', 'rb'))['wind_inst_1']
+                                               '1_.p', 'rb'))['wind_inst_1']
         for i in np.arange(17):
             results_capacities[1][i] = pickle.load(open('../results/' +
                                                str(arguments['--scenario']) + '/' +
@@ -153,8 +157,9 @@ def read_results_capacities():
                                                str(arguments['--region']) + '_' +
                                                str(arguments['--scenario_year']) + '_' +
                                                str(i + 1998) + '_' +
-                                               str(arguments['--ssr']) +
-                                               '_1_.p', 'rb'))['pv_inst_1']
+                                               # str(arguments['--ssr']) +
+                                               # '_1_.p', 'rb'))['pv_inst_1']
+                                               '1_.p', 'rb'))['pv_inst_1']
 
         results_capacities_MW = results_capacities / 1e3
 
@@ -355,7 +360,7 @@ def bar_plot(results_capacities):
         ind = np.arange(17)
         p1 = plt.bar(ind, results_capacities[0,:], color='blue')
         p2 = plt.bar(ind, results_capacities[1,:], bottom=results_capacities[0,:], color='yellow')
-        plt.ylim([results_capacities.min(), results_capacities.max() + 100])
+        plt.ylim([0, 5100])
         plt.xlabel('Weather year', size=18)
         plt.ylabel('Installed capacities in MW', size=18)
         plt.xticks(ind, ['1998', '1999', '2000', '2001', '2002', '2003', '2004',
@@ -420,14 +425,14 @@ if __name__ == '__main__':
     arguments = docopt(__doc__)
     print(arguments)
     results_storage = read_results_storage()
-    # results_capacities = read_results_capacities()
+    results_capacities = read_results_capacities()
     (results_excess, results_grid, results_grid_max) = read_results_excess_grid()
-    fig_1 = dot_plot(results_storage)
-    # fig_2 = bar_plot(results_capacities)
-    fig_3 = dot_plot_excess_and_grid_energy(results_excess, results_grid)
-    fig_4 = dot_plot_grid_power(results_grid_max)
+    # fig_1 = dot_plot(results_storage)
+    fig_2 = bar_plot(results_capacities)
+    # fig_3 = dot_plot_excess_and_grid_energy(results_excess, results_grid)
+    # fig_4 = dot_plot_grid_power(results_grid_max)
 
     if arguments['--save']:
-        fig_4.savefig(os.path.join(os.path.dirname(__file__), 'saved_figures') +
+        fig_2.savefig(os.path.join(os.path.dirname(__file__), 'saved_figures') +
                 '/' + 'current_figure' +
                 '.png')

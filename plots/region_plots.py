@@ -39,13 +39,14 @@ def calculate_combinations(num_regions):
 
 def scatter_plot(combinations):
 
-    res_single_regions = pickle.load(open('../results/results_single_regions_85.p', 'rb'))
+    res_single_regions = pickle.load(open('../results/results_single_regions_70.p', 'rb'))
+    print(res_single_regions)
 
     results = [0, 0, 0]
 
     for i in np.arange(1, len(combinations)):
         res_combinations = pickle.load(open
-                ('../results/region_results_dc_0.85_' + str(i) + '_.p', 'rb'))
+                ('../results/region_results_dc_region_70_2005_0.70_' + str(i) + '_.p', 'rb'))
         results = np.vstack((results,
                 [i, (res_single_regions['storage_cap' + str(combinations[i][1])] +
                      res_single_regions['storage_cap' + str(combinations[i][2])]),

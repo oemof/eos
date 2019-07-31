@@ -80,6 +80,8 @@ class Line:
         ax = plt.subplot()
 
         lw = 3
+        diagram_color = 'black'
+        main_color = '#7f7f7f'
         colors = []
 
         if kwargs.get('wind') is not None:
@@ -92,97 +94,90 @@ class Line:
             line, = ax.plot(kwargs.get('demand').reset_index()['h0'], linewidth=2, label='Load BDEW H0', color='mediumblue', linestyle=':')
             colors.append(plt.getp(line,'color'))
         if kwargs.get('residual_1') is not None:
-            plt.plot(np.arange(0, 8760), kwargs.get('residual_1'),
-                    # color='skyblue',
-                    # color='orchid',
-                    color='orange',
-                    # color='peru',
-                    # color='grey',
-                    linestyle='-',
-                    linewidth=3,
-                    # label='Landkreis Osnabrück 2020')
+            line, = ax.plot(np.arange(0, 8760), kwargs.get('residual_1'),
+                    color=main_color,
+                    # color='#a6a6a6',
+                    linestyle='--',
+                    linewidth=lw,
+                    # label='City of Osnabrück')
                     # label='LKOS + Stadt Osnabrück')
-                    label='Stadt Osnabrück')
+                    label='2020')
                     # label=kwargs.get('label_res_2'))
+            colors.append(plt.getp(line,'color'))
         if kwargs.get('residual_2') is not None:
-            plt.plot(np.arange(0, 8760), kwargs.get('residual_2'),
-                    # color='dodgerblue',
-                    # color='m',
-                    # color='burlywood',
-                    # color='red',
-                    color='black',
+            line, = ax.plot(np.arange(0, 8760), kwargs.get('residual_2'),
+                    # color='#da467d',
+                    color='#99cc00',
+                    # color='black',
                     linestyle='-',
                     linewidth=lw,
-                    label='Stadt Ibbenbüren')
+                    label='2030')
                     # label='Cross-linking with LKOS')
                     # label='Cross-linking with City of Osnabrück 2030')
-                    # label='LKOS')
+                    # label='Landkreis Osnabrück')
                     # label='Stadt Osnabrück 2020')
                     #label=kwargs.get('label_res_1'))
+            colors.append(plt.getp(line,'color'))
         if kwargs.get('residual_3') is not None:
-            plt.plot(np.arange(0, 8760), kwargs.get('residual_3'),
-                    # color='royalblue',
-                    # color='grey',
-                    # color='dodgerblue',
-                    # color='purple',
-                    # color='chocolate',
-                    # color='m',
-                    color='dimgrey',
-                    linestyle='-',
-                    # linestyle='-.',
-                    linewidth=2,
+            line, = ax.plot(np.arange(0, 8760), kwargs.get('residual_3'),
+                    # color='black',
+                    # color='#99cc00',
+                    color=main_color,
+                    # linestyle='-',
+                    linestyle='-.',
+                    linewidth=lw,
                     # label='Landkreis Osnabrück 2040')
                     # label='Cross-linking with LKOS and KRST')
-                    # label='Landkreis Osnabrück 2040')
-                    label='Stadt Rheine')
+                    # label='Kreis Steinfurt')
+                    label='2040')
                     # label=kwargs.get('label_res_3'))
+            colors.append(plt.getp(line,'color'))
         if kwargs.get('residual_4') is not None:
             print(kwargs.get('residual_4'))
-            plt.plot(np.arange(0, 8760), kwargs.get('residual_4'),
-                    color='lightgrey',
+            line, = ax.plot(np.arange(0, 8760), kwargs.get('residual_4'),
+                    color=main_color,
                     # color='midnightblue',
                     # color='saddlebrown',
                     # color='skyblue',
-                    # linestyle=':',
-                    linestyle='-',
+                    linestyle=':',
+                    # linestyle='-',
                     linewidth=3,
                     # label='Cross-linking with City of Osnabrück 2030')
-                    label='Stadt Steinfurt')
+                    label='2050')
                     # label='Stadt Osnabrück 2050')
                     # label=kwargs.get('label_res_3'))
+            colors.append(plt.getp(line,'color'))
 
-        # plt.axhline(0, color='black')
+        plt.axhline(0, linewidth=0.5, color=main_color)
 
-        plt.xlabel('Hours', fontsize=28, color='grey')
-        # plt.xlabel('Hours of the year')
-        plt.ylabel(res_name, fontsize=28, color='grey')
-        plt.xlim(0, 336)
-        plt.xticks([0, 100, 200, 300], fontsize=28, color='grey')
-        # plt.xlim(0, 8760)
-        # plt.xticks([2000, 4000, 6000, 8000])
-        plt.yticks([0, 200, 400, 600, 800], fontsize=28, color='grey')
-        # plt.yticks([-1500, -1000, -500, 0, 500])
-        # plt.yticks([-2500, -2000, -1500, -1000, -500, 0, 500, 1000])
+        # plt.xlabel('Hours', fontsize=28, color=diagram_color)
+        plt.xlabel('Hours of the year', fontsize=28, color=diagram_color)
+        plt.ylabel(res_name, fontsize=28, color=diagram_color)
+        # plt.xlim(0, 336)
+        # plt.xticks([0, 100, 200, 300], fontsize=28, color=diagram_color)
+        plt.xlim(0, 8760)
+        plt.xticks([0, 2000, 4000, 6000, 8000], fontsize=28, color=diagram_color)
+        # plt.yticks([0, 200, 400, 600, 800], fontsize=28, color=diagram_color)
+        # plt.yticks([-1500, -1000, -500, 0, 500], fontsize=28, color=diagram_color)
+        plt.yticks([-2500, -2000, -1500, -1000, -500, 0, 500], fontsize=28, color=diagram_color)
         # plt.yticks([-2000, -1500, -1000, -500, 0, 500, 1000])
         # plt.ylim(-2500, +1000),  # plt.yticks([])
         # plt.ylim(-410, +210),  # plt.yticks([])
         # plt.rcParams.update({'font.size': 18})
         # plt.legend(kwargs.keys())
 
-        # res_1_patch = mpatches.Patch(color='red', label='OS')
-        # res_2_patch = mpatches.Patch(color='blue', label='LKOS')
-        # res_3_patch = mpatches.Patch(color='green', label='OS + LKOS')
-
-        # plt.legend(handles=[res_1_patch, res_2_patch, res_3_patch])
-        leg = plt.legend(loc='upper right', frameon=False, prop={'size': 24})
+        # leg = plt.legend(loc='lower left', frameon=False, prop={'size': 24})
+        leg = plt.legend(loc='lower left', frameon=False, prop={'size': 28})
+        leg._legend_box.align = 'left'
+        leg.set_title('Kreis Steinfurt', prop={'size': 28})
         for color,text in zip(colors,leg.get_texts()):
         # for text in l.get_texts():
             text.set_color(color)
         plt.tight_layout()
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_color('grey')
-        ax.spines['bottom'].set_color('grey')
+        ax.spines['left'].set_color(main_color)
+        ax.spines['bottom'].set_color(main_color)
 
         if show:
             plt.show()
@@ -199,7 +194,12 @@ class Bar:
 
     def bar_plot(res_name, show=True, **kwargs):
 
-        fig = plt.figure()
+        fig = plt.figure(figsize=(12, 8))
+        ax = plt.subplot()
+
+        diagram_color = 'black'
+        main_color = '#7f7f7f'
+        colors = []
 
         n = 12
         X = np.arange(n)
@@ -212,23 +212,42 @@ class Bar:
         Y3 = kwargs.get('Y3') / 1e3
 
         # plt.axes([0.025, 0.025, 0.95, 0.95])
-        plt.bar(X, Y3, facecolor='lightsteelblue', edgecolor='white',
+        ax.bar(X, Y3, facecolor='orangered', edgecolor='white',
                 label='Deficit')
-        plt.bar(X, Y1, facecolor='#9999ff', edgecolor='white',
+        ax.bar(X, Y1, facecolor='#a6a6a6', edgecolor='white',
                 label='Covered demand')
-        plt.bar(X, Y2, facecolor='#ff9999', edgecolor='white',
+        ax.bar(X, Y2, facecolor='darkcyan', edgecolor='white',
                 label='Excess')
 
+        plt.axhline(0, linewidth=0.5, color=main_color)
+
         # plt.xlabel('Monhts')
-        plt.ylabel(res_name, fontsize=16)
+        plt.ylabel(res_name, fontsize=28, color=diagram_color)
         plt.xticks(X, ['Jan', 'Feb', 'Mar', 'Apr',
             'May', 'Jun', 'Jul', 'Aug', 'Sep',
-            'Oct', 'Nov', 'Dec'], fontsize=14)
+            'Oct', 'Nov', 'Dec'], fontsize=28, color=diagram_color)
 
-        legend = plt.legend(title='Landkreis Osnabrück',
-                         loc='upper center', prop={'size': 11})
-        legend.get_title().set_fontsize('11')
-        # plt.rcParams['font.size']=16
+        plt.ylim(-100, 450)
+        plt.yticks([-100, 0, 100, 200, 300, 400], fontsize=28, color=diagram_color)
+        # plt.yticks([-100, 0, 100, 200, 300])
+
+        leg = ax.legend(loc='upper center', frameon=False, prop={'size': 28})
+        leg.set_title('Landkreis Osnabrück (LKOS)', prop={'size': 28})
+        leg._legend_box.align = 'left'
+
+        for bar,text in zip(leg.get_patches(), leg.get_texts()):
+                text.set_color(bar.get_facecolor())
+        # for color,text in zip(colors,leg.get_texts()):
+        # for text in l.get_texts():
+            # text.set_color(color)
+
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_color(main_color)
+        ax.spines['bottom'].set_color(main_color)
+
+        plt.tight_layout()
+
         # plt.tight_layout()
 
         # for x, y in zip(X, Y1):
@@ -238,10 +257,6 @@ class Bar:
         #     plt.text(x+0.4, -y-0.05, '%.2f' % y, ha='center', va='top')
 
         # plt.xlim(-.5, n)  # plt.xticks([])
-        plt.ylim(-100, 350),  plt.yticks([-100, 0, 100, 200, 300], fontsize=14)
-        # plt.yticks([-100, 0, 100, 200, 300])
-
-        plt.tight_layout()
 
         if show:
             plt.show()
