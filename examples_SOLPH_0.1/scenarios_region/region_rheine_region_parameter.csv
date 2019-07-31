@@ -1,0 +1,7 @@
+param,1
+region_name,Rheine
+pv_field_MW,27.5
+pv_roof_MW,124.1
+pv_MW,151.6
+wind_MW,242
+annual_demand_GWh,334.119

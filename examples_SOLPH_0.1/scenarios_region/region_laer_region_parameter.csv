@@ -1,0 +1,7 @@
+param,1
+region_name,Laer
+pv_field_MW,0.9
+pv_roof_MW,15
+pv_MW,15.9
+wind_MW,47
+annual_demand_GWh,21.18

@@ -1,0 +1,7 @@
+param,1
+region_name,Wettringen
+pv_field_MW,1.3
+pv_roof_MW,23.1
+pv_MW,24.4
+wind_MW,89
+annual_demand_GWh,28.955

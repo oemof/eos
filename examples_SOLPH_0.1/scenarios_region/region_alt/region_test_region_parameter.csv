@@ -1,0 +1,7 @@
+param,1
+region_name,Nordwalde
+pv_field_MW,4.7
+pv_roof_MW,23.7
+pv_MW,28.4
+wind_MW,0
+annual_demand_GWh,44.937

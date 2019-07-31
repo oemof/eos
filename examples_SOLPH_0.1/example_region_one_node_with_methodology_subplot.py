@@ -491,32 +491,33 @@ def create_subplot(energysystem, results, year):
                                  date_from=year + '-06-01 00:00:00',
                                  date_to=year + '-06-08 00:00:00') / 1000
 
-    subset_wind.plot(ax=axes[0], kind="bar", stacked='True',
-                                    color='#5b5bae',
-                                    align='center', width=1)
+    # subset_bio = esplot.slice_by(type='to_bus',
+    #                               obj_label='region_1_biogas',
+    #                               date_from=year + '-06-01 00:00:00',
+    #                               date_to=year + '-06-08 00:00:00') / 1000
 
-    subset_pv.plot(ax=axes[0], kind="bar", stacked='True',
-                                    color='#ffde32',
-                                     align='center', width=1)
+    subset_wind.reset_index(drop=True, inplace=True)
+    subset_pv.reset_index(drop=True, inplace=True)
+    subset_gridsource.reset_index(drop=True, inplace=True)
+    subset_bat.reset_index(drop=True, inplace=True)
 
-    subset_gridsource.plot(ax=axes[0], kind="bar", stacked='True',
-                                    color='#636f6b',
-                                     align='center', width=1)
+    subset_generation = pd.concat([subset_wind, subset_pv, subset_gridsource, subset_bat], axis=1)
 
-    subset_bat.plot(ax=axes[0], kind="bar", stacked='True',
-                                    color='#42c77a',
-                                     align='center', width=1)
+    subset_generation.plot(ax=axes[0], kind="bar", stacked='True',
+        color=['#558ed5', '#ffc000', '#636f6b', '#FF5050'],
+        align='center', width=1)
 
-    axes[0].set_title('Electric energy generation', fontsize=24)
+    axes[0].set_title('Strombereitstellung', fontsize=24)
     axes[0].set_xlabel("")
     axes[0].set_xticks(range(0, len(dates), tick_distance), minor=False)
     axes[0].set_xticklabels("")
-    axes[0].set_ylabel("MW", fontsize=22)
+    axes[0].set_xlim(0, 168)
+    axes[0].set_ylabel("Leistung in MW", fontsize=22)
     # axes[0].set_ylim(0, 201)
-    axes[0].set_yticks(range(0, 700, 200), minor=False)
+    axes[0].set_yticks(range(0, 1300, 400), minor=False)
     axes[0].tick_params(axis='x', labelsize=20)
     axes[0].tick_params(axis='y', labelsize=20)
-    axes[0].legend(['Wind power', 'PV', 'Import', 'Storage'], loc='upper left', fontsize=18,
+    axes[0].legend(['Windenergie', 'PV', 'Import', 'Speicher', 'Bio'], loc='upper left', fontsize=18,
                    ncol=4)
 
     # SOC
@@ -526,19 +527,21 @@ def create_subplot(energysystem, results, year):
                                  date_to=year + '-06-08 00:00:00') / results['storage_cap1']
 
     subset_soc.plot(ax=axes[1], drawstyle='steps',
-                                    color='#42c77a',
+                                    color='#FF5050',
+                                    # color='#42c77a',
                                     linewidth=2)
 
-    axes[1].set_title('Storage state of charge', fontsize=24)
+    axes[1].set_title('Speicherstand', fontsize=24)
     axes[1].set_xlabel("")
     axes[1].set_xticks(range(0, len(dates), tick_distance), minor=False)
     axes[1].set_xticklabels("")
-    axes[1].set_ylabel("%", fontsize=22)
+    axes[1].set_xlim(0, 168)
+    axes[1].set_ylabel("SOC in %", fontsize=22)
     axes[1].set_ylim(0, 1.1)
     axes[1].set_yticks([0, 0.5, 1], minor=False)
     axes[1].tick_params(axis='x', labelsize=20)
     axes[1].tick_params(axis='y', labelsize=20)
-    axes[1].legend(['Storage state of charge'], loc='upper left', fontsize=18)
+    axes[1].legend(['State of Charge (SOC)'], loc='upper left', fontsize=18)
 
     # Excess
     subset_excess = esplot.slice_by(type='from_bus',
@@ -552,23 +555,24 @@ def create_subplot(energysystem, results, year):
                                     date_to=year + '-06-08 00:00:00') / 1000
 
     subset_demand.plot(ax=axes[2], drawstyle='steps',
-                                    color='indigo',
-                                    linewidth=2)
-
-    subset_excess.plot(ax=axes[2], drawstyle='steps',
                                     color='#830000',
                                     linewidth=2)
 
-    axes[2].set_title('Demand and excess', fontsize=24)
-    axes[2].set_xlabel("")
+    subset_excess.plot(ax=axes[2], drawstyle='steps',
+                                    color='indigo',
+                                    linewidth=2)
+
+    axes[2].set_title('Stromverbrauch und Überschuss', fontsize=24)
+    axes[2].set_xlabel("Beispielwoche", fontsize=24)
     axes[2].set_xticks(range(0, len(dates), tick_distance), minor=False)
     axes[2].set_xticklabels("")
-    axes[2].set_ylabel("MW", fontsize=22)
+    axes[2].set_xlim(0, 168)
+    axes[2].set_ylabel("Leistung in MW", fontsize=22)
     # axes[2].set_ylim(0, 1.1)
-    axes[2].set_yticks(range(0, 700, 200), minor=False)
+    axes[2].set_yticks(range(0, 1100, 500), minor=False)
     axes[2].tick_params(axis='x', labelsize=20)
     axes[2].tick_params(axis='y', labelsize=20)
-    axes[2].legend(['Demand', 'Excess'], loc='upper left', fontsize=18)
+    axes[2].legend(['Stromverbrauch', 'Überschuss'], loc='upper left', fontsize=18)
 
     # cdict = {'region_1_wind': '#5b5bae',
     #      'region_1_pv': '#ffde32',
@@ -635,8 +639,8 @@ def main(**arguments):
                                    parameters,
                                    loopi,
                                    **arguments)
-        esys.dump()
-        # esys.restore()
+        # esys.dump()
+        esys.restore()
         pp.pprint(get_result_dict(esys, parameters, loopi, **arguments))
         # create_plots(esys, year=arguments['--year'])
         results = get_result_dict(esys, parameters, loopi, **arguments)
