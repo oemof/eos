@@ -2196,12 +2196,13 @@ if __name__ == "__main__":
         #                      show=True)
 
         fig = line.line_plot(residual_1=results['residual_region_1'],
-                             #residual_2=results['residual_region_2'],
-                             #residual_3=results['residual_region_3'],
+                             residual_2=results['residual_region_2'],
+                             residual_3=results['residual_region_3'],
                              # residual_4=results['residual_region_4'],
-                             residual_2=results['residual_kombi_1'],
-                             residual_3=results['residual_kombi_3'],
-                             res_name='Residual load [MW]',
+                             # residual_2=results['residual_kombi_1'],
+                             # residual_3=results['residual_kombi_3'],
+                             res_name='Residuallast in MW',
+                             # res_name='Residual load [MW]',
                              # res_name=('Residual demand ' +
                              # str(arguments['--year']) + ' in MW'),
                              show=True)
@@ -2239,11 +2240,6 @@ if __name__ == "__main__":
         #                    show=True)
 
     if arguments['--save']:
-        fig.savefig(os.path.join(os.path.dirname(__file__), 'saved_figures') +
-                '/' + 'bar_' +
-                'region_1_' + str(arguments['--region_1']) + '_' +
-                'region_2_' + str(arguments['--region_2']) + '_' +
-                'kombi_1_'+ str(arguments['--kombi_1']) + '_' +
-                'kombi_3_'+ str(arguments['--kombi_3']) + '_' +
-                'kombi_5_'+ str(arguments['--kombi_5']) + '_' +
-                '.png')
+        fig.savefig(os.path.join(os.path.dirname(__file__)) +
+                'current_figure' +
+                '.pdf')

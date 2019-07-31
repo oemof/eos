@@ -16,7 +16,7 @@ Options:
                            WARNING, ERROR or CRITICAL.
                            [default: ERROR]
   -h, --help               Display this help.
-  -t, --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
+      --timesteps=TSTEPS   Set number of timesteps. [default: 8760]
       --lat=LAT            Sets the simulation longitude to choose the right
                            weather data set. [default: 53.41] # Parchim
       --lon=LON            Sets the simulation latitude to choose the right
@@ -288,9 +288,7 @@ def create_energysystem(energysystem, parameters, house, house_pv,
             actual_value=parameters['pv_generation'],
             fixed=True,
             fixed_costs=parameters['opex_pv'],
-            investment=solph.Investment(
-                maximum=parameters['pv_parameter'].loc['p_max'][label_pv],
-                ep_costs=parameters['pv_epc']))})
+            investment=solph.Investment(ep_costs=parameters['pv_epc']))})
 
     else:
         solph.Source(label=house+'_pv', outputs={bel_pv: solph.Flow(
@@ -299,8 +297,8 @@ def create_energysystem(energysystem, parameters, house, house_pv,
                 'pv_parameter'].loc['p_max'][label_pv],
             fixed=True,
             fixed_costs=parameters['opex_pv'])})
-        parameters['pv_inst_'+house] = parameters[
-                'pv_parameter'].loc['p_max'][label_pv]
+        # parameters['pv_inst_'+house] = parameters[
+                # 'pv_parameter'].loc['p_max'][label_pv]
 
     # Create simple sink objects for demands
     solph.Sink(

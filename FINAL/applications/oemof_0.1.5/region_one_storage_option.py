@@ -44,6 +44,7 @@ import logging
 import csv
 import pickle
 import pprint as pp
+import os
 from demandlib import bdew as bdew
 
 try:
@@ -365,8 +366,21 @@ def create_energysystem(energysystem, parameters, loopi,
     # Create source and transformer object for biogas
     if arguments['--biogas']:
 
-        biogas_nv = float(parameters['region_parameter'].
-                            loc['biogas_GWh'][str(loopi)]) * 1e6
+        if int(arguments['--multi-regions']) == 2:
+            biogas_nv = (float(parameters['region_parameter'].
+                           loc['biogas_GWh'][str(parameters
+                                            ['combinations']
+                                            [loopi][1])]) * 1e6 +
+
+                     float(parameters['region_parameter'].
+                           loc['biogas_GWh'][str(parameters
+                                            ['combinations']
+                                            [loopi][2])]) * 1e6)
+
+        else:
+
+            biogas_nv = float(parameters['region_parameter'].
+                                loc['biogas_GWh'][str(loopi)]) * 1e6
 
         solph.Source(label='region_'+str(loopi)+'_rbiogas',
                 outputs={bbiogas: solph.Flow(
@@ -415,17 +429,6 @@ def create_energysystem(energysystem, parameters, loopi,
                              investment=solph.Investment(
                                    ep_costs=parameters['biogas_bhkw_epc']))},
                              conversion_factors={bel: 0.38})
-
-        # if int(arguments['--multi-regions']) == 2:
-        #     biogas_nv = (float(parameters['region_parameter'].
-        #                    loc['biogas_GWh'][str(parameters
-        #                                     ['combinations']
-        #                                     [loopi][1])]) * 1e3 +
-
-        #              float(parameters['region_parameter'].
-        #                    loc['biogas_GWh'][str(parameters
-        #                                     ['combinations']
-        #                                     [loopi][2])]) * 1e3)
 
     # Create simple sink objects for demands
     if int(arguments['--multi-regions']) == 2:
@@ -504,11 +507,17 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
                             date_from=year+'-01-01 00:00:00',
                             date_to=year+'-12-31 23:00:00')
 
-    storage_in = myresults.slice_by(obj_label='region_'+str(loopi)+'_bat',
+    storage_in = myresults.slice_by(type='from_bus',
+                            obj_label='region_'+str(loopi)+'_bat',
                             date_from=year+'-01-01 00:00:00',
                             date_to=year+'-12-31 23:00:00')
 
-    if (arguments['--biogas']) or (arguments['--biogas-costopt']):
+    storage_out = myresults.slice_by(type='to_bus',
+                            obj_label='region_'+str(loopi)+'_bat',
+                            date_from=year+'-01-01 00:00:00',
+                            date_to=year+'-12-31 23:00:00')
+
+    if (arguments['--biogas']) or (arguments['--biogas-costopt']) or (arguments['--biogas-flex']):
         biogas_bhkw = myresults.slice_by(obj_label='region_'+str(loopi)+'_biogas_bhkw',
                                          date_from=year+'-01-01 00:00:00',
                                          date_to=year+'-12-31 23:00:00')
@@ -521,7 +530,7 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
                                   date_from=year+'-01-01 00:00:00',
                                   date_to=year+'-12-31 23:00:00')
 
-    if (arguments['--biogas']) or (arguments['--biogas-costopt']):
+    if (arguments['--biogas']) or (arguments['--biogas-costopt']) or (arguments['--biogas-flex']):
         results_dc['biogas_bhkw_ts_'+str(loopi)] = biogas_bhkw
 
     results_dc['demand_'+str(loopi)] = float(demand.sum())
@@ -537,8 +546,8 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
     results_dc['pv_max_'+str(loopi)] = float(pv.max())
     results_dc['storage_cap_'+str(loopi)] = energysystem.results[
         storage][storage].invest
-    results_dc['storage_in_ts_'+str(loopi)] = storage_in
-    # results_dc['storage_out_ts_'+str(loopi)] = storage_out
+    results_dc['storage_in_ts_'+str(loopi)] = storage_in # ist das der richtige Wert?
+    results_dc['storage_out_ts_'+str(loopi)] = storage_out
     results_dc['objective'] = energysystem.results.objective
 
     if arguments['--costopt']:
@@ -574,7 +583,7 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
                 '.p', "wb"))
     # pickle.dump(myresults, open("save_myresults.p", "wb"))
 
-    return(results_dc)
+    return (results_dc)
 
 
 def create_plots(energysystem, year):
@@ -591,21 +600,201 @@ def create_plots(energysystem, year):
     plt.show()
 
 
+def create_subplot(energysystem, results, year):
+
+    esplot = outputlib.DataFramePlot(energy_system=energysystem)
+    idx = pd.IndexSlice
+
+    fig, axes = plt.subplots(nrows=3, ncols=1)  # figsize=(6,60)
+    tick_distance = 4 * 24
+
+    print(esplot)
+
+    # Electricity generation
+    subset_wind = esplot.slice_by(type='to_bus',
+                                  obj_label='region_1_wind',
+                                  date_from=year + '-06-01 00:00:00',
+                                  date_to=year + '-06-08 00:00:00') / 1000
+
+    dates = subset_wind.index.get_level_values('datetime').unique()
+
+    subset_pv = esplot.slice_by(type='to_bus',
+                                obj_label='region_1_pv',
+                                date_from=year + '-06-01 00:00:00',
+                                date_to=year + '-06-08 00:00:00') / 1000
+
+    subset_gridsource = esplot.slice_by(type='to_bus',
+                                        obj_label='region_1_gridsource',
+                                        date_from=year + '-06-01 00:00:00',
+                                        date_to=year + '-06-08 00:00:00') / 1000
+
+    subset_bat = esplot.slice_by(type='to_bus',
+                                 obj_label='region_1_bat',
+                                 date_from=year + '-06-01 00:00:00',
+                                 date_to=year + '-06-08 00:00:00') / 1000
+
+    # subset_bio = esplot.slice_by(type='to_bus',
+    #                               obj_label='region_1_biogas_bhkw',
+    #                               date_from=year + '-06-01 00:00:00',
+    #                               date_to=year + '-06-08 00:00:00') / 1000
+
+    subset_wind.plot(ax=axes[0], kind="bar", stacked='True',
+                                    color='#5b5bae',
+                                    align='center', width=1)
+
+    subset_pv.plot(ax=axes[0], kind="bar", stacked='True',
+                                    color='#ffde32',
+                                     align='center', width=1)
+
+    subset_gridsource.plot(ax=axes[0], kind="bar", stacked='True',
+                                    color='#636f6b',
+                                     align='center', width=1)
+
+    subset_bat.plot(ax=axes[0], kind="bar", stacked='True',
+                                    color='#42c77a',
+                                     align='center', width=1)
+
+    # subset_bio.plot(ax=axes[0], kind="bar", stacked='True',
+    #                                 color='#006400',
+    #                                 align='center', width=1)
+
+    axes[0].set_title('Electric energy generation', fontsize=24)
+    axes[0].set_xlabel("")
+    axes[0].set_xticks(range(0, len(dates), tick_distance), minor=False)
+    axes[0].set_xticklabels("")
+    axes[0].set_ylabel("MW", fontsize=22)
+    # axes[0].set_ylim(0, 201)
+    axes[0].set_yticks(range(0, 700, 200), minor=False)
+    axes[0].tick_params(axis='x', labelsize=20)
+    axes[0].tick_params(axis='y', labelsize=20)
+    axes[0].legend(['Wind power', 'PV', 'Import', 'Storage'], loc='upper left', fontsize=18,
+                   ncol=4)
+
+    # SOC
+    subset_soc = esplot.slice_by(type='other',
+                                 obj_label='region_1_bat',
+                                 date_from=year + '-06-01 00:00:00',
+                                 date_to=year + '-06-08 00:00:00') / results['storage_cap_1']
+
+    subset_soc.plot(ax=axes[1], drawstyle='steps',
+                                    color='#42c77a',
+                                    linewidth=2)
+
+    axes[1].set_title('Storage state of charge', fontsize=24)
+    axes[1].set_xlabel("")
+    axes[1].set_xticks(range(0, len(dates), tick_distance), minor=False)
+    axes[1].set_xticklabels("")
+    axes[1].set_ylabel("%", fontsize=22)
+    axes[1].set_ylim(0, 1.1)
+    axes[1].set_yticks([0, 0.5, 1], minor=False)
+    axes[1].tick_params(axis='x', labelsize=20)
+    axes[1].tick_params(axis='y', labelsize=20)
+    axes[1].legend(['Storage state of charge'], loc='upper left', fontsize=18)
+
+    # Excess
+    subset_excess = esplot.slice_by(type='from_bus',
+                                    obj_label='region_1_excess',
+                                    date_from=year + '-06-01 00:00:00',
+                                    date_to=year + '-06-08 00:00:00') / 1000
+
+    subset_demand = esplot.slice_by(type='from_bus',
+                                    obj_label='region_1_demand',
+                                    date_from=year + '-06-01 00:00:00',
+                                    date_to=year + '-06-08 00:00:00') / 1000
+
+    subset_demand.plot(ax=axes[2], drawstyle='steps',
+                                    color='indigo',
+                                    linewidth=2)
+
+    subset_excess.plot(ax=axes[2], drawstyle='steps',
+                                    color='#830000',
+                                    linewidth=2)
+
+    axes[2].set_title('Demand and excess', fontsize=24)
+    axes[2].set_xlabel("")
+    axes[2].set_xticks(range(0, len(dates), tick_distance), minor=False)
+    axes[2].set_xticklabels("")
+    axes[2].set_ylabel("MW", fontsize=22)
+    # axes[2].set_ylim(0, 1.1)
+    axes[2].set_yticks(range(0, 700, 200), minor=False)
+    axes[2].tick_params(axis='x', labelsize=20)
+    axes[2].tick_params(axis='y', labelsize=20)
+    axes[2].legend(['Demand', 'Excess'], loc='upper left', fontsize=18)
+
+    # cdict = {'region_1_wind': '#5b5bae',
+    #      'region_1_pv': '#ffde32',
+    #      'region_1_bat': '#42c77a',
+    #      'region_1_gridsource': '#636f6b',
+    #      'region_1_demand': '#830000',
+    #      }
+
+    # fig = plt.figure(figsize=(24, 14))
+    # plt.rc('legend', **{'fontsize': 14})
+    # plt.rcParams.update({'font.size': 24})
+    # plt.style.use('ggplot')
+
+    # plt.subplots_adjust(hspace=0.1, left=0.07, right=0.9)
+
+    # handles, labels = esplot.io_plot(
+    #     "region_1_bel", cdict, ax=fig.add_subplot(3, 1, 1),
+    #     date_from=year+"-06-01 00:00:00", date_to=year+"-06-8 00:00:00",
+    #     line_kwa={'linewidth': 4})
+
+    # labels = fix_labels(labels)
+    # esplot.outside_legend(handles=handles, labels=labels)
+    # esplot.ax.set_ylabel('Power in MW')
+    # esplot.ax.set_xlabel('')
+    # esplot.set_datetime_ticks(tick_distance=24, date_format='%d-%m-%Y')
+    # esplot.ax.set_xticklabels([])
+
+    # handles, labels = esplot.io_plot(
+    #     "region_1_bel", cdict, ax=fig.add_subplot(3, 1, 2),
+    #     date_from=year+"-06-01 00:00:00", date_to=year+"-06-8 00:00:00",
+    #     line_kwa={'linewidth': 4})
+
+    # labels = fix_labels(labels)
+    # esplot.outside_legend(handles=handles, labels=labels)
+    # esplot.ax.set_ylabel('Power in MW')
+    # esplot.ax.set_xlabel('')
+    # esplot.set_datetime_ticks(tick_distance=24, date_format='%d-%m-%Y')
+    # esplot.ax.set_xticklabels([])
+
+    # handles, labels = esplot.io_plot(
+    #     "region_1_bel", cdict, ax=fig.add_subplot(3, 1, 3),
+    #     date_from=year+"-06-01 00:00:00", date_to=year+"-06-8 00:00:00",
+    #     line_kwa={'linewidth': 4})
+
+    # labels = fix_labels(labels)
+    # esplot.outside_legend(handles=handles, labels=labels)
+    # esplot.ax.set_ylabel('Power in MW')
+    # esplot.ax.set_xlabel('Date')
+    # esplot.set_datetime_ticks(tick_distance=24, date_format='%d-%m-%Y')
+
+    fig.savefig(os.path.join(os.path.dirname(__file__), 'current_figure.pdf'))
+    plt.tight_layout()
+    plt.show(fig)
+
 def main(**arguments):
+
     logger.define_logging()
-    esys = initialise_energysystem(year=arguments['--year'],
+    parameters = read_and_calculate_parameters(**arguments)
+
+    for loopi in parameters['loop']:
+        esys = initialise_energysystem(year=arguments['--year'],
                                    number_timesteps=int(
                                        arguments['--timesteps']))
-    parameters = read_and_calculate_parameters(**arguments)
-    for loopi in parameters['loop']:
         esys = create_energysystem(esys,
                                    parameters,
                                    loopi,
                                    **arguments)
-        esys.dump()
+        # esys.dump()
         # esys.restore()
         pp.pprint(get_result_dict(esys, parameters, loopi, **arguments))
         # create_plots(esys, year=arguments['--year'])
+        results = get_result_dict(esys, parameters, loopi, **arguments)
+        create_subplot(esys, results, year=arguments['--year'])
+
+        del esys
 
 
 if __name__ == "__main__":
