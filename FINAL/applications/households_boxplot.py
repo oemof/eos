@@ -57,7 +57,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.5' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_21_bis_40_50 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -66,7 +66,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.5' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_41_bis_60_50 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -75,7 +75,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.5' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_61_bis_74_50 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -84,7 +84,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.5' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
 # HOUSEHOLDS 60 % AUTARKIE
@@ -94,7 +94,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.6' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_21_bis_40_60 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -103,7 +103,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.6' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_41_bis_60_60 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -112,7 +112,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.6' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_61_bis_74_60 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -121,7 +121,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.6' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
 # HOUSEHOLDS 70 % AUTARKIE
@@ -131,7 +131,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.7' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_21_bis_40_70 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -140,7 +140,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.7' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_41_bis_60_70 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -149,7 +149,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.7' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_61_bis_74_70 = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -158,7 +158,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_0.7' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
 # # HOUSEHOLDS 80 % AUTARKIE
@@ -279,7 +279,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_None' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_21_bis_40_None = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -288,7 +288,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_None' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_41_bis_60_None = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -297,7 +297,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_None' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_61_bis_74_None = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -306,7 +306,7 @@ class System:
                                        '_1_1_' +
                                         str(arguments['--year']) +
                                        '_None' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
 # HOUSEHOLDS AUTARKIE NICHT VORGEGEBEN BW
@@ -316,7 +316,7 @@ class System:
                                        '_2_1_' +
                                         str(arguments['--year']) +
                                        '_None' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_21_bis_40_None_BW = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -325,7 +325,7 @@ class System:
                                        '_2_1_' +
                                         str(arguments['--year']) +
                                        '_None' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_41_bis_60_None_BW = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -334,7 +334,7 @@ class System:
                                        '_2_1_' +
                                         str(arguments['--year']) +
                                        '_None' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
         results_61_bis_74_None_BW = pd.read_pickle('../results/HOUSEHOLDS_QUARTIER/' +
@@ -343,7 +343,7 @@ class System:
                                        '_2_1_' +
                                         str(arguments['--year']) +
                                        '_None' +
-                                       '_costopt' +
+                                       '_' +
                                        '.p')
 
 ###################################################################
@@ -515,8 +515,8 @@ class System:
 # -------------------------------------------------------------------
 # PV
         # df_pv = pd.concat([df_50_pv, df_60_pv, df_70_pv], axis=1)
-        # df_pv = pd.concat([df_None, df_None_BW], axis=1)
-        # df_ohne_lastprofil_46 = df_pv.drop(axis=0, index=45)
+        df_pv = pd.concat([df_None_pv, df_None_BW_pv], axis=1)
+        df_pv_ohne_lastprofil_46 = df_pv.drop(axis=0, index=45)
 
 # -------------------------------------------------------------------
 
@@ -540,6 +540,8 @@ class System:
         for house in np.arange(14):
             df_None_BW_ssr = df_None_BW_ssr.append({'ssr_None_BW': results_61_bis_74_None_BW['check_ssr_house_' + str(house+1)]}, ignore_index=True)
 
+        df_None_ssr_ohne_lastprofil_46 = df_None_ssr.drop(axis=0, index=45)
+        df_None_BW_ssr_ohne_lastprofil_46 = df_None_BW_ssr.drop(axis=0, index=45)
 # BO    XPLOTS UND HISTOGRAMME
 # --    -----------------------------------------------------------------
         # df.boxplot(column=['storage_cap_50', 'storage_cap_60', 'storage_cap_70', 'storage_cap_80', 'storage_cap_90', 'storage_cap_100', 'storage_cap_None', 'storage_cap_None_BW'])
@@ -569,11 +571,11 @@ class System:
         # boxplot = df.boxplot(column=['Col1', 'Col2', 'Col3'])
         # -----------------------------------------------------------
 
-        return (df, df_ohne_lastprofil_46, df_None_ssr, df_None_BW_ssr)
+        return (df, df_pv, df_ohne_lastprofil_46,  df_pv_ohne_lastprofil_46, df_None_ssr, df_None_BW_ssr, df_None_ssr_ohne_lastprofil_46, df_None_BW_ssr_ohne_lastprofil_46)
 
 # FINAL PLOTS
 # -------------------------------------------------------------------
-def boxplot_storage(dataframe):
+def boxplot(dataframe):
 
     fig = plt.figure(figsize=(12, 8))
     ax = plt.subplot()
@@ -583,19 +585,17 @@ def boxplot_storage(dataframe):
     main_color = '#7f7f7f'
     colors = []
 
-    color = dict(boxes='black', whiskers='black', medians='#2ca25f')
-    # color = dict(boxes='black', whiskers='black', medians='#FF5050')
-    # color = dict(boxes='black', whiskers='black', medians='#ffc000')
-
-    dataframe.plot.box(ax=ax,
-            color=color,
-            boxprops=dict(linewidth=2),
-            whiskerprops=dict(linewidth=2),
-            medianprops=dict(linewidth=2.5, linestyle='--'),
-            capprops=dict(linewidth=2),
-            flierprops=dict(markersize=10),
-            grid=False,
-            fontsize=28)
+##############################################################
+# ALT: groups nicht möglich
+    # dataframe.plot.box(ax=ax,
+    #         color=color,
+    #         boxprops=dict(linewidth=2),
+    #         whiskerprops=dict(linewidth=2),
+    #         medianprops=dict(linewidth=2.5, linestyle='--'),
+    #         capprops=dict(linewidth=2),
+    #         flierprops=dict(markersize=10),
+    #         grid=False,
+    #         fontsize=28)
 
     # Add jitter
     # ax = sns.swarmplot(data=dataframe, color=main_color)
@@ -608,13 +608,35 @@ def boxplot_storage(dataframe):
     #         color=color,
     #         grid=False,
     #         fontsize=28)
+    ##############################################################
 
-    # ax.set_xticklabels(['0,50', '0,60', '0,70'])
-    ax.set_xticklabels(['aus SYS-Sicht', 'aus BW-Sicht'])
+    sns.boxplot(data=dataframe,
+            width=0.4,
+            # width=0.5,
+            boxprops=dict(linewidth=2),
+            whiskerprops=dict(linewidth=2),
+            medianprops=dict(linewidth=2.5, linestyle='--'),
+            capprops=dict(linewidth=2),
+            flierprops=dict(markersize=10, marker='o', markeredgecolor='black', markerfacecolor='None'),
+            palette=['#2ca25f'], ax=ax)
+
+    for i,artist in enumerate(ax.artists):
+        artist.set_edgecolor('black')
+        # artist.set_facecolor('None')
+
+        for j in range(i*6,i*6+6):
+            line = ax.lines[j]
+            line.set_color('black')
+
+    # ax.set_xticklabels(['0,50', '0,60', '0,70'], fontsize=28, color=diagram_color)
+    ax.set_xticklabels(['aus SYS-Sicht', 'aus BW-Sicht'], fontsize=28, color=diagram_color)
     # ax.set_ylim([-1, 20])
     ax.set_ylim([-0.05, 0.8])
     # ax.set_yticks([0, 500, 1000])
     # ax.set_yticks([0, 5, 10, 15, 20])
+    # ax.set_yticklabels([0, 5, 10, 15, 20], fontsize=28, color=diagram_color)
+    # ax.set_yticks([0, 400, 800, 1200])
+    # ax.set_yticklabels([0, 400, 800, 1200], fontsize=28, color=diagram_color)
     ax.set_yticks([0, 0.20, 0.40, 0.60, 0.80])
     ax.set_yticklabels(['0', '0,20', '0,40', '0,60', '0,80'], fontsize=28, color=diagram_color)
 
@@ -623,6 +645,127 @@ def boxplot_storage(dataframe):
 
     # plt.ylabel('Speicherkapazität in kWh', fontsize=28, color=diagram_color)
     plt.ylabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    # # plt.ylabel('Installierte PV-Leistung in kW', fontsize=28, color=diagram_color)
+
+    plt.tight_layout()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color(main_color)
+    ax.spines['bottom'].set_color(main_color)
+
+    leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
+    leg._legend_box.align = 'left'
+    for color,text in zip(['#FF5050','#ffc000'],leg.get_texts()):
+        # for text in leg.get_texts():
+            text.set_color(color)
+
+    plt.show()
+
+    return fig
+
+
+def boxplot_grouped(dataframe_1, dataframe_2):
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = plt.subplot()
+
+    lw = 3
+    diagram_color = 'black'
+    main_color = '#7f7f7f'
+    colors = []
+
+    # # ssr
+    # #######################################################
+    # df_50 = pd.concat([dataframe_1['storage_cap_50'], dataframe_2['pv_50']], axis=1)
+
+    # df_60 = pd.concat([dataframe_1['storage_cap_60'], dataframe_2['pv_60']], axis=1)
+
+    # df_70 = pd.concat([dataframe_1['storage_cap_70'], dataframe_2['pv_70']], axis=1)
+
+    # df_50 = df_50.rename(columns={
+    #     'storage_cap_50': 'RES in kWh',
+    #     'pv_50': 'PV in kW'})
+    # df_50["Y"] = 1
+
+    # df_60 = df_60.rename(columns={
+    #     'storage_cap_60': 'RES in kWh',
+    #     'pv_60': 'PV in kW'})
+    # df_60["Y"] = 2
+
+    # df_70 = df_70.rename(columns={
+    #     'storage_cap_70': 'RES in kWh',
+    #     'pv_70': 'PV in kW'})
+    # df_70["Y"] = 3
+
+    # dataframe = pd.concat([df_50, df_60, df_70], axis=0)
+    #######################################################
+
+    # no ssr
+    #######################################################
+    df_None = pd.concat([dataframe_1['storage_cap_None'], dataframe_2['pv_None']], axis=1)
+
+    df_None_BW = pd.concat([dataframe_1['storage_cap_None_BW'], dataframe_2['pv_None_BW']], axis=1)
+
+    df_None = df_None.rename(columns={
+        'storage_cap_None': 'RES in kWh',
+        'pv_None': 'PV in kW'})
+    df_None["Y"] = 1
+
+    df_None_BW = df_None_BW.rename(columns={
+        'storage_cap_None_BW': 'RES in kWh',
+        'pv_None_BW': 'PV in kW'})
+    df_None_BW["Y"] = 2
+
+    dataframe = pd.concat([df_None, df_None_BW], axis=0)
+    #######################################################
+
+    dataframe_2 = pd.melt(dataframe, id_vars="Y")
+    dataframe_2.sort_values(["Y", "variable"], ascending=False, inplace=True)
+
+    print(dataframe_2)
+
+    #2ca25f
+    #FF5050 # Speicher
+    #ffc000
+
+    # flierprops = {'marker':'o','markerfacecolor':None, 'markeredgecolor':'black'}
+
+    sns.boxplot(x="Y", y="value", hue="variable", data=dataframe_2,
+            # width=0.4,
+            # width=0.5,
+            width=0.7,
+            boxprops=dict(linewidth=2),
+            whiskerprops=dict(linewidth=2),
+            medianprops=dict(linewidth=2.5, linestyle='--'),
+            capprops=dict(linewidth=2),
+            flierprops=dict(markersize=10, marker='o', markeredgecolor='black', markerfacecolor='None'),
+            palette=['#FF5050','#ffc000'], ax=ax)
+
+    for i,artist in enumerate(ax.artists):
+        artist.set_edgecolor('black')
+        # artist.set_facecolor('None')
+
+        for j in range(i*6,i*6+6):
+            line = ax.lines[j]
+            line.set_color('black')
+
+    # ax.set_xticklabels(['0,50', '0,60', '0,70'], fontsize=28, color=diagram_color)
+    ax.set_xticklabels(['aus SYS-Sicht', 'aus BW-Sicht'], fontsize=28, color=diagram_color)
+    # ax.set_ylim([-1, 20])
+    # ax.set_ylim([-0.05, 0.8])
+    # ax.set_yticks([0, 500, 1000])
+    ax.set_yticks([0, 5, 10, 15, 20])
+    ax.set_yticklabels([0, 5, 10, 15, 20], fontsize=28, color=diagram_color)
+    # ax.set_yticks([0, 400, 800, 1200])
+    # ax.set_yticklabels([0, 400, 800, 1200], fontsize=28, color=diagram_color)
+    # ax.set_yticks([0, 0.20, 0.40, 0.60, 0.80])
+    # ax.set_yticklabels(['0', '0,20', '0,40', '0,60', '0,80'], fontsize=28, color=diagram_color)
+
+    # plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    plt.xlabel('Kostenoptimum', fontsize=28, color=diagram_color)
+
+    plt.ylabel('Speicherkap. in kWh, PV in kW', fontsize=28, color=diagram_color)
+    # plt.ylabel('Autarkiegrad', fontsize=28, color=diagram_color)
     # plt.ylabel('Installierte PV-Leistung in kW', fontsize=28, color=diagram_color)
 
     plt.tight_layout()
@@ -631,37 +774,61 @@ def boxplot_storage(dataframe):
     ax.spines['left'].set_color(main_color)
     ax.spines['bottom'].set_color(main_color)
 
-    # plt.xlim([0.68, 0.92])
-    # plt.ylim([0, 11])
-    # plt.ylim([0, 21])
-
+    leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
+    leg._legend_box.align = 'left'
+    for color,text in zip(['#FF5050','#ffc000'],leg.get_texts()):
+        # for text in leg.get_texts():
+            text.set_color(color)
 
     plt.show()
 
     return fig
 
-
 if __name__ == '__main__':
     arguments = docopt(__doc__)
     print(arguments)
     sys = System
-    (df, df_ohne_lastprofil_46, df_None_ssr, df_None_BW_ssr) = sys.get_results_and_make_dataframe(arguments)
+    (df, df_pv, df_ohne_lastprofil_46, df_pv_ohne_lastprofil_46,df_None_ssr, df_None_BW_ssr, df_None_ssr_ohne_lastprofil_46, df_None_BW_ssr_ohne_lastprofil_46) = sys.get_results_and_make_dataframe(arguments)
 
     # dataframe = df
+    # dataframe_1 = df
+    # dataframe_2 = df_pv
     # dataframe = df_ohne_lastprofil_46
+    # dataframe_1 = df_ohne_lastprofil_46
+    # dataframe_2 = df_pv_ohne_lastprofil_46
     # dataframe = df_None_BW_ssr
-    dataframe = pd.concat([df_None_ssr, df_None_BW_ssr], axis=1)
+    # dataframe = pd.concat([df_None_ssr, df_None_BW_ssr], axis=1)
+    dataframe = pd.concat([df_None_ssr_ohne_lastprofil_46, df_None_BW_ssr_ohne_lastprofil_46], axis=1)
 
-    fig = boxplot_storage(dataframe)
+    fig = boxplot(dataframe)
+    # fig = boxplot_grouped(dataframe_1, dataframe_2)
 
-    print('mean', dataframe.mean(0))
-    print('std', dataframe.std(0))
-    print('min', dataframe.min(0))
-    print('quantile_25', dataframe.quantile(0.25))
-    print('median', dataframe.median(0))
-    print('quantile_75', dataframe.quantile(0.75))
-    print('max', dataframe.max(0))
-    print('SUM', dataframe.sum())
+    # print('mean', dataframe.mean(0))
+    # print('std', dataframe.std(0))
+    # print('min', dataframe.min(0))
+    # print('quantile_25', dataframe.quantile(0.25))
+    # print('median', dataframe.median(0))
+    # print('quantile_75', dataframe.quantile(0.75))
+    # print('max', dataframe.max(0))
+    # print('SUM', dataframe.sum())
+
+    # print('mean', dataframe_1.mean(0))
+    # print('std', dataframe_1.std(0))
+    # print('min', dataframe_1.min(0))
+    # print('quantile_25', dataframe_1.quantile(0.25))
+    # print('median', dataframe_1.median(0))
+    # print('quantile_75', dataframe_1.quantile(0.75))
+    # print('max', dataframe_1.max(0))
+    # print('SUM', dataframe_1.sum())
+
+    # print('mean', dataframe_2.mean(0))
+    # print('std', dataframe_2.std(0))
+    # print('min', dataframe_2.min(0))
+    # print('quantile_25', dataframe_2.quantile(0.25))
+    # print('median', dataframe_2.median(0))
+    # print('quantile_75', dataframe_2.quantile(0.75))
+    # print('max', dataframe_2.max(0))
+    # print('SUM', dataframe_2.sum())
 
     if arguments['--save']:
         fig.savefig(os.path.join(os.path.dirname(__file__)) +
