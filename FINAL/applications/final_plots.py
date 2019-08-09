@@ -1656,40 +1656,40 @@ def read_results_storage_biogas_options():
 
     results_storage_biogas_flex_2030 = np.zeros(5).reshape(1, 5)
 
-    results_storage_biogas_flex_2030[0][0] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2030[0][0] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_biogas_flex_2030[0][1] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2030[0][1] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_biogas_flex_2030[0][2] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2030[0][2] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_biogas_flex_2030[0][3] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2030[0][3] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_biogas_flex_2030[0][4] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2030[0][4] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
@@ -1698,95 +1698,139 @@ def read_results_storage_biogas_options():
 
     results_storage_biogas_flex_2050 = np.zeros(5).reshape(1, 5)
 
-    results_storage_biogas_flex_2050[0][0] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2050[0][0] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_biogas_flex_2050[0][1] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2050[0][1] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_biogas_flex_2050[0][2] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2050[0][2] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_biogas_flex_2050[0][3] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2050[0][3] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_biogas_flex_2050[0][4] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'masterplan_results_mit_biogas_flex' + '/' +
+    results_storage_biogas_flex_2050[0][4] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/3_szenario_mit_biogas_flex_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.90_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_costopt_auch_biogas = np.zeros(5).reshape(1, 5)
+    results_storage_biogas_costopt_2030 = np.zeros(5).reshape(1, 5)
 
-    results_storage_costopt_auch_biogas[0][0] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt_auch_biogas/' +
+    results_storage_biogas_costopt_2030[0][0] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.70_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_costopt_auch_biogas[0][1] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt_auch_biogas/' +
+    results_storage_biogas_costopt_2030[0][1] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.75_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_costopt_auch_biogas[0][2] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt_auch_biogas/' +
+    results_storage_biogas_costopt_2030[0][2] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.80_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_costopt_auch_biogas[0][3] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt_auch_biogas/' +
+    results_storage_biogas_costopt_2030[0][3] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
                                         str(2005) + '_' +
                                         '0.85_1_.p', 'rb'))['storage_cap_1']
 
-    results_storage_costopt_auch_biogas[0][4] = pd.read_pickle(open('../../../../Caros_Daten/' +
-                                        'costopt_auch_biogas/' +
+    results_storage_biogas_costopt_2030[0][4] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
                                         'region_results_dc' + '_' +
                                         str(arguments['--region']) + '_' +
                                         '2030' + '_' +
+                                        str(2005) + '_' +
+                                        '0.90_1_.p', 'rb'))['storage_cap_1']
+
+    results_storage_biogas_costopt_2050 = np.zeros(5).reshape(1, 5)
+
+    results_storage_biogas_costopt_2050[0][0] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.70_1_.p', 'rb'))['storage_cap_1']
+
+    results_storage_biogas_costopt_2050[0][1] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.75_1_.p', 'rb'))['storage_cap_1']
+
+    results_storage_biogas_costopt_2050[0][2] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.80_1_.p', 'rb'))['storage_cap_1']
+
+    results_storage_biogas_costopt_2050[0][3] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
+                                        str(2005) + '_' +
+                                        '0.85_1_.p', 'rb'))['storage_cap_1']
+
+    results_storage_biogas_costopt_2050[0][4] = pd.read_pickle(open('../results/1_EIN_SPEICHER' +
+                                        '/4_v2_szenario_mit_biogas_costopt_ein_speicher' + '/' +
+                                        'region_results_dc' + '_' +
+                                        str(arguments['--region']) + '_' +
+                                        '2050' + '_' +
                                         str(2005) + '_' +
                                         '0.90_1_.p', 'rb'))['storage_cap_1']
 
     results_storage_biogas_flex_2030_GWh = results_storage_biogas_flex_2030 / 1e6
     results_storage_biogas_flex_2050_GWh = results_storage_biogas_flex_2050 / 1e6
-    results_storage_costopt_auch_biogas_GWh = results_storage_costopt_auch_biogas / 1e6
+    results_storage_biogas_costopt_2030_GWh = results_storage_biogas_costopt_2030 / 1e6
+    results_storage_biogas_costopt_2050_GWh = results_storage_biogas_costopt_2050 / 1e6
 
     results_storage_biogas_options_GWh = {'flex_2030': results_storage_biogas_flex_2030_GWh,
                                           'flex_2050': results_storage_biogas_flex_2050_GWh,
-                                          'biogas_costopt': results_storage_costopt_auch_biogas_GWh}
+                                          'biogas_costopt_2030': results_storage_biogas_costopt_2030_GWh,
+                                          'biogas_costopt_2050': results_storage_biogas_costopt_2050_GWh}
 
     return results_storage_biogas_options_GWh
 
@@ -2530,9 +2574,12 @@ def boxplot_storage_quartier_random(dataframe):
 
     # ax.set_xticklabels(['0,50', '0,60', '0,70'])
     # ax.set_xticklabels(['aus SYS-Sicht', 'aus BW-Sicht'])
+    ax.set_xticklabels(['PV-Szenario', 'PV-Kostenoptimum'])
     # ax.set_ylim([-1, 20])
+    # ax.set_ylim([-1, 700])
     # ax.set_ylim([-0.05, 0.8])
     # ax.set_yticks([0, 500, 1000])
+    # ax.set_yticks([0, 200, 400, 600])
     # ax.set_yticks([0, 5, 10, 15, 20])
     # ax.set_yticks([0, 0.20, 0.40, 0.60, 0.80])
     # ax.set_yticklabels(['0', '0,20', '0,40', '0,60', '0,80'], fontsize=28, color=diagram_color)
@@ -2580,53 +2627,68 @@ def dot_plot_storage_biogas_options(results_storage,
     colors = []
 
     line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-                     results_storage['2050'][0][:],
+                     results_storage['2030'][0][:],
                      linestyle='',
                      marker='o',
                      markersize=16,
-                     markeredgecolor='b',
+                     markeredgecolor='goldenrod',
                      markeredgewidth=3,
                      markerfacecolor='None',
-                     label='Biogas-BHKW konstant 2050')
+                     label='Basisszenario 2030')
     colors.append(plt.getp(line,'markeredgecolor'))
 
     line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-                     results_storage_biogas_options['flex_2050'][0][:],
+                     results_storage_biogas_options['flex_2030'][0][:],
                      linestyle='',
                      marker='o',
                      markersize=16,
-                     markeredgecolor='g',
+                     markeredgecolor='#92d050',
                      markeredgewidth=3,
                      markerfacecolor='None',
-                     label='Biogas-BHKW flexibel 2050')
+                     label='Biogas-BHKW flexibel')
     colors.append(plt.getp(line,'markeredgecolor'))
 
-    # line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-    #                  results_storage_biogas_options['biogas_costopt'][0][:],
-    #                  linestyle='',
-    #                  marker='o',
-    #                  markersize=16,
-    #                  markeredgecolor=darker_grey,
-    #                  markeredgewidth=3,
-    #                  markerfacecolor='None',
-    #                  label='Biogas-BHKW kostenoptimiert')
-    # colors.append(plt.getp(line,'markeredgecolor'))
+    line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                     results_storage_biogas_options['biogas_costopt_2030'][0][:],
+                     linestyle='',
+                     marker='o',
+                     markersize=16,
+                     markeredgecolor=diagram_color,
+                     markeredgewidth=3,
+                     markerfacecolor='None',
+                     label='Biogas-BHKW optimiert')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                     results_storage['costopt'][0][:],
+                     linestyle='',
+                     marker='o',
+                     markersize=16,
+                     markeredgecolor=main_color,
+                     markeredgewidth=3,
+                     markerfacecolor='None',
+                     label='Basisszenario Kostenoptimum')
+    colors.append(plt.getp(line,'markeredgecolor'))
 
     # plt.axis([0.68, 0.92,
         # results_storage['2030'].min(), results_storage['2030'].max() + 1])
 
     plt.xlim([0.68, 0.92])
-    plt.ylim([0, 5])
+    # plt.ylim([0, 11.5])
+    # plt.ylim([0, 21.5])
+    # plt.ylim([0, 3.5])
 
-    plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90], fontsize=28, color=diagram_color)
-    plt.yticks([0, 1, 2, 3, 4], fontsize=28, color=diagram_color)
+    plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90])
+    ax.set_xticklabels(['0,70', '0,75', '0,80', '0,85', '0,90'], fontsize=28, color=diagram_color)
     # plt.yticks([0, 5, 10], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 1, 2, 3], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 5, 10, 15, 20], fontsize=28, color=diagram_color)
     plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
     plt.ylabel('Speicherkapazität in GWh', fontsize=28, color=diagram_color)
 
     leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
     leg._legend_box.align = 'left'
-    leg.set_title('Landkreis Osnabrück', prop={'size': 28})
+    # leg.set_title('Landkreis Osnabrück', prop={'size': 28})
     for color,text in zip(colors,leg.get_texts()):
         # for text in leg.get_texts():
             text.set_color(color)
@@ -2857,12 +2919,12 @@ if __name__ == '__main__':
     arguments = docopt(__doc__)
     print(arguments)
 
-    # results_storage = read_results_storage()
+    results_storage = read_results_storage()
     # fig = dot_plot_storage(results_storage)
     # results_quartier = read_results_storage_quartier()
     # results_quartier = read_results_storage_pv_quartier_costopt()
-    dataframe = read_results_storage_quartier_random()
-    fig = boxplot_storage_quartier_random(dataframe)
+    # dataframe = read_results_storage_quartier_random()
+    # fig = boxplot_storage_quartier_random(dataframe)
     # fig = dot_plot_storage_quartier(results_quartier)
     # (results_storage_two_short,
     #         results_storage_two_short_in,
@@ -2881,8 +2943,8 @@ if __name__ == '__main__':
     # (results_deficit, results_excess, results_demand) = read_results_deficit_excess()
     # fig = bar_plot_deficit_excess(results_deficit, results_excess, results_demand)
     # fig = bar_plot_excess(results_excess)
-    # results_storage_biogas_options = read_results_storage_biogas_options()
-    # fig = dot_plot_storage_biogas_options(results_storage, results_storage_biogas_options)
+    results_storage_biogas_options = read_results_storage_biogas_options()
+    fig = dot_plot_storage_biogas_options(results_storage, results_storage_biogas_options)
 
     if arguments['--save']:
         fig.savefig(os.path.join(os.path.dirname(__file__)) +
