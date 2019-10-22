@@ -394,6 +394,7 @@ def get_result_dict(energysystem, parameters, house, results_dc, **arguments):
     results_dc['excess_'+house] = float(excess.sum())
     # results_dc['self_con_'+house] = float(sc.sum())
     results_dc['grid_'+house] = float(grid.sum())
+    results_dc['ts_grid-'+house] = grid
     results_dc['check_ssr_'+house] = float(1 - (grid.sum() / demand.sum()))
     # results_dc['bat_'+house] = float(bat.sum())
     results_dc['storage_cap_'+house] = energysystem.results[
