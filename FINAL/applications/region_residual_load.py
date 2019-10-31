@@ -9,8 +9,8 @@ Options:
   -o, --region_1=REGONE    The region 1. Choose from stein, lkos, osna and
                            rheine.
   -t, --region_2=REGTWO    The region 2. Choose from stein, lkos, osna and
-      --region_3=REGTHR    The region 3. Choose from stein, lkos, osna and
                            rheine.
+      --region_3=REGTHR    The region 3. Choose from stein, lkos, osna and
                            rheine.
       --region_4=REGFOU    The region 4. Choose from stein, lkos, osna and
                            rheine.
@@ -1399,16 +1399,23 @@ def main(**arguments):
         h0_slp = h0_slp_15_min.resample('H').mean()
         data_load_2 = h0_slp['h0'].reset_index(drop=True)
 
-        masterplan = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
-                                 str(arguments['--region_1']) + '.csv', sep=',',
+        # masterplan = pd.read_csv('../../examples_SOLPH_0.1/scenarios/masterplan_' +
+                                 # str(arguments['--region_1']) + '.csv', sep=',',
+                                 # index_col=0)
+
+        masterplan = pd.read_csv('../scenarios/region/region_' +
+                                 str(arguments['--region_1']) +
+                                 '_region_parameter' +
+                                 '.csv', sep=',',
                                  index_col=0)
 
         print(masterplan)
 
-        demand = masterplan.loc['demand'][str(arguments['--year_1'])]  # demand in GWh
-        wind = masterplan.loc['wind'][str(arguments['--year_1'])]  # installed wind in MW
-        pv = masterplan.loc['pv'][str(arguments['--year_1'])]  # installed pv in MW
-        bio = masterplan.loc['bio_MW'][str(arguments['--year_1'])]  # installed pv in MW
+        demand = masterplan.loc['annual_demand_GWh'][str(arguments['--year_1'])]  # demand in GWh
+        wind = masterplan.loc['wind_MW'][str(arguments['--year_1'])]  # installed wind in MW
+        pv = masterplan.loc['pv_MW'][str(arguments['--year_1'])]  # installed pv in MW
+        # bio = masterplan.loc['bio_MW'][str(arguments['--year_1'])]  # installed pv in MW
+        bio = 2
 
         demand_ts_MW = data_load/data_load.sum() * demand * 1e3
         demand_ts_MW_2 = data_load_2/data_load_2.sum() * demand * 1e3
@@ -1417,6 +1424,7 @@ def main(**arguments):
         bio_ts_MW = np.ones(8760)*bio
         # bio_ts_MW = np.ones(8785)*bio
         residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW + bio_ts_MW)
+        # residual_MW = demand_ts_MW - (wind_ts_MW + pv_ts_MW)
 
         print(max(demand_ts_MW))
         print(min(demand_ts_MW))
@@ -1424,6 +1432,9 @@ def main(**arguments):
 
         positive = residual_MW.where(residual_MW > 0, 0)
         negative = residual_MW.where(residual_MW < 0, 0)
+
+        print(positive.sum())
+        print('autarkie: ', 100*(1-positive.sum()/(demand.sum()*1e3)))
 
         jan_residual = residual_MW[1:744]
         feb_residual = residual_MW[745:1416]
@@ -1551,86 +1562,86 @@ def main(**arguments):
             okt_covered_demand.sum(), nov_covered_demand.sum(),
             dez_covered_demand.sum()])
 
-        print(str(arguments['--region_1']) + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
-        print(str(arguments['--region_1']) + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
-        print(str(arguments['--region_1']) + '_positive_GWh: ', positive.sum()/1e3)
-        print(str(arguments['--region_1']) + '_negative_GWh: ', negative.sum()/1e3)
-        print(str(arguments['--region_1']) + '_max_positive_MW: ', positive.max())
-        print(str(arguments['--region_1']) + '_min_negative_MW: ', negative.min())
-        print(str(arguments['--region_1']) + '_hours_positive: ', len(positive.nonzero()[0]))
-        print(str(arguments['--region_1']) + '_hours_negative: ', len(negative.nonzero()[0]))
-        print(str(arguments['--region_1']) + '_jan_residual: ', jan_residual.sum())
-        print(str(arguments['--region_1']) + '_feb_residual: ', feb_residual.sum())
-        print(str(arguments['--region_1']) + '_mar_residual: ', mar_residual.sum())
-        print(str(arguments['--region_1']) + '_apr_residual: ', apr_residual.sum())
-        print(str(arguments['--region_1']) + '_mai_residual: ', mai_residual.sum())
-        print(str(arguments['--region_1']) + '_jun_residual: ', jun_residual.sum())
-        print(str(arguments['--region_1']) + '_jul_residual: ', jul_residual.sum())
-        print(str(arguments['--region_1']) + '_aug_residual: ', aug_residual.sum())
-        print(str(arguments['--region_1']) + '_sep_residual: ', sep_residual.sum())
-        print(str(arguments['--region_1']) + '_okt_residual: ', okt_residual.sum())
-        print(str(arguments['--region_1']) + '_nov_residual: ', nov_residual.sum())
-        print(str(arguments['--region_1']) + '_dez_residual: ', dez_residual.sum())
-        print(str(arguments['--region_1']) + '_jan_positive: ', jan_positive.sum())
-        print(str(arguments['--region_1']) + '_feb_positive: ', feb_positive.sum())
-        print(str(arguments['--region_1']) + '_mar_positive: ', mar_positive.sum())
-        print(str(arguments['--region_1']) + '_apr_positive: ', apr_positive.sum())
-        print(str(arguments['--region_1']) + '_mai_positive: ', mai_positive.sum())
-        print(str(arguments['--region_1']) + '_jun_positive: ', jun_positive.sum())
-        print(str(arguments['--region_1']) + '_jul_positive: ', jul_positive.sum())
-        print(str(arguments['--region_1']) + '_aug_positive: ', aug_positive.sum())
-        print(str(arguments['--region_1']) + '_sep_positive: ', sep_positive.sum())
-        print(str(arguments['--region_1']) + '_okt_positive: ', okt_positive.sum())
-        print(str(arguments['--region_1']) + '_nov_positive: ', nov_positive.sum())
-        print(str(arguments['--region_1']) + '_dez_positive: ', dez_positive.sum())
-        print(str(arguments['--region_1']) + '_jan_negative: ', jan_negative.sum())
-        print(str(arguments['--region_1']) + '_feb_negative: ', feb_negative.sum())
-        print(str(arguments['--region_1']) + '_mar_negative: ', mar_negative.sum())
-        print(str(arguments['--region_1']) + '_apr_negative: ', apr_negative.sum())
-        print(str(arguments['--region_1']) + '_mai_negative: ', mai_negative.sum())
-        print(str(arguments['--region_1']) + '_jun_negative: ', jun_negative.sum())
-        print(str(arguments['--region_1']) + '_jul_negative: ', jul_negative.sum())
-        print(str(arguments['--region_1']) + '_aug_negative: ', aug_negative.sum())
-        print(str(arguments['--region_1']) + '_sep_negative: ', sep_negative.sum())
-        print(str(arguments['--region_1']) + '_okt_negative: ', okt_negative.sum())
-        print(str(arguments['--region_1']) + '_nov_negative: ', nov_negative.sum())
-        print(str(arguments['--region_1']) + '_dez_negative: ', dez_negative.sum())
-        print(str(arguments['--region_1']) + '_jan_demand: ', jan_demand.sum())
-        print(str(arguments['--region_1']) + '_feb_demand: ', feb_demand.sum())
-        print(str(arguments['--region_1']) + '_mar_demand: ', mar_demand.sum())
-        print(str(arguments['--region_1']) + '_apr_demand: ', apr_demand.sum())
-        print(str(arguments['--region_1']) + '_mai_demand: ', mai_demand.sum())
-        print(str(arguments['--region_1']) + '_jun_demand: ', jun_demand.sum())
-        print(str(arguments['--region_1']) + '_jul_demand: ', jul_demand.sum())
-        print(str(arguments['--region_1']) + '_aug_demand: ', aug_demand.sum())
-        print(str(arguments['--region_1']) + '_sep_demand: ', sep_demand.sum())
-        print(str(arguments['--region_1']) + '_okt_demand: ', okt_demand.sum())
-        print(str(arguments['--region_1']) + '_nov_demand: ', nov_demand.sum())
-        print(str(arguments['--region_1']) + '_dez_demand: ', dez_demand.sum())
-        print(str(arguments['--region_1']) + '_jan_wind: ', jan_wind.sum())
-        print(str(arguments['--region_1']) + '_feb_wind: ', feb_wind.sum())
-        print(str(arguments['--region_1']) + '_mar_wind: ', mar_wind.sum())
-        print(str(arguments['--region_1']) + '_apr_wind: ', apr_wind.sum())
-        print(str(arguments['--region_1']) + '_mai_wind: ', mai_wind.sum())
-        print(str(arguments['--region_1']) + '_jun_wind: ', jun_wind.sum())
-        print(str(arguments['--region_1']) + '_jul_wind: ', jul_wind.sum())
-        print(str(arguments['--region_1']) + '_aug_wind: ', aug_wind.sum())
-        print(str(arguments['--region_1']) + '_sep_wind: ', sep_wind.sum())
-        print(str(arguments['--region_1']) + '_okt_wind: ', okt_wind.sum())
-        print(str(arguments['--region_1']) + '_nov_wind: ', nov_wind.sum())
-        print(str(arguments['--region_1']) + '_dez_wind: ', dez_wind.sum())
-        print(str(arguments['--region_1']) + '_jan_pv: ', jan_pv.sum())
-        print(str(arguments['--region_1']) + '_feb_pv: ', feb_pv.sum())
-        print(str(arguments['--region_1']) + '_mar_pv: ', mar_pv.sum())
-        print(str(arguments['--region_1']) + '_apr_pv: ', apr_pv.sum())
-        print(str(arguments['--region_1']) + '_mai_pv: ', mai_pv.sum())
-        print(str(arguments['--region_1']) + '_jun_pv: ', jun_pv.sum())
-        print(str(arguments['--region_1']) + '_jul_pv: ', jul_pv.sum())
-        print(str(arguments['--region_1']) + '_aug_pv: ', aug_pv.sum())
-        print(str(arguments['--region_1']) + '_sep_pv: ', sep_pv.sum())
-        print(str(arguments['--region_1']) + '_okt_pv: ', okt_pv.sum())
-        print(str(arguments['--region_1']) + '_nov_pv: ', nov_pv.sum())
-        print(str(arguments['--region_1']) + '_dez_pv: ', dez_pv.sum())
+        # print(str(arguments['--region_1']) + '_wind_GWh: ', ((data_weather['wind']*wind).sum())/1e3)
+        # print(str(arguments['--region_1']) + '_pv_GWh: ', ((data_weather['pv']*pv).sum())/1e3)
+        # print(str(arguments['--region_1']) + '_positive_GWh: ', positive.sum()/1e3)
+        # print(str(arguments['--region_1']) + '_negative_GWh: ', negative.sum()/1e3)
+        # print(str(arguments['--region_1']) + '_max_positive_MW: ', positive.max())
+        # print(str(arguments['--region_1']) + '_min_negative_MW: ', negative.min())
+        # print(str(arguments['--region_1']) + '_hours_positive: ', len(positive.nonzero()[0]))
+        # print(str(arguments['--region_1']) + '_hours_negative: ', len(negative.nonzero()[0]))
+        # print(str(arguments['--region_1']) + '_jan_residual: ', jan_residual.sum())
+        # print(str(arguments['--region_1']) + '_feb_residual: ', feb_residual.sum())
+        # print(str(arguments['--region_1']) + '_mar_residual: ', mar_residual.sum())
+        # print(str(arguments['--region_1']) + '_apr_residual: ', apr_residual.sum())
+        # print(str(arguments['--region_1']) + '_mai_residual: ', mai_residual.sum())
+        # print(str(arguments['--region_1']) + '_jun_residual: ', jun_residual.sum())
+        # print(str(arguments['--region_1']) + '_jul_residual: ', jul_residual.sum())
+        # print(str(arguments['--region_1']) + '_aug_residual: ', aug_residual.sum())
+        # print(str(arguments['--region_1']) + '_sep_residual: ', sep_residual.sum())
+        # print(str(arguments['--region_1']) + '_okt_residual: ', okt_residual.sum())
+        # print(str(arguments['--region_1']) + '_nov_residual: ', nov_residual.sum())
+        # print(str(arguments['--region_1']) + '_dez_residual: ', dez_residual.sum())
+        # print(str(arguments['--region_1']) + '_jan_positive: ', jan_positive.sum())
+        # print(str(arguments['--region_1']) + '_feb_positive: ', feb_positive.sum())
+        # print(str(arguments['--region_1']) + '_mar_positive: ', mar_positive.sum())
+        # print(str(arguments['--region_1']) + '_apr_positive: ', apr_positive.sum())
+        # print(str(arguments['--region_1']) + '_mai_positive: ', mai_positive.sum())
+        # print(str(arguments['--region_1']) + '_jun_positive: ', jun_positive.sum())
+        # print(str(arguments['--region_1']) + '_jul_positive: ', jul_positive.sum())
+        # print(str(arguments['--region_1']) + '_aug_positive: ', aug_positive.sum())
+        # print(str(arguments['--region_1']) + '_sep_positive: ', sep_positive.sum())
+        # print(str(arguments['--region_1']) + '_okt_positive: ', okt_positive.sum())
+        # print(str(arguments['--region_1']) + '_nov_positive: ', nov_positive.sum())
+        # print(str(arguments['--region_1']) + '_dez_positive: ', dez_positive.sum())
+        # print(str(arguments['--region_1']) + '_jan_negative: ', jan_negative.sum())
+        # print(str(arguments['--region_1']) + '_feb_negative: ', feb_negative.sum())
+        # print(str(arguments['--region_1']) + '_mar_negative: ', mar_negative.sum())
+        # print(str(arguments['--region_1']) + '_apr_negative: ', apr_negative.sum())
+        # print(str(arguments['--region_1']) + '_mai_negative: ', mai_negative.sum())
+        # print(str(arguments['--region_1']) + '_jun_negative: ', jun_negative.sum())
+        # print(str(arguments['--region_1']) + '_jul_negative: ', jul_negative.sum())
+        # print(str(arguments['--region_1']) + '_aug_negative: ', aug_negative.sum())
+        # print(str(arguments['--region_1']) + '_sep_negative: ', sep_negative.sum())
+        # print(str(arguments['--region_1']) + '_okt_negative: ', okt_negative.sum())
+        # print(str(arguments['--region_1']) + '_nov_negative: ', nov_negative.sum())
+        # print(str(arguments['--region_1']) + '_dez_negative: ', dez_negative.sum())
+        # print(str(arguments['--region_1']) + '_jan_demand: ', jan_demand.sum())
+        # print(str(arguments['--region_1']) + '_feb_demand: ', feb_demand.sum())
+        # print(str(arguments['--region_1']) + '_mar_demand: ', mar_demand.sum())
+        # print(str(arguments['--region_1']) + '_apr_demand: ', apr_demand.sum())
+        # print(str(arguments['--region_1']) + '_mai_demand: ', mai_demand.sum())
+        # print(str(arguments['--region_1']) + '_jun_demand: ', jun_demand.sum())
+        # print(str(arguments['--region_1']) + '_jul_demand: ', jul_demand.sum())
+        # print(str(arguments['--region_1']) + '_aug_demand: ', aug_demand.sum())
+        # print(str(arguments['--region_1']) + '_sep_demand: ', sep_demand.sum())
+        # print(str(arguments['--region_1']) + '_okt_demand: ', okt_demand.sum())
+        # print(str(arguments['--region_1']) + '_nov_demand: ', nov_demand.sum())
+        # print(str(arguments['--region_1']) + '_dez_demand: ', dez_demand.sum())
+        # print(str(arguments['--region_1']) + '_jan_wind: ', jan_wind.sum())
+        # print(str(arguments['--region_1']) + '_feb_wind: ', feb_wind.sum())
+        # print(str(arguments['--region_1']) + '_mar_wind: ', mar_wind.sum())
+        # print(str(arguments['--region_1']) + '_apr_wind: ', apr_wind.sum())
+        # print(str(arguments['--region_1']) + '_mai_wind: ', mai_wind.sum())
+        # print(str(arguments['--region_1']) + '_jun_wind: ', jun_wind.sum())
+        # print(str(arguments['--region_1']) + '_jul_wind: ', jul_wind.sum())
+        # print(str(arguments['--region_1']) + '_aug_wind: ', aug_wind.sum())
+        # print(str(arguments['--region_1']) + '_sep_wind: ', sep_wind.sum())
+        # print(str(arguments['--region_1']) + '_okt_wind: ', okt_wind.sum())
+        # print(str(arguments['--region_1']) + '_nov_wind: ', nov_wind.sum())
+        # print(str(arguments['--region_1']) + '_dez_wind: ', dez_wind.sum())
+        # print(str(arguments['--region_1']) + '_jan_pv: ', jan_pv.sum())
+        # print(str(arguments['--region_1']) + '_feb_pv: ', feb_pv.sum())
+        # print(str(arguments['--region_1']) + '_mar_pv: ', mar_pv.sum())
+        # print(str(arguments['--region_1']) + '_apr_pv: ', apr_pv.sum())
+        # print(str(arguments['--region_1']) + '_mai_pv: ', mai_pv.sum())
+        # print(str(arguments['--region_1']) + '_jun_pv: ', jun_pv.sum())
+        # print(str(arguments['--region_1']) + '_jul_pv: ', jul_pv.sum())
+        # print(str(arguments['--region_1']) + '_aug_pv: ', aug_pv.sum())
+        # print(str(arguments['--region_1']) + '_sep_pv: ', sep_pv.sum())
+        # print(str(arguments['--region_1']) + '_okt_pv: ', okt_pv.sum())
+        # print(str(arguments['--region_1']) + '_nov_pv: ', nov_pv.sum())
+        # print(str(arguments['--region_1']) + '_dez_pv: ', dez_pv.sum())
 # #
 #         print(str(arguments['--region_1']) + '_jan_cov: ', jan_covered_demand.sum())
 #         print(str(arguments['--region_1']) + '_feb_cov: ', feb_covered_demand.sum())
@@ -2158,15 +2169,27 @@ if __name__ == "__main__":
             results['residual_kombi_6'].sort_values(ascending=False,inplace=True)
         if arguments['--region_1']:
             results['residual_region_1'].sort_values(ascending=False, inplace=True)
+            results['wind_ts'].sort_values(ascending=False, inplace=True)
+            results['pv_ts'].sort_values(ascending=False, inplace=True)
+            results['demand_ts'].sort_values(ascending=False, inplace=True)
             xxx = results['residual_region_1']
         if arguments['--region_2']:
             results['residual_region_2'].sort_values(ascending=False, inplace=True)
+            results['wind_ts'].sort_values(ascending=False, inplace=True)
+            results['pv_ts'].sort_values(ascending=False, inplace=True)
+            results['demand_ts'].sort_values(ascending=False, inplace=True)
             yyy = results['residual_region_2']
         if arguments['--region_3']:
             results['residual_region_3'].sort_values(ascending=False, inplace=True)
+            results['wind_ts'].sort_values(ascending=False, inplace=True)
+            results['pv_ts'].sort_values(ascending=False, inplace=True)
+            results['demand_ts'].sort_values(ascending=False, inplace=True)
             zzz = results['residual_region_3']
         if arguments['--region_4']:
             results['residual_region_4'].sort_values(ascending=False,inplace=True)
+            results['wind_ts'].sort_values(ascending=False, inplace=True)
+            results['pv_ts'].sort_values(ascending=False, inplace=True)
+            results['demand_ts'].sort_values(ascending=False, inplace=True)
 
         # xxx = xxx.to_frame().reset_index()
         # yyy = yyy.to_frame().reset_index()
@@ -2198,7 +2221,7 @@ if __name__ == "__main__":
         fig = line.line_plot(residual_1=results['residual_region_1'],
                              residual_2=results['residual_region_2'],
                              residual_3=results['residual_region_3'],
-                             # residual_4=results['residual_region_4'],
+                             residual_4=results['residual_region_4'],
                              # residual_2=results['residual_kombi_1'],
                              # residual_3=results['residual_kombi_3'],
                              res_name='Residuallast in MW',
@@ -2206,6 +2229,11 @@ if __name__ == "__main__":
                              # res_name=('Residual demand ' +
                              # str(arguments['--year']) + ' in MW'),
                              show=True)
+
+        # fig = line.line_plot(residual_1=results['demand_ts'],
+        #                      # residual_2=results['pv_ts'],
+        #                      res_name='Erzeugungsleistung in MW',
+        #                      show=True)
 
     # print(results['demand_monthly_kombi_3_1'].sum())
     # print(results['covered_demand_monthly_kombi_3_1'].sum())
