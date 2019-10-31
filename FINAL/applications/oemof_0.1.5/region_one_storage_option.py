@@ -533,6 +533,8 @@ def get_result_dict(energysystem, parameters, loopi, **arguments):
     if (arguments['--biogas']) or (arguments['--biogas-costopt']) or (arguments['--biogas-flex']):
         results_dc['biogas_bhkw_ts_'+str(loopi)] = biogas_bhkw
 
+    print(biogas_bhkw)
+
     results_dc['demand_'+str(loopi)] = float(demand.sum())
     results_dc['demand_ts_'+str(loopi)] = demand
     results_dc['grid_'+str(loopi)] = float(grid.sum())
