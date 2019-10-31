@@ -534,6 +534,12 @@ def get_result_dict(energysystem, om, parameters, loopi, **arguments):
     storage_short_inst_cap = results[(storage_short, None)]['scalars']['invest']
     storage_long_inst_cap = results[(storage_long, None)]['scalars']['invest']
 
+    storage_short_inst_in = results[(bel, storage_short)]['scalars']['invest']
+    storage_short_inst_out = results[(storage_short, bel)]['scalars']['invest']
+
+    storage_long_inst_in = results[(bel, storage_long)]['scalars']['invest']
+    storage_long_inst_out = results[(storage_long, bel)]['scalars']['invest']
+
     if arguments['--costopt']:
          wind_inst = (results[wind, bel])['scalars']['invest']
          pv_inst = (results[pv, bel])['scalars']['invest']
@@ -586,6 +592,13 @@ def get_result_dict(energysystem, om, parameters, loopi, **arguments):
     # --------------------------------------------------------------------------------
     results_dc['storage_short_cap_'+str(loopi)] = storage_short_inst_cap
     results_dc['storage_long_cap_'+str(loopi)] = storage_long_inst_cap
+
+    results_dc['storage_short_inst_in_'+str(loopi)] = storage_short_inst_in
+    results_dc['storage_short_inst_out_'+str(loopi)] = storage_short_inst_out
+
+    results_dc['storage_long_inst_in_'+str(loopi)] = storage_long_inst_in
+    results_dc['storage_long_inst_out_'+str(loopi)] = storage_long_inst_out
+
     results_dc['objective'] = energysystem.results['meta']['objective']
 
     if arguments['--costopt']:
@@ -709,30 +722,30 @@ def main(**arguments):
         # create_plots(esys, year=arguments['--year'])
 
 
-    energysystem_graph = graph.create_nx_graph(esys)
-    matplotlib.rcParams['figure.figsize'] = [10.0, 10.0]
-    draw_graph(energysystem_graph, node_size=5500,
-                node_color={
-                            'coal': '#0f2e2e',
-                            'gas': '#c76c56',
-                            'oil': '#494a19',
-                            'lignite': '#56201d',
-                            'bel': '#9a9da1',
-                            'bth': '#cd3333',
-                            'wind': '#4ca7c3',
-                            'pv': '#ffde32',
-                            'demand_el': '#9a9da1',
-                            'excess_el': '#9a9da1',
-                            'demand_th': '#cd3333',
-                            'pp_coal': '#0f2e2e',
-                            'pp_lig': '#56201d',
-                            'pp_gas': '#c76c56',
-                            'pp_oil': '#494a19',
-                            'pp_chp': '#eeac7e',
-                            'b_heat_source': '#cd3333',
-                            'heat_source': '#cd3333',
-                            'heat_pump': '#42c77a'},
-                edge_color='#eeac7e')
+    # energysystem_graph = graph.create_nx_graph(esys)
+    # matplotlib.rcParams['figure.figsize'] = [10.0, 10.0]
+    # draw_graph(energysystem_graph, node_size=5500,
+    #             node_color={
+    #                         'coal': '#0f2e2e',
+    #                         'gas': '#c76c56',
+    #                         'oil': '#494a19',
+    #                         'lignite': '#56201d',
+    #                         'bel': '#9a9da1',
+    #                         'bth': '#cd3333',
+    #                         'wind': '#4ca7c3',
+    #                         'pv': '#ffde32',
+    #                         'demand_el': '#9a9da1',
+    #                         'excess_el': '#9a9da1',
+    #                         'demand_th': '#cd3333',
+    #                         'pp_coal': '#0f2e2e',
+    #                         'pp_lig': '#56201d',
+    #                         'pp_gas': '#c76c56',
+    #                         'pp_oil': '#494a19',
+    #                         'pp_chp': '#eeac7e',
+    #                         'b_heat_source': '#cd3333',
+    #                         'heat_source': '#cd3333',
+    #                         'heat_pump': '#42c77a'},
+    #             edge_color='#eeac7e')
 
 
 if __name__ == "__main__":
