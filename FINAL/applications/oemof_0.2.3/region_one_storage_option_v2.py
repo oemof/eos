@@ -240,13 +240,14 @@ def create_energysystem(energysystem, parameters, loopi,
             label='region_'+str(loopi)+'_bat',
             inputs={bel: solph.Flow(investment=solph.Investment(
                 ep_costs=parameters['storage_power_epc']+parameters['cost_parameter'].loc['storage_power']['opex_fix']), variable_costs=0)},
-            outputs={bel: solph.Flow(variable_costs=0)},
+            outputs={bel: solph.Flow(variable_costs=0, investment=solph.Investment(ep_costs=0))},
+            invest_relation_input_output=1,
             capacity_loss=parameters[
                 'tech_parameter'].loc['storage']['cap_loss'],
-            nominal_input_capacity_ratio=parameters[
-                'tech_parameter'].loc['storage']['c_rate'],
-            nominal_output_capacity_ratio=parameters[
-                'tech_parameter'].loc['storage']['c_rate'],
+            # nominal_input_capacity_ratio=parameters[
+                # 'tech_parameter'].loc['storage']['c_rate'],
+            # nominal_output_capacity_ratio=parameters[
+                # 'tech_parameter'].loc['storage']['c_rate'],
             inflow_conversion_factor=parameters[
                 'tech_parameter'].loc['storage']['eta_in'],
             outflow_conversion_factor=parameters[
@@ -715,30 +716,30 @@ def main(**arguments):
         # create_plots(esys, year=arguments['--year'])
 
 
-    energysystem_graph = graph.create_nx_graph(esys)
-    matplotlib.rcParams['figure.figsize'] = [10.0, 10.0]
-    draw_graph(energysystem_graph, node_size=5500,
-                node_color={
-                            'coal': '#0f2e2e',
-                            'gas': '#c76c56',
-                            'oil': '#494a19',
-                            'lignite': '#56201d',
-                            'bel': '#9a9da1',
-                            'bth': '#cd3333',
-                            'wind': '#4ca7c3',
-                            'pv': '#ffde32',
-                            'demand_el': '#9a9da1',
-                            'excess_el': '#9a9da1',
-                            'demand_th': '#cd3333',
-                            'pp_coal': '#0f2e2e',
-                            'pp_lig': '#56201d',
-                            'pp_gas': '#c76c56',
-                            'pp_oil': '#494a19',
-                            'pp_chp': '#eeac7e',
-                            'b_heat_source': '#cd3333',
-                            'heat_source': '#cd3333',
-                            'heat_pump': '#42c77a'},
-                edge_color='#eeac7e')
+    # energysystem_graph = graph.create_nx_graph(esys)
+    # matplotlib.rcParams['figure.figsize'] = [10.0, 10.0]
+    # draw_graph(energysystem_graph, node_size=5500,
+    #             node_color={
+    #                         'coal': '#0f2e2e',
+    #                         'gas': '#c76c56',
+    #                         'oil': '#494a19',
+    #                         'lignite': '#56201d',
+    #                         'bel': '#9a9da1',
+    #                         'bth': '#cd3333',
+    #                         'wind': '#4ca7c3',
+    #                         'pv': '#ffde32',
+    #                         'demand_el': '#9a9da1',
+    #                         'excess_el': '#9a9da1',
+    #                         'demand_th': '#cd3333',
+    #                         'pp_coal': '#0f2e2e',
+    #                         'pp_lig': '#56201d',
+    #                         'pp_gas': '#c76c56',
+    #                         'pp_oil': '#494a19',
+    #                         'pp_chp': '#eeac7e',
+    #                         'b_heat_source': '#cd3333',
+    #                         'heat_source': '#cd3333',
+    #                         'heat_pump': '#42c77a'},
+    #             edge_color='#eeac7e')
 
 
 if __name__ == "__main__":
