@@ -674,49 +674,49 @@ def boxplot_grouped(dataframe_1, dataframe_2):
     main_color = '#7f7f7f'
     colors = []
 
-    # # ssr
+     # ssr
+     #######################################################
+    df_50 = pd.concat([dataframe_1['storage_cap_50'], dataframe_2['pv_50']], axis=1)
+
+    df_60 = pd.concat([dataframe_1['storage_cap_60'], dataframe_2['pv_60']], axis=1)
+
+    df_70 = pd.concat([dataframe_1['storage_cap_70'], dataframe_2['pv_70']], axis=1)
+
+    df_50 = df_50.rename(columns={
+         'storage_cap_50': 'RES in kWh',
+         'pv_50': 'PV in kW'})
+    df_50["Y"] = 1
+
+    df_60 = df_60.rename(columns={
+         'storage_cap_60': 'RES in kWh',
+         'pv_60': 'PV in kW'})
+    df_60["Y"] = 2
+
+    df_70 = df_70.rename(columns={
+         'storage_cap_70': 'RES in kWh',
+         'pv_70': 'PV in kW'})
+    df_70["Y"] = 3
+
+    dataframe = pd.concat([df_50, df_60, df_70], axis=0)
+    ######################################################
+
+    # # no ssr
     # #######################################################
-    # df_50 = pd.concat([dataframe_1['storage_cap_50'], dataframe_2['pv_50']], axis=1)
+    # df_None = pd.concat([dataframe_1['storage_cap_None'], dataframe_2['pv_None']], axis=1)
 
-    # df_60 = pd.concat([dataframe_1['storage_cap_60'], dataframe_2['pv_60']], axis=1)
+    # df_None_BW = pd.concat([dataframe_1['storage_cap_None_BW'], dataframe_2['pv_None_BW']], axis=1)
 
-    # df_70 = pd.concat([dataframe_1['storage_cap_70'], dataframe_2['pv_70']], axis=1)
+    # df_None = df_None.rename(columns={
+    #     'storage_cap_None': 'RES in kWh',
+    #     'pv_None': 'PV in kW'})
+    # df_None["Y"] = 1
 
-    # df_50 = df_50.rename(columns={
-    #     'storage_cap_50': 'RES in kWh',
-    #     'pv_50': 'PV in kW'})
-    # df_50["Y"] = 1
+    # df_None_BW = df_None_BW.rename(columns={
+    #     'storage_cap_None_BW': 'RES in kWh',
+    #     'pv_None_BW': 'PV in kW'})
+    # df_None_BW["Y"] = 2
 
-    # df_60 = df_60.rename(columns={
-    #     'storage_cap_60': 'RES in kWh',
-    #     'pv_60': 'PV in kW'})
-    # df_60["Y"] = 2
-
-    # df_70 = df_70.rename(columns={
-    #     'storage_cap_70': 'RES in kWh',
-    #     'pv_70': 'PV in kW'})
-    # df_70["Y"] = 3
-
-    # dataframe = pd.concat([df_50, df_60, df_70], axis=0)
-    #######################################################
-
-    # no ssr
-    #######################################################
-    df_None = pd.concat([dataframe_1['storage_cap_None'], dataframe_2['pv_None']], axis=1)
-
-    df_None_BW = pd.concat([dataframe_1['storage_cap_None_BW'], dataframe_2['pv_None_BW']], axis=1)
-
-    df_None = df_None.rename(columns={
-        'storage_cap_None': 'RES in kWh',
-        'pv_None': 'PV in kW'})
-    df_None["Y"] = 1
-
-    df_None_BW = df_None_BW.rename(columns={
-        'storage_cap_None_BW': 'RES in kWh',
-        'pv_None_BW': 'PV in kW'})
-    df_None_BW["Y"] = 2
-
-    dataframe = pd.concat([df_None, df_None_BW], axis=0)
+    # dataframe = pd.concat([df_None, df_None_BW], axis=0)
     #######################################################
 
     dataframe_2 = pd.melt(dataframe, id_vars="Y")
@@ -749,8 +749,8 @@ def boxplot_grouped(dataframe_1, dataframe_2):
             line = ax.lines[j]
             line.set_color('black')
 
-    # ax.set_xticklabels(['0,50', '0,60', '0,70'], fontsize=28, color=diagram_color)
-    ax.set_xticklabels(['aus SYS-Sicht', 'aus BW-Sicht'], fontsize=28, color=diagram_color)
+    ax.set_xticklabels(['0,50', '0,60', '0,70'], fontsize=28, color=diagram_color)
+    # ax.set_xticklabels(['aus SYS-Sicht', 'aus BW-Sicht'], fontsize=28, color=diagram_color)
     # ax.set_ylim([-1, 20])
     # ax.set_ylim([-0.05, 0.8])
     # ax.set_yticks([0, 500, 1000])
@@ -761,8 +761,8 @@ def boxplot_grouped(dataframe_1, dataframe_2):
     # ax.set_yticks([0, 0.20, 0.40, 0.60, 0.80])
     # ax.set_yticklabels(['0', '0,20', '0,40', '0,60', '0,80'], fontsize=28, color=diagram_color)
 
-    # plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
-    plt.xlabel('Kostenoptimum', fontsize=28, color=diagram_color)
+    plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    # plt.xlabel('Kostenoptimum', fontsize=28, color=diagram_color)
 
     plt.ylabel('Speicherkap. in kWh, PV in kW', fontsize=28, color=diagram_color)
     # plt.ylabel('Autarkiegrad', fontsize=28, color=diagram_color)
@@ -792,15 +792,15 @@ if __name__ == '__main__':
 
     # dataframe = df
     # dataframe_1 = df
-    # dataframe_2 = df_pv
+    # dataframe_1 = df_pv
     # dataframe = df_ohne_lastprofil_46
     # dataframe_1 = df_ohne_lastprofil_46
-    # dataframe_2 = df_pv_ohne_lastprofil_46
-    # dataframe = df_None_BW_ssr
+    # dataframe_1 = df_pv_ohne_lastprofil_46
+    dataframe_1 = df_None_BW_ssr_ohne_lastprofil_46
     # dataframe = pd.concat([df_None_ssr, df_None_BW_ssr], axis=1)
-    dataframe = pd.concat([df_None_ssr_ohne_lastprofil_46, df_None_BW_ssr_ohne_lastprofil_46], axis=1)
+    # dataframe = pd.concat([df_None_ssr_ohne_lastprofil_46, df_None_BW_ssr_ohne_lastprofil_46], axis=1)
 
-    fig = boxplot(dataframe)
+    # fig = boxplot(dataframe)
     # fig = boxplot_grouped(dataframe_1, dataframe_2)
 
     # print('mean', dataframe.mean(0))
@@ -812,14 +812,14 @@ if __name__ == '__main__':
     # print('max', dataframe.max(0))
     # print('SUM', dataframe.sum())
 
-    # print('mean', dataframe_1.mean(0))
-    # print('std', dataframe_1.std(0))
-    # print('min', dataframe_1.min(0))
-    # print('quantile_25', dataframe_1.quantile(0.25))
-    # print('median', dataframe_1.median(0))
-    # print('quantile_75', dataframe_1.quantile(0.75))
-    # print('max', dataframe_1.max(0))
-    # print('SUM', dataframe_1.sum())
+    print('mean', dataframe_1.mean(0))
+    print('std', dataframe_1.std(0))
+    print('min', dataframe_1.min(0))
+    print('quantile_25', dataframe_1.quantile(0.25))
+    print('median', dataframe_1.median(0))
+    print('quantile_75', dataframe_1.quantile(0.75))
+    print('max', dataframe_1.max(0))
+    print('SUM', dataframe_1.sum())
 
     # print('mean', dataframe_2.mean(0))
     # print('std', dataframe_2.std(0))

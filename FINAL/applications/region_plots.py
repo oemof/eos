@@ -34,21 +34,30 @@ def calculate_combinations(num_regions):
         combinations = np.vstack((combinations, [i, n[0], n[1]]))
         i = i + 1
 
-    # print('combinations: ', combinations)
+    print('combinations: ', combinations)
 
     return combinations
 
 
 def scatter_plot(combinations):
 
-    res_single_regions = pickle.load(open('../results/REGION_COMMUNE_MULTI/mit_biogas_unflex/results_single_regions_0.80.p', 'rb'))
-    print(res_single_regions['storage_cap_18'])
+    # res_single_regions = pickle.load(open('../results/REGION_COMMUNE_MULTI/mit_biogas_unflex/results_single_regions_0.90.p', 'rb'))
+    # print(res_single_regions['storage_cap_18'])
 
+    res_single_regions = pickle.load(open('../results/results_single_regions_0.80.p', 'rb'))
     results = [0, 0, 0]
+
+    # for i in np.arange(1, len(combinations)):
+    #     res_combinations = pickle.load(open
+    #             ('../results/REGION_COMMUNE_MULTI/mit_biogas_unflex/region_results_dc_region_80_2005_0.90_' + str(i) + '_.p', 'rb'))
+    #     results = np.vstack((results,
+    #             [i, (res_single_regions['storage_cap_' + str(combinations[i][1])] +
+    #                  res_single_regions['storage_cap_' + str(combinations[i][2])]),
+    #                  res_combinations['storage_cap_' + str(i)]]))
 
     for i in np.arange(1, len(combinations)):
         res_combinations = pickle.load(open
-                ('../results/REGION_COMMUNE_MULTI/mit_biogas_unflex/region_results_dc_region_80_2005_0.80_' + str(i) + '_.p', 'rb'))
+                ('../results/region_results_dc_region_all_ohne_ibb_und_mett_2005_0.80_' + str(i) + '_.p', 'rb'))
         results = np.vstack((results,
                 [i, (res_single_regions['storage_cap_' + str(combinations[i][1])] +
                      res_single_regions['storage_cap_' + str(combinations[i][2])]),
@@ -66,8 +75,9 @@ def scatter_plot(combinations):
     main_color = '#7f7f7f'
     colors = []
 
-    plt.scatter(results_MWh[:, 1], results_MWh[:, 2])
-    plt.plot([0, results_MWh.max()], [0, results_MWh.max()], 'r-')
+    plt.scatter(results_MWh[:, 1], results_MWh[:, 2], color='#6A51A3')
+    # plt.scatter(results_MWh[:, 1], results_MWh[:, 2], color='#C4BD97')
+    plt.plot([0, results_MWh.max()], [0, results_MWh.max()], 'k-')
     plt.axis([-10, results_MWh.max()+10, -10, results_MWh.max()+10])
     plt.xlabel('Speicherkapazität in MWh \n (Summe 2 Teilregionen)', size=28, color=diagram_color)
     plt.ylabel('Speicherkapazität in MWh \n (Vernetzung 2 Teilregionen)', size=28, color=diagram_color)
@@ -75,6 +85,8 @@ def scatter_plot(combinations):
 
     plt.xticks([0, 20, 40, 60, 80, 100, 120], fontsize=28, color=diagram_color)
     plt.yticks([0, 20, 40, 60, 80, 100, 120], fontsize=28, color=diagram_color)
+    # plt.xticks([0, 50, 100, 150, 200, 250, 300], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 50, 100, 150, 200, 250, 300], fontsize=28, color=diagram_color)
 
     plt.tight_layout()
     ax.spines['top'].set_visible(False)

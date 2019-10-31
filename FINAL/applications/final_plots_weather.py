@@ -21,6 +21,7 @@ Options:
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import os
 from docopt import docopt
 
@@ -514,7 +515,7 @@ def dot_plot_storage(results_storage):
 
     plt.xlim([0.68, 0.92])
     # plt.ylim([0, 11])
-    plt.ylim([0, 21])
+    # plt.ylim([0, 21])
 
     plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90])
     ax.set_xticklabels(['0,70', '0,75', '0,80', '0,85', '0,90'], fontsize=28, color=diagram_color)
@@ -598,7 +599,7 @@ def dot_plot_wind_pv(results_wind_pv):
     plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90])
     ax.set_xticklabels(['0,70', '0,75', '0,80', '0,85', '0,90'], fontsize=28, color=diagram_color)
     # plt.yticks([0, 10, 20, 30, 40], fontsize=28, color=diagram_color)
-    plt.yticks([0, 1000, 2000, 3000, 4000, 5000], fontsize=28, color=diagram_color)/EIN_SPEICHER
+    plt.yticks([0, 1000, 2000, 3000, 4000, 5000], fontsize=28, color=diagram_color)
     plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
     # plt.ylabel('Speicherkapazität in GWh', fontsize=28, color=diagram_color)
     plt.ylabel('Installierte Leistung in MW', fontsize=28, color=diagram_color)
@@ -613,23 +614,126 @@ def dot_plot_wind_pv(results_wind_pv):
 
     return fig
 
-def dot_plot_excess_and_grid_energy(results_excess, results_grid):
+
+def hist_plot_wind_pv(results_wind_pv):
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = plt.subplot()
+
+    lw = 3
+    diagram_color = 'black'
+    main_color = '#7f7f7f'
+    colors = []
+
+    df_wind_80 = pd.DataFrame(columns=['wind_80'])
+    df_wind_90 = pd.DataFrame(columns=['wind_90'])
+    df_pv_80 = pd.DataFrame(columns=['pv_80'])
+    df_pv_90 = pd.DataFrame(columns=['pv_90'])
 
     for i in np.arange(17):
-        fig = plt.figure(1)
-        plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-                results_excess[i][:], 'bo')
-        plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-                results_grid[i][:], 'ro')
-    # plt.axis([0.68, 0.92,
-        # results_excess.min(), results_excess.max() + 1])
-    plt.legend(['Excess', 'Import'], loc='upper left', prop={'size': 18})
+        df_wind_80 = df_wind_80.append({'wind_80': results_wind_pv['wind'][i][2]}, ignore_index=True)
 
-    plt.yticks([0, 2000, 4000, 6000, 8000, 10000])
-    plt.xlabel('Self-sufficiency degree', size=18)
-    plt.ylabel('Excess and import energy in GWh', size=18)
-    plt.rcParams.update({'font.size': 18})
+    for i in np.arange(17):
+        df_wind_90 = df_wind_90.append({'wind_90': results_wind_pv['wind'][i][4]}, ignore_index=True)
+
+    for i in np.arange(17):
+        df_pv_80 = df_pv_80.append({'pv_80': results_wind_pv['pv'][i][2]}, ignore_index=True)
+
+    for i in np.arange(17):
+        df_pv_90 = df_pv_90.append({'pv_90': results_wind_pv['pv'][i][4]}, ignore_index=True)
+
+    df_wind_80.hist(bins=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000])
+    df_wind_90.hist(bins=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000])
+    df_pv_80.hist(bins=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000])
+    df_pv_90.hist(bins=[0, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000, 3250, 3500, 3750, 4000, 4250, 4500, 4750, 5000])
+
+#########################################################
     plt.tight_layout()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color(main_color)
+    ax.spines['bottom'].set_color(main_color)
+
+    plt.show()
+#########################################################
+
+    return fig
+
+def dot_plot_excess_and_grid_energy(results_excess, results_grid):
+
+    fig = plt.figure(figsize=(12, 8))
+    ax = plt.subplot()
+
+    lw = 3
+    diagram_color = 'black'
+    main_color = '#7f7f7f'
+    colors = []
+
+    line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                      results_excess[0][:],
+                      linestyle='',
+                      marker='o',
+                      markersize=16,
+                      markeredgecolor=main_color,
+                      markeredgewidth=3,
+                      markerfacecolor='None',
+                      label='Überschuss')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                      results_grid[0][:],
+                      linestyle='',
+                      marker='o',
+                      markersize=16,
+                      markeredgecolor='#FF5050',
+                      markeredgewidth=3,
+                      markerfacecolor='None',
+                      label='Import')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
+    leg._legend_box.align = 'left'
+    # leg.set_title('Masterplanregion', prop={'size': 28})
+    for color,text in zip(colors,leg.get_texts()):
+      # for text in leg.get_texts():
+            text.set_color(color)
+
+    for i in np.arange(16):
+        line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                         results_excess[i+1][:],
+                         linestyle='',
+                         marker='o',
+                         markersize=16,
+                         markeredgecolor=main_color,
+                         markeredgewidth=3,
+                         markerfacecolor='None')
+
+        line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                         results_grid[i+1][:],
+                         linestyle='',
+                         marker='o',
+                         markersize=16,
+                         markeredgecolor='#FF5050',
+                         markeredgewidth=3,
+                         markerfacecolor='None')
+
+    plt.xlim([0.68, 0.92])
+    # plt.ylim([0, 11])
+    # plt.ylim([0, 21])
+
+    plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90])
+    ax.set_xticklabels(['0,70', '0,75', '0,80', '0,85', '0,90'], fontsize=28, color=diagram_color)
+    # plt.yticks([0, 10, 20, 30, 40], fontsize=28, color=diagram_color)
+    plt.yticks([0, 2000, 4000, 6000, 8000, 10000], fontsize=28, color=diagram_color)
+    plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    # plt.ylabel('Speicherkapazität in GWh', fontsize=28, color=diagram_color)
+    plt.ylabel('Überschuss- und Importenergie in GWh', fontsize=28, color=diagram_color)
+
+    plt.tight_layout()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color(main_color)
+    ax.spines['bottom'].set_color(main_color)
 
     plt.show()
 
@@ -638,22 +742,57 @@ def dot_plot_excess_and_grid_energy(results_excess, results_grid):
 
 def dot_plot_grid_power(results_grid_max):
 
-    for i in np.arange(17):
-        fig = plt.figure(1)
-        plt.plot([0.70, 0.75, 0.80, 0.85, 0.90],
-                results_grid_max[i][:], 'ro')
-    # plt.axis([0.68, 0.92,
-        # results_excess.min(), results_excess.max() + 1])
-    # plt.legend(['Importleistung'], loc='upper left', prop={'size': 18})
+    fig = plt.figure(figsize=(12, 8))
+    ax = plt.subplot()
 
-    # plt.ylim([500, 850])
-    # plt.yticks([500, 600, 700, 800])
-    plt.ylim([0, 38000])
-    plt.yticks([0, 10000, 20000, 30000])
-    plt.xlabel('Self-sufficiency degree', size=18)
-    plt.ylabel('Max. Importleistung in MW', size=18)
-    plt.rcParams.update({'font.size': 18})
+    lw = 3
+    diagram_color = 'black'
+    main_color = '#7f7f7f'
+    colors = []
+
+    line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                      results_grid_max[0][:],
+                      linestyle='',
+                      marker='o',
+                      markersize=16,
+                      markeredgecolor='#FF5050',
+                      markeredgewidth=3,
+                      markerfacecolor='None',
+                      label='Max. Importleistung')
+    colors.append(plt.getp(line,'markeredgecolor'))
+
+    # leg = plt.legend(loc='upper left', frameon=False, prop={'size': 28})
+    # leg._legend_box.align = 'left'
+    # # leg.set_title('Masterplanregion', prop={'size': 28})
+    # for color,text in zip(colors,leg.get_texts()):
+    #   # for text in leg.get_texts():
+    #         text.set_color(color)
+
+    for i in np.arange(16):
+        line, = ax.plot([0.70, 0.75, 0.80, 0.85, 0.90],
+                         results_grid_max[i+1][:],
+                         linestyle='',
+                         marker='o',
+                         markersize=16,
+                         markeredgecolor='#FF5050',
+                         markeredgewidth=3,
+                         markerfacecolor='None')
+
+    plt.xlim([0.68, 0.92])
+    plt.ylim([500, 850])
+
+    plt.xticks([0.70, 0.75, 0.80, 0.85, 0.90])
+    ax.set_xticklabels(['0,70', '0,75', '0,80', '0,85', '0,90'], fontsize=28, color=diagram_color)
+    plt.yticks([500, 600, 700, 800], fontsize=28, color=diagram_color)
+    plt.xlabel('Autarkiegrad', fontsize=28, color=diagram_color)
+    # plt.ylabel('Speicherkapazität in GWh', fontsize=28, color=diagram_color)
+    plt.ylabel('Max. Importleistung in MW', fontsize=28, color=diagram_color)
+
     plt.tight_layout()
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_color(main_color)
+    ax.spines['bottom'].set_color(main_color)
 
     plt.show()
 
@@ -665,11 +804,50 @@ if __name__ == '__main__':
     print(arguments)
     # results_storage = read_results_storage()
     (results_excess, results_grid, results_grid_max) = read_results_excess_grid()
-    results_wind_pv = read_results_wind_pv()
+    # results_wind_pv = read_results_wind_pv()
     # fig = dot_plot_storage(results_storage)
-    fig_2 = dot_plot_excess_and_grid_energy(results_excess, results_grid)
-    fig_3 = dot_plot_grid_power(results_grid_max)
-    fig = dot_plot_wind_pv(results_wind_pv)
+    # fig = dot_plot_excess_and_grid_energy(results_excess, results_grid)
+    fig = dot_plot_grid_power(results_grid_max)
+    # fig = dot_plot_wind_pv(results_wind_pv)
+    # fig = hist_plot_wind_pv(results_wind_pv)
+
+    # df_storage_2030_80 = pd.DataFrame(columns=['storage_2030_80'])
+    # df_storage_2030_90 = pd.DataFrame(columns=['storage_2030_90'])
+
+    # df_storage_2050_80 = pd.DataFrame(columns=['storage_2050_80'])
+    # df_storage_2050_90 = pd.DataFrame(columns=['storage_2050_90'])
+
+    # df_storage_ko_80 = pd.DataFrame(columns=['storage_ko_80'])
+    # df_storage_ko_90 = pd.DataFrame(columns=['storage_ko_90'])
+
+    # for i in np.arange(17):
+    #     df_storage_2030_80 = df_storage_2030_80.append({'storage_2030_80': results_storage['2030'][i][2]}, ignore_index=True)
+
+    # for i in np.arange(17):
+    #     df_storage_2030_90 = df_storage_2030_90.append({'storage_2030_90': results_storage['2030'][i][4]}, ignore_index=True)
+
+    # for i in np.arange(17):
+    #     df_storage_2050_80 = df_storage_2050_80.append({'storage_2050_80': results_storage['2050'][i][2]}, ignore_index=True)
+
+    # for i in np.arange(17):
+    #     df_storage_2050_90 = df_storage_2050_90.append({'storage_2050_90': results_storage['2050'][i][4]}, ignore_index=True)
+
+    # for i in np.arange(17):
+    #     df_storage_ko_80 = df_storage_ko_80.append({'storage_ko_80': results_storage['costopt'][i][2]}, ignore_index=True)
+
+    # for i in np.arange(17):
+    #     df_storage_ko_90 = df_storage_ko_90.append({'storage_ko_90': results_storage['costopt'][i][4]}, ignore_index=True)
+
+    # dataframe = df_storage_2050_90
+
+    # print(dataframe)
+    # print('mean', dataframe.mean(0))
+    # # print('std', dataframe.std(0))
+    # print('min', dataframe.min(0))
+    # # print('quantile_25', dataframe.quantile(0.25))
+    # print('median', dataframe.median(0))
+    # # print('quantile_75', dataframe.quantile(0.75))
+    # print('max', dataframe.max(0))
 
     if arguments['--save']:
         fig.savefig(os.path.join(os.path.dirname(__file__)) +

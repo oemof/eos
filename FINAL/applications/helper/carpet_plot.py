@@ -95,11 +95,15 @@ class Line:
             colors.append(plt.getp(line,'color'))
         if kwargs.get('residual_1') is not None:
             line, = ax.plot(np.arange(0, 8760), kwargs.get('residual_1'),
-                    color=main_color,
+                    # color=main_color,
+                    color='000000',
                     # color='#a6a6a6',
+                    # color='#558ed5',
                     linestyle='-',
                     linewidth=lw,
-                    label='Stadt Osnabrück')
+                    # label='Windenergie')
+                    label='Osnabrück')
+                    # label='Stadt Osnabrück')
                     # label='City of Osnabrück')
                     # label='LKOS + Stadt Osnabrück')
                     # label='2020')
@@ -107,25 +111,28 @@ class Line:
             colors.append(plt.getp(line,'color'))
         if kwargs.get('residual_2') is not None:
             line, = ax.plot(np.arange(0, 8760), kwargs.get('residual_2'),
-                    color='#da467d',
+                    # color='#da467d',
                     # color='#99cc00',
-                    # color='black',
+                    color='000000',
                     # color='goldenrod',
-                    linestyle='-',
+                    # color='#ffc000',
+                    linestyle='--',
                     linewidth=lw,
+                    label='Ibbenbüren')
+                    # label='Photovoltaik')
                     # label='2030')
                     # label='Vernetzung mit LKOS')
                     # label='Cross-linking with LKOS')
                     # label='Cross-linking with City of Osnabrück 2030')
-                    label='Landkreis Osnabrück')
+                    # label='Landkreis Osnabrück')
                     # label='Stadt Osnabrück 2020')
                     #label=kwargs.get('label_res_1'))
             colors.append(plt.getp(line,'color'))
         if kwargs.get('residual_3') is not None:
             line, = ax.plot(np.arange(0, 8760), kwargs.get('residual_3'),
                     # color='black',
-                    color='#99cc00',
-                    # color=main_color,
+                    # color='#99cc00',
+                    color=main_color,
                     # color='darkblue',
                     linestyle='-',
                     # linestyle='-.',
@@ -133,7 +140,8 @@ class Line:
                     # label='Landkreis Osnabrück 2040')
                     # label='Cross-linking with LKOS and KRST')
                     # label='Vernetzung mit LKOS und KRST')
-                    label='Kreis Steinfurt')
+                    label='Rheine')
+                    # label='Kreis Steinfurt')
                     # label='2040')
                     # label=kwargs.get('label_res_3'))
             colors.append(plt.getp(line,'color'))
@@ -144,11 +152,12 @@ class Line:
                     # color='midnightblue',
                     # color='saddlebrown',
                     # color='skyblue',
-                    linestyle=':',
+                    linestyle='--',
                     # linestyle='-',
                     linewidth=3,
                     # label='Cross-linking with City of Osnabrück 2030')
-                    label='2050')
+                    # label='2050')
+                    label='Steinfurt')
                     # label='Stadt Osnabrück 2050')
                     # label=kwargs.get('label_res_3'))
             colors.append(plt.getp(line,'color'))
@@ -164,7 +173,9 @@ class Line:
         plt.xticks([0, 2000, 4000, 6000, 8000], fontsize=28, color=diagram_color)
         #plt.yticks([0, 200, 400, 600, 800], fontsize=28, color=diagram_color)
         # plt.yticks([-1500, -1000, -500, 0, 500], fontsize=28, color=diagram_color)
-        plt.yticks([-2500, -2000, -1500, -1000, -500, 0, 500], fontsize=28, color=diagram_color)
+        # plt.yticks([0, 500, 1000, 1500], fontsize=28, color=diagram_color)
+        plt.yticks([- 400, -300, -200, -100, 0, 100], fontsize=28, color=diagram_color)
+        # plt.yticks([-2500, -2000, -1500, -1000, -500, 0, 500], fontsize=28, color=diagram_color)
         # plt.yticks([-2000, -1500, -1000, -500, 0, 500, 1000])
         # plt.ylim(-2500, +1000),  # plt.yticks([])
         # plt.ylim(-410, +210),  # plt.yticks([])
@@ -172,6 +183,7 @@ class Line:
         # plt.legend(kwargs.keys())
 
         # leg = plt.legend(loc='lower left', frameon=False, prop={'size': 24})
+        # leg = plt.legend(loc='lower left', frameon=False, prop={'size': 28})
         leg = plt.legend(loc='lower left', frameon=False, prop={'size': 28})
         leg._legend_box.align = 'left'
         # leg.set_title('Kreis Steinfurt', prop={'size': 28})
