@@ -1,9 +1,0 @@
-,capex,lifetime,wacc,opex_fix,opex_var
-wind,1000,20,0.05,15,0
-pv,1000,20,0.05,20,0
-storage,1000,20,0.05,35,0
-biogas_bhkw,650,20,0.028,20,0
-grid,0,0,0,0,0.3
-sc,0,0,0,0,0.0
-fit,0,0,0,0,0.0
-

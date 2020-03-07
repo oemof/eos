@@ -1,7 +1,0 @@
-param,1
-region_name,Greven
-pv_field_MW,16.1
-pv_roof_MW,69.6
-pv_MW,85.7
-wind_MW,62
-annual_demand_GWh,205.645

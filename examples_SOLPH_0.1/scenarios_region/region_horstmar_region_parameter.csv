@@ -1,7 +1,0 @@
-param,1
-region_name,Horstmar
-pv_field_MW,0.6
-pv_roof_MW,49.5
-pv_MW,50.1
-wind_MW,67
-annual_demand_GWh,19.128

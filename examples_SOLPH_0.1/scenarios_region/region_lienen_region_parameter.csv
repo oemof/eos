@@ -1,7 +1,0 @@
-param,1
-region_name,Lienen
-pv_field_MW,10.8
-pv_roof_MW,19.1
-pv_MW,29.9
-wind_MW,7
-annual_demand_GWh,41.359

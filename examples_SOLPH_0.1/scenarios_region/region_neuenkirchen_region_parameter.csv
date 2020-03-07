@@ -1,7 +1,0 @@
-param,1
-region_name,Neuenkirchen
-pv_field_MW,2
-pv_roof_MW,28.1
-pv_MW,30
-wind_MW,38
-annual_demand_GWh,78.688

@@ -1,5 +1,0 @@
-,eta_in,eta_out,cap_loss,c_rate,max_feedin,capacity_min,capacity_max
-storage,1,0.8,0,1,0,0,1
-storage_short,1,0.8,0,1,0,0,1
-storage_long,0.01,0.35,0,1,0,0,1
-pv,0,0,0,0,0.5,0,0
